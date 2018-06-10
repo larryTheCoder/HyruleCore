@@ -16,6 +16,10 @@ panel:
   cloak-remove: "§cRemove current cloak"
   cloak-selected: "§aSelected cloak: {CLOAK}"
 
+interface:
+  select-kit: "&aSelect this kit"
+  buy-kit: "&eBuy this kit."
+
 # Broadcast system is here
 broadcast:
 - "§aWant to Purchase a §6[VIP] §ato help this Server? Buy at §7hyruleloja.esy.es"
