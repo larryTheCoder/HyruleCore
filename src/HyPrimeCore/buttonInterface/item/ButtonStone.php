@@ -31,30 +31,21 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace HyPrimeCore\kits\KitInterface\menu;
+namespace HyPrimeCore\buttonInterface\item;
 
+class ButtonStone extends Button {
 
-use pocketmine\Player;
+    protected $id = self::STONE_BUTTON;
 
-class CloakMenu extends Menu {
-
-    /** @var int[] */
-    private $player = [];
-    /** @var string[] */
-    private $types = ["Firerings", "Firewings", "Frosty", "Superhero", "Scanner", "Shaman"];
-
-    public function __construct() {
-
+    public function getName(): string {
+        return "Stone Button";
     }
 
-    public function getInteractId() {
-        return self::INTERACT_CLOAK_MENU;
+    public function getHardness(): float {
+        return 1000000;
     }
 
-    public function getNextMenu(Player $p) {
-        if (!isset($this->player[$p->getName()])) {
-            return;
-        }
-        
+    public function getType(): string {
+        return "Stone";
     }
 }

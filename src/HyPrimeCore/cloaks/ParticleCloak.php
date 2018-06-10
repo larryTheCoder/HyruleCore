@@ -53,15 +53,17 @@ abstract class ParticleCloak {
     private $task;
 
     public function __construct(Player $player, int $delay, int $data) {
-        if (!$player->hasPermission($this->getPermissionNode())) {
-            $player->sendMessage(CoreMain::get()->getMessage($player, 'error.buy-site'));
-            return;
-        }
-        $this->moving = false;
-        $this->data = $data;
         $this->player = $player;
-        $this->task = Server::getInstance()->getScheduler()->scheduleRepeatingTask(new CloakTask($this), $delay);
-        $this->listener = new CloakListener($this);
+        if ($this->player !== null) {
+            if (!$player->hasPermission($this->getPermissionNode())) {
+                $player->sendMessage(CoreMain::get()->getMessage($player, 'error.buy-site'));
+                return;
+            }
+            $this->moving = false;
+            $this->data = $data;
+            $this->task = Server::getInstance()->getScheduler()->scheduleRepeatingTask(new CloakTask($this), $delay);
+            $this->listener = new CloakListener($this);
+        }
     }
 
     public abstract function getPermissionNode(): string;

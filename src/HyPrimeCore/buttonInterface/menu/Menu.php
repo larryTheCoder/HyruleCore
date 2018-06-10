@@ -31,8 +31,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace HyPrimeCore\kits\KitInterface\menu;
+namespace HyPrimeCore\buttonInterface\menu;
 
+
+use pocketmine\Player;
 
 abstract class Menu {
 
@@ -40,5 +42,43 @@ abstract class Menu {
     const INTERACT_KIT_MENU = 1;
     const INTERACT_CAGES_MENU = 2;
 
-    public abstract function getInteractId();
+    public abstract function getInteractId(): int;
+
+    /**
+     * Get the next menu for player
+     *
+     * @param Player $p
+     * @return string[]
+     */
+    public abstract function getNextMenu(Player $p): array;
+
+    /**
+     * Get the previous menu for player
+     *
+     * @param Player $p
+     * @return string[]
+     */
+    public abstract function getPrevMenu(Player $p): array;
+
+    /**
+     * Executed when a player clicks on the menu
+     *
+     * @param Player $p
+     */
+    public abstract function onSelectedMenu(Player $p);
+
+    /**
+     * Player returned to home or main menu
+     *
+     * @param Player $p
+     */
+    public abstract function onReturnMenu(Player $p);
+
+    /**
+     * Executed when a player select the button
+     *
+     * @param Player $p
+     */
+    public abstract function onPlayerSelect(Player $p);
+
 }

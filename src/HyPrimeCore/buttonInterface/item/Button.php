@@ -31,7 +31,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace HyPrimeCore\kits\KitInterface\item;
+namespace HyPrimeCore\buttonInterface\item;
 
 use HyPrimeCore\event\ButtonPushEvent;
 use pocketmine\block\Block;

@@ -34,8 +34,8 @@
 namespace HyPrimeCore\kits;
 
 
+use HyPrimeCore\buttonInterface\item\ButtonStone;
 use HyPrimeCore\CoreMain;
-use HyPrimeCore\kits\KitInterface\item\ButtonStone;
 use HyPrimeCore\kits\types\NormalKit;
 use HyPrimeCore\utils\Utils;
 use larryTheCoder\SkyWarsPE;
