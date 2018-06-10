@@ -1,0 +1,27 @@
+###########################################################################################
+# This is a YML file. Be careful when editing. Check your edits in a YAML checker like    #
+# the one at http://yaml-online-parser.appspot.com                                        #
+###########################################################################################
+---
+
+error:
+ no-permission: "§cVocê não tem permissão para usar isso."
+ buy-site: "§eVocê precisa comprar isso no nosso site"
+
+# Panel configuration ONLY
+panel:
+  panel-cancelled: "§cSua solicitação foi cancelada."
+  cloak-about: "§aCloak é sobre partículas, há muitas partículas que você deve tentar. Você deve tentar verificar todos os dias para novo cloak! Você pode precisar comprá-los em nossa loja."
+  cloak-title: "§cEscolha o seu cloak"
+  cloak-remove: "§cRemover atual cloak"
+  cloak-selected: "§aManto Selecionado: {CLOAK}"
+
+# Broadcast system is here
+broadcast:
+ - "§eQuer Adiquirir um §6[VIP] §ePara Ajudar o Server? Compre Em §7hyruleloja.esy.es"
+ - "§eTwitter do Servidor §c@HyruleNetwork69 §cTire Suas Duvidas lá.."
+ - "§eNão Há Vagas na Staff, Caso Contrário se Ficar Pedindo Levará §cBAN."
+ - "§eServidor em §cBETA , §eViu Algum BUG?, §eNão Hesite em Reportar em Nosso Twitter : §c@HyruleNetwork69!"
+ - "§eServidor Foi §cResetado, Todos Kits, Coins, Tag Foram Resetados!"
+ - "§eDiscord do Servidor https://discord.gg/Cu9yZRs"
+ - "§eTag YT com 1.250 inscritos §e + Video(No Minimo 500 views), Tag MiniYT com 500 inscritos §e + Video (No Minimo 100 Views).. §7Tendo esses Requisitos Contate-nos no §bTwitter:§c@HyruleNetwork69"

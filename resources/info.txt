@@ -1,0 +1,142 @@
+Language Name	Language Code	WordPress Locale Code
+Afrikaans	af	af
+Akan	ak	ak
+Albanian	sq	sq
+Amharic	am	am
+Arabic	ar	ar
+Armenian	hy	hy
+Aromanian	rup	rup_MK
+Assamese	as	as
+Azerbaijani	az	az
+Azerbaijani (Turkey)	az-tr	az_TR
+Bashkir	ba	ba
+Basque	eu	eu
+Belarusian	bel	bel
+Bengali	bn	bn_BD
+Bosnian	bs	bs_BA
+Bulgarian	bg	bg_BG
+Burmese	mya	my_MM
+Catalan	ca	ca
+Catalan (Balear)	bal	bal
+Chinese (China)	zh-cn	zh_CN
+Chinese (Hong Kong)	zh-hk	zh_HK
+Chinese (Taiwan)	zh-tw	zh_TW
+Corsican	co	co
+Croatian	hr	hr
+Czech	cs	cs_CZ
+Danish	da	da_DK
+Dhivehi	dv	dv
+Dutch	nl	nl_NL
+Dutch (Belgium)	nl-be	nl_BE
+English	en	en_US
+English (Australia)	en-au	en_AU
+English (Canada)	en-ca	en_CA
+English (UK)	en-gb	en_GB
+Esperanto	eo	eo
+Estonian	et	et
+Faroese	fo	fo
+Finnish	fi	fi
+French (Belgium)	fr-be	fr_BE
+French (France)	fr	fr_FR
+Frisian	fy	fy
+Fulah	fuc	fuc
+Galician	gl	gl_ES
+Georgian	ka	ka_GE
+German	de	de_DE
+German (Switzerland)	de-ch	de_CH
+Greek	el	el
+Guaraní	gn	gn
+Gujarati	gu	gu_IN
+Hawaiian	haw	haw_US
+Hazaragi	haz	haz
+Hebrew	he	he_IL
+Hindi	hi	hi_IN
+Hungarian	hu	hu_HU
+Icelandic	is	is_IS
+Ido	ido	ido
+Indonesian	id	id_ID
+Irish	ga	ga
+Italian	it	it_IT
+Japanese	ja	ja
+Javanese	jv	jv_ID
+Kannada	kn	kn
+Kazakh	kk	kk
+Khmer	km	km
+Kinyarwanda	kin	kin
+Kirghiz	ky	ky_KY
+Korean	ko	ko_KR
+Kurdish (Sorani)	ckb	ckb
+Lao	lo	lo
+Latvian	lv	lv
+Limburgish	li	li
+Lingala	lin	lin
+Lithuanian	lt	lt_LT
+Luxembourgish	lb	lb_LU
+Macedonian	mk	mk_MK
+Malagasy	mg	mg_MG
+Malay	ms	ms_MY
+Malayalam	ml	ml_IN
+Marathi	mr	mr
+Mingrelian	xmf	xmf
+Mongolian	mn	mn
+Montenegrin	me	me_ME
+Nepali	ne	ne_NP
+Norwegian (Bokmål)	nb	nb_NO
+Norwegian (Nynorsk)	nn	nn_NO
+Oriya	ory	ory
+Ossetic	os	os
+Pashto	ps	ps
+Persian	fa	fa_IR
+Persian (Afghanistan)	fa-af	fa_AF
+Polish	pl	pl_PL
+Portuguese (Brazil)	pt-br	pt_BR
+Portuguese (Portugal)	pt	pt_PT
+Punjabi	pa	pa_IN
+Rohingya	rhg	rhg
+Romanian	ro	ro_RO
+Russian	ru	ru_RU
+Russian (Ukraine)	ru-ua	ru_UA
+Rusyn	rue	rue
+Sakha	sah	sah
+Sanskrit	sa-in	sa_IN
+Sardinian	srd	srd
+Scottish Gaelic	gd	gd
+Serbian	sr	sr_RS
+Sindhi	sd	sd_PK
+Sinhala	si	si_LK
+Slovak	sk	sk_SK
+Slovenian	sl	sl_SI
+Somali	so	so_SO
+South Azerbaijani	azb	azb
+Spanish (Argentina)	es-ar	es_AR
+Spanish (Chile)	es-cl	es_CL
+Spanish (Colombia)	es-co	es_CO
+Spanish (Mexico)	es-mx	es_MX
+Spanish (Peru)	es-pe	es_PE
+Spanish (Puerto Rico)	es-pr	es_PR
+Spanish (Spain)	es	es_ES
+Spanish (Venezuela)	es-ve	es_VE
+Sundanese	su	su_ID
+Swahili	sw	sw
+Swedish	sv	sv_SE
+Swiss German	gsw	gsw
+Tagalog	tl	tl
+Tajik	tg	tg
+Tamazight (Central Atlas)	tzm	tzm
+Tamil	ta	ta_IN
+Tamil (Sri Lanka)	ta-lk	ta_LK
+Tatar	tt	tt_RU
+Telugu	te	te
+Thai	th	th
+Tibetan	bo	bo
+Tigrinya	tir	tir
+Turkish	tr	tr_TR
+Turkmen	tuk	tuk
+Uighur	ug	ug_CN
+Ukrainian	uk	uk
+Urdu	ur	ur
+Uzbek	uz	uz_UZ
+Vietnamese	vi	vi
+Walloon	wa	wa
+Welsh	cy	cy
+Yoruba	yor	yor

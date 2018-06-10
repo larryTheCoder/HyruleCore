@@ -1,0 +1,48 @@
+###########################################################################################
+# This is a YML file. Be careful when editing. Check your edits in a YAML checker like    #
+# the one at http://yaml-online-parser.appspot.com                                        #
+###########################################################################################
+---
+# Config version
+# Will be updated frequently, please make
+# Sure you saved all the changes
+config-version: 2
+
+# general settings for this CORE
+general:
+  # Everything must have prefix and suffix.
+  # Here you can change the prefix of some texts
+  # Use `&` for `§`
+  prefix: '§7[§eH§7] &a'
+
+# Everything regarding chat
+chat:
+  # Here you can control every aspect of your server
+  # And support PurePerms and PureChat
+  # {TAG-OS}: The tag for the type of OS
+  # {TAG-NAME}: The player name
+  # {TAG-CHAT}: The player chat/message
+  chat-tag: "§d[{TAG-OS}] §e{TAG-NAME}: §7{TAG-CHAT}"
+  # Stop all offensive words from the server
+  # Some chat will be not shown due to protocol
+  # in minecraft client, but this is just a `block` the player
+  # message in case they use offensive words
+  offensive-block: true
+
+# Everything related to broadcasts
+broadcast:
+  # Message interval in seconds
+  # This will delays message every X seconds
+  message-interval: 20
+  # Message with prefix
+  # This node functions to use Prefix
+  # Set by this config
+  message-prefix: true
+  # Randomize the broadcast
+  # This is good because player don't
+  # want the same and same message
+  message-randomize: false
+  # This node is just to send player login message
+  # NO ITS NOT BROADCAST TO PUBLIC
+  # Its just login-message to player
+  login-broadcast: false

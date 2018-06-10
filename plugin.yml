@@ -1,0 +1,47 @@
+name: HyPrimeCore
+main: HyPrimeCore\CoreMain
+version: "1.0-REV#201-394-675d"
+api: [3.0.0-ALPHA7, 3.0.0-ALPHA8, 3.0.0-ALPHA9, 3.0.0-ALPHA10, 3.0.0-ALPHA11, 3.0.0-ALPHA12]
+author: ["larryTheCoder"]
+softdepends: ['PocketVote', 'SkyWarsForPE']
+
+commands:
+  cloak:
+    description: "The main cloak particle command"
+    default: true
+  fly:
+    description: "Ability to fly on air"
+    default: true
+    permission: "ability.fly"
+  about:
+    desription: "What up with our server"
+    default: true
+
+permissions:
+  ability.fly:
+    description: "Ability to fly on air"
+    default: op
+  core.cloak.firerings:
+    desription: "Firerings particle for all"
+    default: op
+  core.cloak.firewings:
+    desription: "Firewings particle for all"
+    default: op
+  core.cloak.frosty:
+    desription: "Frosty particle for all"
+    default: op
+  core.cloak.scanner:
+    desription: "Scanner particle for all"
+    default: op
+  core.cloak.shaman:
+    desription: "Shaman particle for all"
+    default: op
+  core.cloak.superhero:
+    desription: "Superhero particle for all"
+    default: op
+
+
+
+
+
+
