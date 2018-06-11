@@ -71,7 +71,7 @@ abstract class Button extends Flowable {
 
     public function onActivate(Item $item, Player $player = null): bool {
         if (!is_null($player)) {
-            $event = new ButtonPushEvent($player);
+            $event = new ButtonPushEvent($player, $this);
             Server::getInstance()->getPluginManager()->callEvent($event);
         }
         $this->setDamage($this->getDamage() ^ 0x08);

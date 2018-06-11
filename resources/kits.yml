@@ -14,6 +14,7 @@ interface:
   button-prev: '301:98:28:world'
   button-choose: '301:98:32:world'
   button-next: '301:98:35:world'
+  button-back: '301:96:32:world'
 
 # This is a kit file
 kits:

@@ -33,8 +33,8 @@
 
 namespace HyPrimeCore\event;
 
-
 use pocketmine\event\Event;
+use pocketmine\level\Position;
 use pocketmine\Player;
 
 /**
@@ -44,14 +44,27 @@ use pocketmine\Player;
  * @package HyPrimeCore\event
  */
 class ButtonPushEvent extends Event {
+
     public static $handlerList = null;
     protected $player;
+    protected $pos;
 
-    public function __construct(Player $player) {
+    public function __construct(Player $player, Position $pos) {
         $this->player = $player;
+        $this->pos = $pos;
     }
 
+    /**
+     * @return Player
+     */
     public function getPlayer() {
         return $this->player;
+    }
+
+    /**
+     * @return Position
+     */
+    public function getPos(): Position {
+        return $this->pos;
     }
 }

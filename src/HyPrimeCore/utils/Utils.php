@@ -147,6 +147,22 @@ class Utils {
         Server::getInstance()->broadcastPacket($level->getPlayers(), $light);
     }
 
+    /**
+     * Decode a position form a string
+     *
+     * @param string $decodedPos
+     * @return null|Position
+     */
+    public static function parsePosition(string $decodedPos): ?Position {
+        $piece = explode(":", $decodedPos);
+        if (count($piece) !== 4) {
+            Utils::send("Attempted to decode a non-decoded-position");
+            return null;
+        }
+        $level = Server::getInstance()->getLevelByName($piece[3]);
+        return new Position($piece[0], $piece[1], $piece[2], $level);
+    }
+
     public static function loadFirst(string $levelName, bool $load = true) {
         Server::getInstance()->generateLevel($levelName);
         if ($load) {

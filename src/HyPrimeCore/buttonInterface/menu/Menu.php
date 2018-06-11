@@ -44,6 +44,32 @@ abstract class Menu {
 
     public abstract function getInteractId(): int;
 
+    public static function getMenuName(int $id): string {
+        switch ($id) {
+            case self::INTERACT_CLOAK_MENU:
+                return "Cloak Menu";
+            case self::INTERACT_KIT_MENU:
+                return "Kit Menu";
+            case self::INTERACT_CAGES_MENU:
+                return "Cages Menu";
+            default:
+                return "MEMBER OF ILLUMINATI";
+        }
+    }
+
+    public static function getMenu(int $id): ?Menu {
+        switch ($id) {
+            case self::INTERACT_CLOAK_MENU:
+                return new CloakMenu();
+            case self::INTERACT_KIT_MENU:
+                return new KitMenu();
+            case self::INTERACT_CAGES_MENU:
+                return new CageMenu();
+            default:
+                return null;
+        }
+    }
+
     /**
      * Get the next menu for player
      *

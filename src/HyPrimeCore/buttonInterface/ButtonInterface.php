@@ -33,33 +33,102 @@
 
 namespace HyPrimeCore\buttonInterface;
 
+use HyPrimeCore\buttonInterface\menu\CageMenu;
+use HyPrimeCore\buttonInterface\menu\CloakMenu;
+use HyPrimeCore\buttonInterface\menu\KitMenu;
+use HyPrimeCore\buttonInterface\menu\Menu;
 use HyPrimeCore\CoreMain;
 use HyPrimeCore\event\ButtonPushEvent;
 use HyPrimeCore\kits\KitInjectionModule;
+use HyPrimeCore\utils\Utils;
 use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerJoinEvent;
+use pocketmine\level\Location;
 use pocketmine\Player;
+use pocketmine\utils\Config;
 
 class ButtonInterface implements Listener {
 
-    /** @var Player[] */
-    private $users = [];
+    /** @var Menu[] */
+    private $menuType = []; // Choose a menu
     /** @var int[] */
+    private $currentPath = []; // The path of the menu (chosen and not chosen)
+    /** @var Menu[] */
     private $menu = [];
-    /** @var int[] */
-    private $tiers = [];
     /** @var KitInjectionModule */
     private $module;
+    /** @var Location */
+    private $buttonNext, $buttonSelect, $buttonPrev, $buttonBack;
+    /** @var Config */
+    private $kit;
 
     public function __construct(CoreMain $plugin, KitInjectionModule $module) {
         $plugin->getServer()->getPluginManager()->registerEvents($this, $plugin);
+        $this->kit = new Config($plugin->getDataFolder() . "kits.yml", Config::YAML);
         $this->module = $module;
+        $this->menu[] = new CageMenu();
+        $this->menu[] = new CloakMenu();
+        $this->menu[] = new KitMenu();
+        $this->buttonNext = Utils::parsePosition($this->kit->getNested('interface.button-next'));
+        $this->buttonSelect = Utils::parsePosition($this->kit->getNested('interface.button-choose'));
+        $this->buttonPrev = Utils::parsePosition($this->kit->getNested('interface.button-prev'));
+        $this->buttonBack = Utils::parsePosition($this->kit->getNested('interface.button-back'));
+    }
+
+    /**
+     * @param PlayerJoinEvent $ev
+     */
+    public function onPlayerJoin(PlayerJoinEvent $ev) {
+        $this->menuType[$ev->getPlayer()->getName()] = null;
+        $this->currentPath[$ev->getPlayer()->getName()] = Menu::INTERACT_CLOAK_MENU;
     }
 
     public function onButtonPush(ButtonPushEvent $event) {
         $p = $event->getPlayer();
-        if (!isset($this->users[$p->getPlayer()->getName()])) {
-            $tier = $this->tiers[$p->getPlayer()->getName()];
+        $menu = $this->menuType[$p->getName()];
+        $path = $this->currentPath[$p->getName()];
+        if ($menu === null) {
+            if ($event->getPos()->equals($this->buttonNext)) {
+                if ($path === 3) {
+                    $path = 0;
+                } else {
+                    $path++;
+                }
+            } else if ($event->getPos()->equals($this->buttonPrev)) {
+                if ($path === 0) {
+                    $path = 3;
+                } else {
+                    $path--;
+                }
+            } else if ($event->getPos()->equals($this->buttonSelect)) {
+                $menu = Menu::getMenu($path);
+                $menu->onSelectedMenu($p);
+                $this->menuType[$p->getName()] = $menu;
+            } else {
+                // Back button? Its useless buddy, what you gonna to back of?
+                return;
+            }
 
+            $this->currentPath[$p->getName()] = $path;
+            $this->updateText($p);
+            return;
         }
+        if ($event->getPos()->equals($this->buttonNext)) {
+            $menu->getNextMenu($p);
+        } else if ($event->getPos()->equals($this->buttonPrev)) {
+            $menu->getPrevMenu($p);
+        } else if ($event->getPos()->equals($this->buttonSelect)) {
+            $menu->onPlayerSelect($p);
+        } else {
+            $menu->onReturnMenu($p);
+            $this->menuType[$p->getName()] = null;
+            return;
+        }
+        $this->menuType[$p->getName()] = $menu;
+        $this->updateText($p);
+    }
+
+    private function updateText(Player $p) {
+
     }
 }

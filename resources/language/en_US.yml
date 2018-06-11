@@ -19,6 +19,7 @@ panel:
 interface:
   select-kit: "&aSelect this kit"
   buy-kit: "&eBuy this kit."
+  select-cage: "&aSelect this cage"
 
 # Broadcast system is here
 broadcast:
