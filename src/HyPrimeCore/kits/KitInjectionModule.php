@@ -71,7 +71,7 @@ class KitInjectionModule {
     }
 
     private function load() {
-        $this->plugin->saveResource("kits.yml", true);
+        $this->plugin->saveResource("kits.yml");
         $kit = new Config($this->plugin->getDataFolder() . "kits.yml", Config::YAML);
         $array = $kit->get("kits");
         if (!is_array($array)) {

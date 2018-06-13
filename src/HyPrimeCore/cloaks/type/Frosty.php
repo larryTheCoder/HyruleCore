@@ -33,8 +33,6 @@
 
 namespace HyPrimeCore\cloaks\type;
 
-
-use HyPrimeCore\cloaks\particle\FireworksParticle;
 use HyPrimeCore\cloaks\ParticleCloak;
 use HyPrimeCore\utils\Utils;
 use pocketmine\level\Location;
@@ -162,7 +160,7 @@ class Frosty extends ParticleCloak {
                         $loc->y = $defY;
                     }
                     for ($k = 0; $k < 3; ++$k) {
-                        $this->getPlayer()->getLevel()->addParticle(new FireworksParticle($newLoc, 46, 21, 34));
+                        $this->getPlayer()->getLevel()->addParticle(new GenericParticle($newLoc, 46));
                     }
                 }
                 $x += $space;

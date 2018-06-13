@@ -43,13 +43,11 @@ use HyPrimeCore\CoreMain;
 use HyPrimeCore\event\ButtonPushEvent;
 use HyPrimeCore\utils\Utils;
 use pocketmine\block\BlockFactory;
-use pocketmine\block\StoneButton;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\level\Location;
 use pocketmine\level\particle\FloatingTextParticle;
-use pocketmine\level\particle\Particle;
 use pocketmine\Player;
 use pocketmine\utils\Config;
 
@@ -147,7 +145,6 @@ class ButtonInterface implements Listener {
     }
 
     public function onButtonPush(ButtonPushEvent $event) {
-        echo "EVENT RUN\n";
         $p = $event->getPlayer();
         $menu = $this->menuType[$p->getName()];
         $path = $this->currentPath[$p->getName()];
@@ -195,48 +192,47 @@ class ButtonInterface implements Listener {
     private function updateText(Player $p) {
         if (!isset($this->defaultMessage[$p->getName()])) {
             // These are non update particles.
-            $p->getLevel()->addParticle(new FloatingTextParticle($this->buttonPrev, "", "§a§l<<"), [$p]);
-            $p->getLevel()->addParticle(new FloatingTextParticle($this->buttonNext, "", "§a§l>>"), [$p]);
-            $p->getLevel()->addParticle(new FloatingTextParticle($this->buttonSelect, "", "§eSelect"), [$p]);
-            $p->getLevel()->addParticle(new FloatingTextParticle($this->buttonBack, "", "§aBack"), [$p]);
-            $this->defaultMessage[$p->getName()] = true;
+            $p->getLevel()->addParticle($pk[] = new FloatingTextParticle($this->buttonPrev->add(0.5, 0, 0.5), "", "§a§l<<"), [$p]);
+            $p->getLevel()->addParticle($pk[] = new FloatingTextParticle($this->buttonNext->add(0.5, 0, 0.5), "", "§a§l>>"), [$p]);
+            $p->getLevel()->addParticle($pk[] = new FloatingTextParticle($this->buttonSelect->add(0.5, 0, 0.5), "", "§eSelect"), [$p]);
+            $p->getLevel()->addParticle($pk[] = new FloatingTextParticle($this->buttonBack->add(0.5, 0, 0.5), "", "§aBack"), [$p]);
+            $this->defaultMessage[$p->getName()] = $pk;
+        } else {
+            foreach ($this->defaultMessage[$p->getName()] as $item) {
+                $p->getLevel()->addParticle($item, [$p]);
+            }
         }
+        $pos1 = $this->buttonSelect->add(0.5, 1, 0.5);
         if ($this->menuType[$p->getName()] !== null) {
             $menu = $this->menuType[$p->getName()];
             // Data[0] = Item name / Kit name / Object Name
             // Data[1][0] = Bool / Object should have a coins.
             // Data[1][1] = int | string / depends on Bool
             $data = $menu->getMenuData();
-            $pos1 = $this->buttonSelect->add(0, 1, 0);
+
             if (!isset($this->textInteract[$p->getName()]['object-name'])) {
                 $particle1 = new FloatingTextParticle($pos1, "", "§a" . $data[0]);
-                $this->addPacketTo($p, $particle1);
+                $p->getLevel()->addParticle($particle1, [$p]);
                 $this->textInteract[$p->getName()]['object-name'] = $particle1;
             } else {
                 $particle1 = $this->textInteract[$p->getName()]['object-name'];
                 $particle1->setTitle("§a" . $data[0]);
-                $this->addPacketTo($p, $particle1);
+                $p->getLevel()->addParticle($particle1, [$p]);
                 $this->textInteract[$p->getName()]['object-name'] = $particle1;
             }
         } else {
             $path = $this->currentPath[$p->getName()];
             $menuType = Menu::getMenuName($path);
-            $pos1 = $this->buttonSelect->add(0, 1, 0);
             if (!isset($this->textInteract[$p->getName()]['object-name'])) {
                 $particle1 = new FloatingTextParticle($pos1, "", "§a" . $menuType);
-                $this->addPacketTo($p, $particle1);
+                $p->getLevel()->addParticle($particle1, [$p]);
                 $this->textInteract[$p->getName()]['object-name'] = $particle1;
             } else {
                 $particle1 = $this->textInteract[$p->getName()]['object-name'];
                 $particle1->setTitle("§a" . $menuType);
-                $this->addPacketTo($p, $particle1);
+                $p->getLevel()->addParticle($particle1, [$p]);
                 $this->textInteract[$p->getName()]['object-name'] = $particle1;
             }
         }
-    }
-
-    private function addPacketTo(Player $p, ?Particle $particle) {
-        echo "DOING FINE\n";
-        $p->getLevel()->addParticle($particle, [$p]);
     }
 }
