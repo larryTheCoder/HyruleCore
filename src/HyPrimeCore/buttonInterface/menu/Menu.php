@@ -87,24 +87,16 @@ abstract class Menu {
     public abstract function getPrevMenu(Player $p): array;
 
     /**
-     * Executed when a player clicks on the menu
-     *
-     * @param Player $p
-     */
-    public abstract function onSelectedMenu(Player $p);
-
-    /**
-     * Player returned to home or main menu
-     *
-     * @param Player $p
-     */
-    public abstract function onReturnMenu(Player $p);
-
-    /**
      * Executed when a player select the button
      *
      * @param Player $p
      */
     public abstract function onPlayerSelect(Player $p);
 
+    /**
+     * Get the data for a menu
+     *
+     * @return array
+     */
+    public abstract function getMenuData(): array;
 }

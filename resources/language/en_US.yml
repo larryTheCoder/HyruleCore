@@ -7,6 +7,7 @@
 error:
  no-permission: "§cYou don't have permission to use this."
  buy-site: "§eYou need to buy this at our website"
+ fly-not-permitted: "§cFlight is not permitted in game."
 
 # Panel configuration ONLY
 panel:
@@ -14,7 +15,13 @@ panel:
   cloak-about: "§aCloak is about particles, there a lot of particles that you should try. You should try to check everyday for new cloak! You may need to buy these at our shop."
   cloak-title: "§cChoose your cloak"
   cloak-remove: "§cRemove current cloak"
-  cloak-selected: "§aSelected cloak: {CLOAK}"
+  cloak-selected: "§aSelected cloak: §7{CLOAK}"
+
+# General only message
+general:
+  flight-enabled: "§aEnjoy your flight"
+  flight-disabled: "§cDisabled your flight"
+  language-selection: "§7Selected language: {LANG}"
 
 interface:
   select-kit: "&aSelect this kit"
@@ -30,14 +37,13 @@ broadcast:
 - "§aServer has been §cReset! §aAll Kits, Coins, Tag Has Been Reset!"
 - "§aAww, you hate that many players around and cannot move around? Buy /fly perk at our shop!"
 - "§aOur brand new Discord Server! https://discord.gg/Cu9yZRs"
-- "§aTag YT with §c1.250 subscribes + Video(In Minimum 500 views), §aTag MiniYT with §c500 subscribes + Video (In Minimum 100 Views).. §aHaving these Requirements Contact us at Twitter: §c@HyruleNetwork69"
 - "§aWe are now supporting §dMulti Language§a! Set your language by setting your client locale."
 - "§aWe are now currently developing our server rapidly, every week there will be a new §eFeature!"
 - "§aLove particles? We also do the same! Check out our brand new /cloak!"
 - "§aWe are starting our server from scratch, help us by voting our server!"
-- "§a"
 
+# Login message AKA. MOTD
 login-message:
- - "§7Welcome to HyruleNetwork {PLAYER}"
- - "§aEnjoy your stay"
+ - "§aWelcome to §6Hyrule§cNetwork, §e{PLAYER}"
+ - "§7Tap on the sign to join a match!"
 

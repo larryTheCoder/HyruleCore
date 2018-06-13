@@ -94,7 +94,7 @@ class Panel implements Listener {
                     /** @var FormResponseSimple $sForm */
                     $sForm = $response;
                     CloakManager::equipCloak($p, $sForm->getClickedButtonId());
-                    $p->sendMessage($this->plugin->getMessage($p, 'panel.cloak-selected', ["{CLOAK}" => $sForm->getClickedButton()->getText()]));
+                    $p->sendMessage($this->plugin->getPrefix() . str_replace("{CLOAK}", $sForm->getClickedButton()->getText(), $this->plugin->getMessage($p, 'panel.cloak-selected')));
                     break;
             }
         }

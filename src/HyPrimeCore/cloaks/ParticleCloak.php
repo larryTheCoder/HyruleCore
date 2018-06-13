@@ -34,7 +34,7 @@
 namespace HyPrimeCore\cloaks;
 
 use HyPrimeCore\CoreMain;
-use HyPrimeCore\task\CloakTask;
+use HyPrimeCore\tasks\CloakTask;
 use pocketmine\event\HandlerList;
 use pocketmine\Player;
 use pocketmine\Server;

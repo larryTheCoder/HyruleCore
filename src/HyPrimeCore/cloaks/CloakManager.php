@@ -62,7 +62,6 @@ class CloakManager {
             return;
         }
         $pManager = CoreMain::get()->getPlayerData($p);
-        $pManager->getCloakData()->clear();
         $pManager->setCurrentCloak(null);
         CoreMain::get()->savePlayerData($p, $pManager);
     }

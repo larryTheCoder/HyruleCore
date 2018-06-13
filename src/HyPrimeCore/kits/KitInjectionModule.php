@@ -33,13 +33,10 @@
 
 namespace HyPrimeCore\kits;
 
-
-use HyPrimeCore\buttonInterface\item\ButtonStone;
 use HyPrimeCore\CoreMain;
 use HyPrimeCore\kits\types\NormalKit;
 use HyPrimeCore\utils\Utils;
 use larryTheCoder\SkyWarsPE;
-use pocketmine\block\BlockFactory;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\Item;
@@ -70,7 +67,6 @@ class KitInjectionModule {
         }
 
         $this->injection = $inj;
-        BlockFactory::registerBlock(new ButtonStone(), true);
         $this->load();
     }
 

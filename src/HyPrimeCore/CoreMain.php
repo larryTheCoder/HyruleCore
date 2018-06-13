@@ -34,15 +34,14 @@
 namespace HyPrimeCore;
 
 use HyPrimeCore\broadcast\BroadcastingSystem;
+use HyPrimeCore\buttonInterface\ButtonInterface;
 use HyPrimeCore\formAPI\FormAPI;
 use HyPrimeCore\kits\KitInjectionModule;
-use HyPrimeCore\kits\KitInterface\item\ButtonStone;
 use HyPrimeCore\panel\Panel;
 use HyPrimeCore\player\PlayerData;
 use HyPrimeCore\tasks\IdleCheckTask;
 use HyPrimeCore\utils\Settings;
 use HyPrimeCore\utils\Utils;
-use pocketmine\block\BlockFactory;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
@@ -70,6 +69,12 @@ class CoreMain extends PluginBase {
     private $formAPI;
     /** @var Panel */
     private $panel;
+    /** @var bool[] */
+    public $justJoined = [];
+    /** @var Player[] */
+    public $fly = [];
+    /** @var ButtonInterface */
+    private $interface;
 
     public static function sendVersion(CommandSender $sender) {
         $sender->sendMessage("§e--- HyruleNetwork (C) 2015-2018 ---");
@@ -88,8 +93,8 @@ class CoreMain extends PluginBase {
         CoreMain::$instance = $this;
         $this->getServer()->getLogger()->info("§eStarting to load HyruleCore...");
         Utils::ensureDirectory($this);
-        $this->saveResource("config.yml");
-        $this->saveResource("language/en_US.yml");
+        $this->saveResource("config.yml", true);
+        $this->saveResource("language/en_US.yml", true);
         $this->saveResource("language/pt_BR.yml");
         $cfg = new Config($this->getDataFolder() . "config.yml", Config::YAML);
         if ($cfg->get("config-version") !== CoreMain::CONFIG_VERSION) {
@@ -105,11 +110,12 @@ class CoreMain extends PluginBase {
     }
 
     public function onEnable() {
-        $this->getServer()->getLogger()->info($this->getPrefix() . "§aStarting booting sequence AIZ26");
+        $this->getServer()->getLogger()->info($this->getPrefix() . "§aStarting booting sequence 0xFFFFFF");
         $this->getServer()->getScheduler()->scheduleRepeatingTask(new BroadcastingSystem($this), Settings::$messageInterval * 20);
         $this->getServer()->getScheduler()->scheduleRepeatingTask(new IdleCheckTask($this), 20);
 
         new KitInjectionModule($this);
+        $this->interface = new ButtonInterface($this);
         $this->formAPI = new FormAPI($this);
         $this->panel = new Panel($this);
 
@@ -137,7 +143,7 @@ class CoreMain extends PluginBase {
     }
 
     public function onCommand(CommandSender $sender, Command $cmd, string $label, array $args): bool {
-        switch ($cmd->getName()) {
+        switch (strtolower($cmd->getName())) {
             case "cloak":
                 if (!($sender instanceof Player)) {
                     $sender->sendMessage("Please use this command in-game");
@@ -155,7 +161,22 @@ class CoreMain extends PluginBase {
                     break;
                 }
 
-                $sender->setAllowFlight(true);
+                if (isset($this->fly[$sender->getName()])) {
+                    $sender->setAllowFlight(false);
+                    $sender->sendMessage($this->getPrefix() . $this->getMessage($sender, "general.flight-disabled"));
+                    unset($this->fly[$sender->getName()]);
+                } else {
+                    $sender->setAllowFlight(true);
+                    $sender->sendMessage($this->getPrefix() . $this->getMessage($sender, "general.flight-enabled"));
+                    $this->fly[$sender->getName()] = [$sender, true];
+                }
+                break;
+            case "setupinterface":
+                if (!($sender instanceof Player)) {
+                    $sender->sendMessage("Please use this command in-game");
+                    break;
+                }
+                $this->interface->setupInterface($sender);
                 break;
         }
         return true;
@@ -189,7 +210,7 @@ class CoreMain extends PluginBase {
                         $message = "";
                     }
                     break;
-                case "pt":
+                case "pt_pt":
                 case "pc_pt":
                 case "pt_br":
                     $locale = new Config($this->getDataFolder() . "language/pt_BR.yml", Config::YAML);
@@ -205,6 +226,13 @@ class CoreMain extends PluginBase {
                         $message = "";
                     }
                     break;
+            }
+        }
+        if ($message === "") {
+            $locale = new Config($this->getDataFolder() . "language/en_US.yml", Config::YAML);
+            if (!$message = $locale->getNested($key)) {
+                $this->getLogger()->warning("$key not found in default locale.");
+                $message = "";
             }
         }
         foreach ($replacement as $index => $value) {

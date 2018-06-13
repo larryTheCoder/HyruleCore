@@ -37,28 +37,20 @@ use HyPrimeCore\CoreMain;
 use larryTheCoder\cages\Cage;
 use larryTheCoder\SkyWarsPE;
 use pocketmine\Player;
-use pocketmine\Server;
 
 class CageMenu extends Menu {
 
-    /** @var int[] */
-    private $player = [];
     /** @var Cage[] */
     private $types;
     /** @var null|SkyWarsPE */
     private $plugin;
+    /** @var int */
+    private $count = 0;
+    /** @var array */
+    private $menuData = [];
 
     public function __construct() {
-        /** @var SkyWarsPE $inj */
-        $this->plugin = Server::getInstance()->getPluginManager()->getPlugin("SkyWarsForPE");
-
-        // Check if injection is available
-        if (is_null($inj)) {
-            Server::getInstance()->getLogger()->error("Could not inject KitAPI to SkyWarsForPE");
-            return;
-        }
-
-        foreach ($inj->cage->getCages() as $cage) {
+        foreach (SkyWarsPE::getInstance()->cage->getCages() as $cage) {
             $this->types[] = $cage;
         }
     }
@@ -74,20 +66,17 @@ class CageMenu extends Menu {
      * @return string[]
      */
     public function getNextMenu(Player $p): array {
-        if (!isset($this->player[$p->getName()])) {
-            return [];
+        if (count($this->types) > $this->count) {
+            $this->count = 0;
         }
-        if (count($this->types) > $this->player[$p->getName()]) {
-            $this->player[$p->getName()] = 0;
-        }
-        $id = $this->player[$p->getName()]++;
+        $id = $this->count++;
         $pd = $this->plugin->getDatabase()->getPlayerData($p->getName());
-        $msg = CoreMain::get()->getMessage($p, 'interface.select-cage');
+        $msg = [false, CoreMain::get()->getMessage($p, 'interface.select-cage')];
         if (!in_array(strtolower($this->types[$id]), $pd->cages)) {
             $msg = [true, $this->types[$id]->getPrice()];
         }
-        // VAR-1: STRING | VAR-2: BOOL, MANDATORY UNIT
-        return [$this->types[$id]->getCageName() => $msg];
+        $this->menuData = [$this->types[$id]->getCageName(), $msg];
+        return [$this->types[$id]->getCageName(), $msg];
     }
 
     /**
@@ -97,28 +86,17 @@ class CageMenu extends Menu {
      * @return string[]
      */
     public function getPrevMenu(Player $p): array {
-        if (!isset($this->player[$p->getName()])) {
-            return [];
+        if (count($this->types) < $this->count) {
+            $this->count = count($this->types);
         }
-        if (count($this->types) < $this->player[$p->getName()]) {
-            $this->player[$p->getName()] = count($this->types);
-        }
-        $id = $this->player[$p->getName()]--;
+        $id = $this->count--;
         $pd = $this->plugin->getDatabase()->getPlayerData($p->getName());
-        $msg = CoreMain::get()->getMessage($p, 'interface.select-cage');
+        $msg = [false, CoreMain::get()->getMessage($p, 'interface.select-cage')];
         if (!in_array(strtolower($this->types[$id]), $pd->cages)) {
             $msg = [true, $this->types[$id]->getPrice()];
         }
-        // VAR-1: STRING | VAR-2: BOOL, MANDATORY UNIT
-        return [$this->types[$id]->getCageName() => $msg];
-    }
-
-    public function onSelectedMenu(Player $p) {
-        $this->player[$p->getName()] = 0;
-    }
-
-    public function onReturnMenu(Player $p) {
-        unset($this->player[$p->getName()]);
+        $this->menuData = [$this->types[$id]->getCageName(), $msg];
+        return [$this->types[$id]->getCageName(), $msg];
     }
 
     /**
@@ -127,10 +105,15 @@ class CageMenu extends Menu {
      * @param Player $p
      */
     public function onPlayerSelect(Player $p) {
-        if (!isset($this->player[$p->getName()])) {
-            return;
-        }
-        $id = $this->player[$p->getName()];
-        $this->plugin->cage->setPlayerCage($p, $this->types[$id]);
+        $this->plugin->cage->setPlayerCage($p, $this->types[$this->count]);
+    }
+
+    /**
+     * Get the data for a menu
+     *
+     * @return array
+     */
+    public function getMenuData(): array {
+        return $this->menuData;
     }
 }

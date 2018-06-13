@@ -17,6 +17,9 @@ commands:
   about:
     desription: "What up with our server"
     default: true
+  setupinterface:
+    desription: "Setup the button interface"
+    default: op
 
 permissions:
   ability.fly:

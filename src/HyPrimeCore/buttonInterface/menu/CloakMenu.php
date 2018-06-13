@@ -40,10 +40,10 @@ use pocketmine\Player;
 
 class CloakMenu extends Menu {
 
-    /** @var int[] */
-    private $player = [];
     /** @var string[] */
     private $types = ["Firerings", "Firewings", "Frosty", "Superhero", "Scanner", "Shaman"];
+    /** @var int */
+    private $count = 0;
 
     public function getInteractId(): int {
         return self::INTERACT_CLOAK_MENU;
@@ -56,19 +56,16 @@ class CloakMenu extends Menu {
      * @return string[]
      */
     public function getNextMenu(Player $p): array {
-        if (!isset($this->player[$p->getName()])) {
-            return [];
+        if (count($this->types) > $this->count) {
+            $this->count = 0;
         }
-        if (count($this->types) > $this->player[$p->getName()]) {
-            $this->player[$p->getName()] = 0;
-        }
-        $id = $this->player[$p->getName()]++;
+        $id = $this->count++;
         if (!$p->hasPermission(CloakType::getCloakById(null, $id)->getPermissionNode())) {
             $msg = CoreMain::get()->getMessage($p, 'error.buy-site');
         } else {
             $msg = "";
         }
-        return [$this->types[$id] => $msg];
+        return [$this->types[$id], $msg];
     }
 
     /**
@@ -78,39 +75,37 @@ class CloakMenu extends Menu {
      * @return string[]
      */
     public function getPrevMenu(Player $p): array {
-        if (!isset($this->player[$p->getName()])) {
-            return [];
+        if (count($this->types) < $this->count) {
+            $this->count = count($this->types);
         }
-        if (count($this->types) < $this->player[$p->getName()]) {
-            $this->player[$p->getName()] = count($this->types);
-        }
-        $id = $this->player[$p->getName()]--;
+        $id = $this->count--;
         if (!$p->hasPermission(CloakType::getCloakById(null, $id)->getPermissionNode())) {
             $msg = CoreMain::get()->getMessage($p, 'error.buy-site');
         } else {
             $msg = "";
         }
-        return [$this->types[$id] => $msg];
-    }
-
-    public function onSelectedMenu(Player $p) {
-        $this->player[$p->getName()] = 0;
-    }
-
-    public function onReturnMenu(Player $p) {
-        unset($this->player[$p->getName()]);
+        return [$this->types[$id], $msg];
     }
 
     public function onPlayerSelect(Player $p) {
-        if (!isset($this->player[$p->getName()])) {
+        if (!isset($this->count)) {
             return;
         }
-        $id = $this->player[$p->getName()];
+        $id = $this->count;
         if (!$p->hasPermission(CloakType::getCloakById(null, $id)->getPermissionNode())) {
             $p->sendMessage(CoreMain::get()->getPrefix() . CoreMain::get()->getMessage($p, 'error.buy-site'));
             return;
         }
         CloakManager::equipCloak($p, $id);
         $p->sendMessage(CoreMain::get()->getMessage($p, 'panel.cloak-selected', ["{CLOAK}" => $this->types[$id]]));
+    }
+
+    /**
+     * Get the data for a menu
+     *
+     * @return array
+     */
+    public function getMenuData(): array {
+        // TODO: Implement getMenuData() method.
     }
 }

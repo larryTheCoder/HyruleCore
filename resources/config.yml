@@ -33,7 +33,7 @@ chat:
 broadcast:
   # Message interval in seconds
   # This will delays message every X seconds
-  message-interval: 20
+  message-interval: 35
   # Message with prefix
   # This node functions to use Prefix
   # Set by this config
@@ -45,4 +45,4 @@ broadcast:
   # This node is just to send player login message
   # NO ITS NOT BROADCAST TO PUBLIC
   # Its just login-message to player
-  login-broadcast: false
+  login-broadcast: true

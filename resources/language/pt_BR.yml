@@ -16,6 +16,11 @@ panel:
   cloak-remove: "§cRemover atual cloak"
   cloak-selected: "§aManto Selecionado: {CLOAK}"
 
+interface:
+  select-kit: "&aSelect this kit"
+  buy-kit: "&eBuy this kit."
+  select-cage: "&aSelect this cage"
+
 # Broadcast system is here
 broadcast:
  - "§eQuer Adiquirir um §6[VIP] §ePara Ajudar o Server? Compre Em §7hyruleloja.esy.es"
@@ -25,3 +30,8 @@ broadcast:
  - "§eServidor Foi §cResetado, Todos Kits, Coins, Tag Foram Resetados!"
  - "§eDiscord do Servidor https://discord.gg/Cu9yZRs"
  - "§eTag YT com 1.250 inscritos §e + Video(No Minimo 500 views), Tag MiniYT com 500 inscritos §e + Video (No Minimo 100 Views).. §7Tendo esses Requisitos Contate-nos no §bTwitter:§c@HyruleNetwork69"
+
+# Login message AKA. MOTD (Automatically centered)
+login-message:
+ - "§aBem Vindo à §6Hyrule§cNetwork, §e{PLAYER}"
+ - "§7Entre nessa aventura de Guerra Nuclear!"

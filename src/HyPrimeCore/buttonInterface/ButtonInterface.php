@@ -33,17 +33,23 @@
 
 namespace HyPrimeCore\buttonInterface;
 
+use HyPrimeCore\buttonInterface\item\Button;
+use HyPrimeCore\buttonInterface\item\ButtonStone;
 use HyPrimeCore\buttonInterface\menu\CageMenu;
 use HyPrimeCore\buttonInterface\menu\CloakMenu;
 use HyPrimeCore\buttonInterface\menu\KitMenu;
 use HyPrimeCore\buttonInterface\menu\Menu;
 use HyPrimeCore\CoreMain;
 use HyPrimeCore\event\ButtonPushEvent;
-use HyPrimeCore\kits\KitInjectionModule;
 use HyPrimeCore\utils\Utils;
+use pocketmine\block\BlockFactory;
+use pocketmine\block\StoneButton;
+use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\level\Location;
+use pocketmine\level\particle\FloatingTextParticle;
+use pocketmine\level\particle\Particle;
 use pocketmine\Player;
 use pocketmine\utils\Config;
 
@@ -55,17 +61,23 @@ class ButtonInterface implements Listener {
     private $currentPath = []; // The path of the menu (chosen and not chosen)
     /** @var Menu[] */
     private $menu = [];
-    /** @var KitInjectionModule */
-    private $module;
+    /** @var array */
+    private $defaultMessage;
     /** @var Location */
     private $buttonNext, $buttonSelect, $buttonPrev, $buttonBack;
     /** @var Config */
     private $kit;
+    /** @var int[] */
+    private $setters = [];
+    /** @var int[] */
+    private $mode;
+    /** @var FloatingTextParticle[][] */
+    private $textInteract = [];
 
-    public function __construct(CoreMain $plugin, KitInjectionModule $module) {
+    public function __construct(CoreMain $plugin) {
         $plugin->getServer()->getPluginManager()->registerEvents($this, $plugin);
         $this->kit = new Config($plugin->getDataFolder() . "kits.yml", Config::YAML);
-        $this->module = $module;
+        BlockFactory::registerBlock(new ButtonStone(), true);
         $this->menu[] = new CageMenu();
         $this->menu[] = new CloakMenu();
         $this->menu[] = new KitMenu();
@@ -75,34 +87,85 @@ class ButtonInterface implements Listener {
         $this->buttonBack = Utils::parsePosition($this->kit->getNested('interface.button-back'));
     }
 
+    public function setupInterface(Player $p) {
+        $this->setters[$p->getName()] = $this->mode[strtolower($p->getName())] = 0;
+        $p->sendMessage("Break another button for previous button. (Previous)");
+    }
+
+    /**
+     * @param BlockBreakEvent $event
+     */
+    public function onPlayerBreak(BlockBreakEvent $event) {
+        $p = $event->getPlayer();
+        $b = $event->getBlock();
+        if (isset($this->setters[$p->getName()])) {
+            $event->setCancelled();
+            if (!($b instanceof Button)) {
+                $p->sendMessage("That is not a button.");
+                return;
+            }
+
+            switch ($this->mode[strtolower($p->getName())]) {
+                case 0:
+                    $this->buttonPrev = $b->asPosition();
+                    $this->kit->setNested("interface.button-prev", Utils::encodePosition($b));
+                    $this->mode[strtolower($p->getName())]++;
+                    $p->sendMessage("Break another button for selection button. (Select)");
+                    break;
+                case 1:
+                    $this->buttonSelect = $b->asPosition();
+                    $this->kit->setNested("interface.button-choose", Utils::encodePosition($b));
+                    $this->mode[strtolower($p->getName())]++;
+                    $p->sendMessage("Break another button for next button. (Next)");
+                    break;
+                case 2:
+                    $this->buttonNext = $b->asPosition();
+                    $this->kit->setNested("interface.button-next", Utils::encodePosition($b));
+                    $this->mode[strtolower($p->getName())]++;
+                    $p->sendMessage("Break another button for back button. (Back)");
+                    break;
+                case 3:
+                    $this->buttonBack = $b->asPosition();
+                    $this->kit->setNested("interface.button-back", Utils::encodePosition($b));
+                    $p->sendMessage("Successfully setting the button GUI");
+                    unset($this->mode[strtolower($p->getName())]);
+                    unset($this->setters[$p->getName()]);
+                    break;
+            }
+
+            $this->kit->save();
+        }
+    }
+
     /**
      * @param PlayerJoinEvent $ev
      */
     public function onPlayerJoin(PlayerJoinEvent $ev) {
         $this->menuType[$ev->getPlayer()->getName()] = null;
         $this->currentPath[$ev->getPlayer()->getName()] = Menu::INTERACT_CLOAK_MENU;
+        $this->updateText($ev->getPlayer());
     }
 
     public function onButtonPush(ButtonPushEvent $event) {
+        echo "EVENT RUN\n";
         $p = $event->getPlayer();
         $menu = $this->menuType[$p->getName()];
         $path = $this->currentPath[$p->getName()];
         if ($menu === null) {
             if ($event->getPos()->equals($this->buttonNext)) {
                 if ($path === 3) {
-                    $path = 0;
+                    $path = 2;
                 } else {
                     $path++;
                 }
             } else if ($event->getPos()->equals($this->buttonPrev)) {
                 if ($path === 0) {
-                    $path = 3;
+                    $path = 2;
                 } else {
                     $path--;
                 }
             } else if ($event->getPos()->equals($this->buttonSelect)) {
                 $menu = Menu::getMenu($path);
-                $menu->onSelectedMenu($p);
                 $this->menuType[$p->getName()] = $menu;
             } else {
                 // Back button? Its useless buddy, what you gonna to back of?
@@ -114,14 +177,15 @@ class ButtonInterface implements Listener {
             return;
         }
         if ($event->getPos()->equals($this->buttonNext)) {
-            $menu->getNextMenu($p);
+            $this->currentPath[$p->getName()] = $menu->getNextMenu($p);
         } else if ($event->getPos()->equals($this->buttonPrev)) {
-            $menu->getPrevMenu($p);
+            $this->currentPath[$p->getName()] = $menu->getPrevMenu($p);
         } else if ($event->getPos()->equals($this->buttonSelect)) {
             $menu->onPlayerSelect($p);
         } else {
-            $menu->onReturnMenu($p);
             $this->menuType[$p->getName()] = null;
+            $this->currentPath[$p->getName()] = $menu->getInteractId();
+            $this->updateText($p);
             return;
         }
         $this->menuType[$p->getName()] = $menu;
@@ -129,6 +193,50 @@ class ButtonInterface implements Listener {
     }
 
     private function updateText(Player $p) {
+        if (!isset($this->defaultMessage[$p->getName()])) {
+            // These are non update particles.
+            $p->getLevel()->addParticle(new FloatingTextParticle($this->buttonPrev, "", "§a§l<<"), [$p]);
+            $p->getLevel()->addParticle(new FloatingTextParticle($this->buttonNext, "", "§a§l>>"), [$p]);
+            $p->getLevel()->addParticle(new FloatingTextParticle($this->buttonSelect, "", "§eSelect"), [$p]);
+            $p->getLevel()->addParticle(new FloatingTextParticle($this->buttonBack, "", "§aBack"), [$p]);
+            $this->defaultMessage[$p->getName()] = true;
+        }
+        if ($this->menuType[$p->getName()] !== null) {
+            $menu = $this->menuType[$p->getName()];
+            // Data[0] = Item name / Kit name / Object Name
+            // Data[1][0] = Bool / Object should have a coins.
+            // Data[1][1] = int | string / depends on Bool
+            $data = $menu->getMenuData();
+            $pos1 = $this->buttonSelect->add(0, 1, 0);
+            if (!isset($this->textInteract[$p->getName()]['object-name'])) {
+                $particle1 = new FloatingTextParticle($pos1, "", "§a" . $data[0]);
+                $this->addPacketTo($p, $particle1);
+                $this->textInteract[$p->getName()]['object-name'] = $particle1;
+            } else {
+                $particle1 = $this->textInteract[$p->getName()]['object-name'];
+                $particle1->setTitle("§a" . $data[0]);
+                $this->addPacketTo($p, $particle1);
+                $this->textInteract[$p->getName()]['object-name'] = $particle1;
+            }
+        } else {
+            $path = $this->currentPath[$p->getName()];
+            $menuType = Menu::getMenuName($path);
+            $pos1 = $this->buttonSelect->add(0, 1, 0);
+            if (!isset($this->textInteract[$p->getName()]['object-name'])) {
+                $particle1 = new FloatingTextParticle($pos1, "", "§a" . $menuType);
+                $this->addPacketTo($p, $particle1);
+                $this->textInteract[$p->getName()]['object-name'] = $particle1;
+            } else {
+                $particle1 = $this->textInteract[$p->getName()]['object-name'];
+                $particle1->setTitle("§a" . $menuType);
+                $this->addPacketTo($p, $particle1);
+                $this->textInteract[$p->getName()]['object-name'] = $particle1;
+            }
+        }
+    }
 
+    private function addPacketTo(Player $p, ?Particle $particle) {
+        echo "DOING FINE\n";
+        $p->getLevel()->addParticle($particle, [$p]);
     }
 }

@@ -31,8 +31,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace HyPrimeCore\task;
-
+namespace HyPrimeCore\tasks;
 
 use HyPrimeCore\cloaks\ParticleCloak;
 use HyPrimeCore\CoreMain;

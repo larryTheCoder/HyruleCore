@@ -42,8 +42,8 @@ class BroadcastingSystem extends Task {
 
     /** @var CoreMain */
     private $plugin;
-    /** @var int */
-    private $currentMessage = 0;
+    /** @var int[] */
+    private $currentMessage = [];
 
     public function __construct(CoreMain $plugin) {
         $this->plugin = $plugin;
@@ -58,25 +58,35 @@ class BroadcastingSystem extends Task {
      */
     public function onRun(int $currentTick) {
         $pl = Server::getInstance()->getOnlinePlayers();
-        if ($this->currentMessage >= count($this->plugin->getMessage(null, 'broadcast'))) {
-            $this->currentMessage = 0;
-        }
+
         foreach ($pl as $p) {
+            // Just joined, cancel the first message
+            if (isset($this->plugin->justJoined[strtolower($p->getName())])) {
+                unset($this->plugin->justJoined[strtolower($p->getName())]);
+                continue;
+            }
+
+            if (!isset($this->currentMessage[$p->getName()])) {
+                $this->currentMessage[$p->getName()] = 0;
+            }
+
+            if ($this->currentMessage[$p->getName()] >= count($this->plugin->getMessage($p, 'broadcast'))) {
+                $this->currentMessage[$p->getName()] = 0;
+            }
+
             if (Settings::$messageRandom) {
-                $this->currentMessage = rand(0, count($this->plugin->getMessage($p, 'broadcast')));
+                $this->currentMessage[$p->getName()] = rand(0, count($this->plugin->getMessage($p, 'broadcast')));
             }
 
             $array = $this->plugin->getMessage($p, 'broadcast');
             if ($p->getLevel()->getName() === "world") {
                 if (Settings::$messagePrefix) {
-                    $p->sendMessage(Settings::$prefix . $array[$this->currentMessage]);
+                    $p->sendMessage(Settings::$prefix . $array[$this->currentMessage[$p->getName()]]);
                 } else {
-                    $p->sendMessage($array[$this->currentMessage]);
+                    $p->sendMessage($array[$this->currentMessage[$p->getName()]]);
                 }
             }
+            $this->currentMessage[$p->getName()]++;
         }
-        $array = $this->plugin->getMessage(null, 'broadcast');
-        Server::getInstance()->getLogger()->info(Settings::$prefix . $array[$this->currentMessage]);
-        $this->currentMessage++;
     }
 }

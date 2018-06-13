@@ -47,6 +47,7 @@ use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Server;
 use pocketmine\utils\Config;
+use pocketmine\utils\TextFormat;
 
 /**
  * Public general utils class for SkyWars
@@ -148,6 +149,24 @@ class Utils {
     }
 
     /**
+     * Centering a text with a number of the center
+     *
+     * @param string $input The message
+     * @param int $count The input of how much to center
+     * @return string       The input
+     */
+    public static function center(string $input, int $count = 44) {
+        $msgCount = ($count - strlen(TextFormat::clean($input))) / 2;
+        $msgTemp = 0;
+        while ($msgCount >= 0) {
+            $input = " " . $input;
+            $msgCount--;
+            $msgTemp++;
+        }
+        return $input;
+    }
+
+    /**
      * Decode a position form a string
      *
      * @param string $decodedPos
@@ -161,6 +180,10 @@ class Utils {
         }
         $level = Server::getInstance()->getLevelByName($piece[3]);
         return new Position($piece[0], $piece[1], $piece[2], $level);
+    }
+
+    public static function encodePosition(Position $pos): string {
+        return "$pos->x:$pos->y:$pos->z:{$pos->getLevel()->getName()}";
     }
 
     public static function loadFirst(string $levelName, bool $load = true) {

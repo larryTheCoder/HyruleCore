@@ -33,6 +33,7 @@
 
 namespace HyPrimeCore;
 
+use HyPrimeCore\cloaks\CloakManager;
 use HyPrimeCore\utils\Utils;
 use larryTheCoder\events\PlayerJoinArenaEvent;
 use larryTheCoder\SkyWarsPE;
@@ -63,6 +64,14 @@ class CoreListener implements Listener {
         $p = $event->getPlayer();
         $event->setJoinMessage("");
 
+        $p->sendMessage("§7[----------------------------------------]");
+        foreach ($this->plugin->getMessage($p, 'login-message') as $msg) {
+            $msg = Utils::center(str_replace(["{PLAYER}", "{ONLINE}"], [$p->getName(), count(Server::getInstance()->getOnlinePlayers())], $msg));
+            $p->sendMessage("- " . $msg);
+        }
+        $p->sendMessage("§7[----------------------------------------]");
+
+        $this->plugin->justJoined[strtolower($p->getName())] = true;
         $this->plugin->idlingTime[strtolower($p->getName())] = microtime(true); // Setup time
         Server::getInstance()->getLogger()->info($this->plugin->getPrefix() . "§7Player §a{$p->getName()} §7logged in with language: §a{$p->getLocale()}");
     }
@@ -128,9 +137,8 @@ class CoreListener implements Listener {
     public function onPlayerJoinArena(PlayerJoinArenaEvent $event) {
         $p = $event->getPlayer();
 
-        if ($p->getAllowFlight()) {
-            $p->setAllowFlight(false);
-        }
+        $p->setAllowFlight(false);
+        CloakManager::unequipCloak($p);
     }
 
     /**
