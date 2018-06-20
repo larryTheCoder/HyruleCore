@@ -33,7 +33,6 @@
 
 namespace HyPrimeCore\buttonInterface\menu;
 
-use HyPrimeCore\CoreMain;
 use larryTheCoder\cages\Cage;
 use larryTheCoder\SkyWarsPE;
 use pocketmine\Player;
@@ -46,13 +45,14 @@ class CageMenu extends Menu {
     private $plugin;
     /** @var int */
     private $count = 0;
-    /** @var array */
-    private $menuData = [];
+    /** @var Player */
+    private $player;
 
-    public function __construct() {
+    public function __construct(Player $p) {
         foreach (SkyWarsPE::getInstance()->cage->getCages() as $cage) {
             $this->types[] = $cage;
         }
+        $this->player = $p;
     }
 
     public function getInteractId(): int {
@@ -63,40 +63,26 @@ class CageMenu extends Menu {
      * Get the next menu for player
      *
      * @param Player $p
-     * @return string[]
      */
-    public function getNextMenu(Player $p): array {
-        if (count($this->types) > $this->count) {
+    public function getNextMenu(Player $p) {
+        if ($this->count >= count($this->types) - 1) {
             $this->count = 0;
+        } else {
+            $this->count++;
         }
-        $id = $this->count++;
-        $pd = $this->plugin->getDatabase()->getPlayerData($p->getName());
-        $msg = [false, CoreMain::get()->getMessage($p, 'interface.select-cage')];
-        if (!in_array(strtolower($this->types[$id]), $pd->cages)) {
-            $msg = [true, $this->types[$id]->getPrice()];
-        }
-        $this->menuData = [$this->types[$id]->getCageName(), $msg];
-        return [$this->types[$id]->getCageName(), $msg];
     }
 
     /**
      * Get the previous menu for player
      *
      * @param Player $p
-     * @return string[]
      */
-    public function getPrevMenu(Player $p): array {
-        if (count($this->types) < $this->count) {
-            $this->count = count($this->types);
+    public function getPrevMenu(Player $p) {
+        if ($this->count <= 0) {
+            $this->count = count($this->types) - 1;
+        } else {
+            $this->count--;
         }
-        $id = $this->count--;
-        $pd = $this->plugin->getDatabase()->getPlayerData($p->getName());
-        $msg = [false, CoreMain::get()->getMessage($p, 'interface.select-cage')];
-        if (!in_array(strtolower($this->types[$id]), $pd->cages)) {
-            $msg = [true, $this->types[$id]->getPrice()];
-        }
-        $this->menuData = [$this->types[$id]->getCageName(), $msg];
-        return [$this->types[$id]->getCageName(), $msg];
     }
 
     /**
@@ -105,7 +91,7 @@ class CageMenu extends Menu {
      * @param Player $p
      */
     public function onPlayerSelect(Player $p) {
-        $this->plugin->cage->setPlayerCage($p, $this->types[$this->count]);
+        SkyWarsPE::getInstance()->cage->setPlayerCage($p, $this->types[$this->count]);
     }
 
     /**
@@ -114,6 +100,16 @@ class CageMenu extends Menu {
      * @return array
      */
     public function getMenuData(): array {
-        return $this->menuData;
+        var_dump($this->count);
+        $data['cage'] = true;
+        $data['name'] = $this->types[$this->count]->getCageName();
+        $pd = SkyWarsPE::getInstance()->getDatabase()->getPlayerData($this->player->getName());
+        if (!in_array(strtolower($this->types[$this->count]->getCageName()), $pd->cages)) {
+            $data['payment'] = $this->types[$this->count]->getPrice();
+        } else {
+            $data['payment'] = 0;
+        }
+
+        return $data;
     }
 }

@@ -31,70 +31,50 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace HyPrimeCore\buttonInterface\menu;
+namespace HyPrimeCore\tasks;
 
+use HyPrimeCore\CoreMain;
+use pocketmine\scheduler\Task;
 
-use pocketmine\Player;
+/**
+ * Message of the day config.
+ * This will be used to replace the MOTD plugin to support
+ * The new API version of PocketMine-MP.
+ *
+ * @package HyPrimeCore\tasks
+ */
+class SendMOTD extends Task {
 
-abstract class Menu {
+    /** @var CoreMain */
+    private $plugin;
+    /** @var int */
+    private $line;
 
-    const INTERACT_CLOAK_MENU = 0;
-    const INTERACT_KIT_MENU = 1;
-    const INTERACT_CAGES_MENU = 2;
-
-    public abstract function getInteractId(): int;
-
-    public static function getMenuName(int $id): string {
-        switch ($id) {
-            case self::INTERACT_CLOAK_MENU:
-                return "Cloak";
-            case self::INTERACT_KIT_MENU:
-                return "Kit";
-            case self::INTERACT_CAGES_MENU:
-                return "Cages";
-            default:
-                return "Unknown";
-        }
-    }
-
-    public static function getMenu(Player $p, int $id): ?Menu {
-        switch ($id) {
-            case self::INTERACT_CLOAK_MENU:
-                return new CloakMenu($p);
-            case self::INTERACT_KIT_MENU:
-                return new KitMenu($p);
-            case self::INTERACT_CAGES_MENU:
-                return new CageMenu($p);
-            default:
-                return null;
-        }
+    public function __construct(CoreMain $plugin) {
+        $this->plugin = $plugin;
+        $this->line = -1;
+        $this->plugin->getServer()->getLogger()->info($plugin->getPrefix() . "§7Starting motd messages");
     }
 
     /**
-     * Get the next menu for player
+     * Actions to execute when run
      *
-     * @param Player $p
-     */
-    public abstract function getNextMenu(Player $p);
-
-    /**
-     * Get the previous menu for player
+     * @param int $currentTick
      *
-     * @param Player $p
+     * @return void
      */
-    public abstract function getPrevMenu(Player $p);
-
-    /**
-     * Executed when a player select the button
-     *
-     * @param Player $p
-     */
-    public abstract function onPlayerSelect(Player $p);
-
-    /**
-     * Get the data for a menu
-     *
-     * @return array
-     */
-    public abstract function getMenuData(): array;
+    public function onRun(int $currentTick) {
+        $getMOTD = $this->plugin->getConfig()->getNested("motd.message");
+        if ($this->plugin->getConfig()->getNested("motd.shuffle") == true) {
+            $msg = $getMOTD[mt_rand(0, count($getMOTD) - 1)];
+            $this->plugin->getServer()->getNetwork()->setName($msg);
+        } else {
+            $this->line++;
+            $msg = $getMOTD[$this->line];
+            $this->plugin->getServer()->getNetwork()->setName($msg);
+            if ($this->line === count($getMOTD) - 1) {
+                $this->line = -1;
+            }
+        }
+    }
 }

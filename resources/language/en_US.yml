@@ -4,9 +4,11 @@
 ###########################################################################################
 ---
 
+language-select: "§6You selected language: {LANGUAGE}"
+
 error:
  no-permission: "§cYou don't have permission to use this."
- buy-site: "§eYou need to buy this at our website"
+ buy-site: "§cYou need to buy this at our website"
  fly-not-permitted: "§cFlight is not permitted in game."
 
 # Panel configuration ONLY
@@ -24,9 +26,17 @@ general:
   language-selection: "§7Selected language: {LANG}"
 
 interface:
-  select-kit: "&aSelect this kit"
-  buy-kit: "&eBuy this kit."
-  select-cage: "&aSelect this cage"
+  about-menu: "§a{MENU} menu."
+  select: "§dSelect"
+  back: "§aBack"
+  home: "§aHome"
+  buy-site: "§cBuy at website"
+  available: "§aAvailable"
+  selection-1: "§eSelect your kit!"
+  selection-2: "§eSelect your cloak!"
+  selection-3: "§eSelect this cage!"
+  price-interface: "§ePrice: §d${VALUE}"
+  balance-interface: "§eCoins: §d${BALANCE}"
 
 # Broadcast system is here
 broadcast:

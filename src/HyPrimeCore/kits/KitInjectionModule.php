@@ -41,6 +41,7 @@ use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\Item;
 use pocketmine\plugin\PluginBase;
+use pocketmine\Server;
 use pocketmine\utils\Config;
 
 class KitInjectionModule {
@@ -59,11 +60,6 @@ class KitInjectionModule {
         if (is_null($inj)) {
             $plugin->getServer()->getLogger()->error("Could not inject KitAPI to SkyWarsForPE");
             return;
-        }
-
-        // Forcefully enable this plugin.
-        if (!$inj->isEnabled()) {
-            $inj->setEnabled(true);
         }
 
         $this->injection = $inj;
@@ -116,7 +112,11 @@ class KitInjectionModule {
                     $items[] = Item::get($split[0], $split[2], $split[1]);
                 } else if (count($split) === 5) {
                     $item = Item::get($split[0], $split[2], $split[1]);
-                    $item->addEnchantment(new EnchantmentInstance(Enchantment::getEnchantment($split[3]), $split[4]));
+                    if (Enchantment::getEnchantment($split[3]) !== null) {
+                        $item->addEnchantment(new EnchantmentInstance(Enchantment::getEnchantment($split[3]), $split[4]));
+                    } else {
+                        Server::getInstance()->getLogger()->error(CoreMain::get()->getPrefix() . "§cUnknown EnchantmentID: " . $split[3]);
+                    }
                 }
             }
             if (isset($kit[$val]["armour"])) {

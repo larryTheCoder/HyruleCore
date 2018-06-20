@@ -1,7 +1,7 @@
 name: HyPrimeCore
 main: HyPrimeCore\CoreMain
 version: "1.0-REV#201-394-675d"
-api: [3.0.0-ALPHA7, 3.0.0-ALPHA8, 3.0.0-ALPHA9, 3.0.0-ALPHA10, 3.0.0-ALPHA11, 3.0.0-ALPHA12]
+api: [3.0.0+ALPHA13]
 author: ["larryTheCoder"]
 softdepends: ['PocketVote']
 depends: ['SkyWarsForPE', 'EconomyAPI']

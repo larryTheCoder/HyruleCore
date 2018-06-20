@@ -15,6 +15,10 @@ interface:
   button-choose: '301:98:32:world'
   button-next: '301:98:35:world'
   button-back: '301:96:32:world'
+  button-home: '301:96:22:world'
+  # The puppet for the player
+  # X:Y:Z:YAW:PITCH:LEVEL
+  puppet-pos: '301:96:32:180:32:world'
 
 # This is a kit file
 kits:

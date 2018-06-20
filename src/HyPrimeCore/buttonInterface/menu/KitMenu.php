@@ -33,7 +33,6 @@
 
 namespace HyPrimeCore\buttonInterface\menu;
 
-use HyPrimeCore\CoreMain;
 use larryTheCoder\kits\Kits;
 use larryTheCoder\SkyWarsPE;
 use pocketmine\Player;
@@ -44,9 +43,12 @@ class KitMenu extends Menu {
     private $types;
     /** @var int */
     private $count = 0;
+    /** @var Player */
+    private $player;
 
-    public function __construct() {
+    public function __construct(Player $p) {
         $this->types = SkyWarsPE::getInstance()->kit->getKits();
+        $this->player = $p;
     }
 
     public function getInteractId(): int {
@@ -57,40 +59,26 @@ class KitMenu extends Menu {
      * Get the next menu for player
      *
      * @param Player $p
-     * @return string[]
      */
-    public function getNextMenu(Player $p): array {
-        if (count($this->types) > $this->count) {
+    public function getNextMenu(Player $p) {
+        if ($this->count >= count($this->types) - 1) {
             $this->count = 0;
+        } else {
+            $this->count++;
         }
-        $id = $this->count++;
-        $pd = SkyWarsPE::getInstance()->getDatabase()->getPlayerData($p->getName());
-        $msg = CoreMain::get()->getMessage($p, 'interface.select-kit');
-        if (!in_array(strtolower($this->types[$id]->getKitEID()), $pd->cages)) {
-            $msg = [true, $this->types[$id]->getKitPrice()];
-        }
-        // VAR-1: STRING | VAR-2: BOOL, MANDATORY UNIT
-        return [$this->types[$id]->getKitName() => $msg];
     }
 
     /**
      * Get the previous menu for player
      *
      * @param Player $p
-     * @return string[]
      */
-    public function getPrevMenu(Player $p): array {
-        if (count($this->types) < $this->count) {
-            $this->count = count($this->types);
+    public function getPrevMenu(Player $p) {
+        if ($this->count <= 0) {
+            $this->count = count($this->types) - 1;
+        } else {
+            $this->count--;
         }
-        $id = $this->count--;
-        $pd = SkyWarsPE::getInstance()->getDatabase()->getPlayerData($p->getName());
-        $msg = CoreMain::get()->getMessage($p, 'interface.select-kit');
-        if (!in_array(strtolower($this->types[$id]->getKitEID()), $pd->cages)) {
-            $msg = [true, $this->types[$id]->getKitPrice()];
-        }
-        // VAR-1: STRING | VAR-2: BOOL, MANDATORY UNIT
-        return [$this->types[$id]->getKitName() => $msg];
     }
 
     /**
@@ -108,6 +96,15 @@ class KitMenu extends Menu {
      * @return array
      */
     public function getMenuData(): array {
-        // TODO: Implement getMenuData() method.
+        $data['kit'] = true;
+        $pd = SkyWarsPE::getInstance()->getDatabase()->getPlayerData($this->player->getName());
+        $data['name'] = $this->types[$this->count]->getKitName();
+        if (!in_array(strtolower($this->types[$this->count]->getKitName()), $pd->kitId)) {
+            $data['payment'] = $this->types[$this->count]->getKitPrice();
+        } else {
+            $data['payment'] = 0;
+        }
+
+        return $data;
     }
 }

@@ -67,6 +67,7 @@ class Panel implements Listener {
         $form->addButton("Superhero");
         $form->addButton("Scanner");
         $form->addButton("Shaman");
+        $form->addButton("Superwing");
         if ($pManager->getCloakData() !== null) {
             $form->addButton($this->plugin->getMessage($p, 'panel.cloak-remove'));
         }

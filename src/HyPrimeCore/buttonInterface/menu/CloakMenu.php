@@ -40,10 +40,14 @@ use pocketmine\Player;
 
 class CloakMenu extends Menu {
 
-    /** @var string[] */
-    private $types = ["Firerings", "Firewings", "Frosty", "Superhero", "Scanner", "Shaman"];
     /** @var int */
     private $count = 0;
+    /** @var Player */
+    private $player;
+
+    public function __construct(Player $p) {
+        $this->player = $p;
+    }
 
     public function getInteractId(): int {
         return self::INTERACT_CLOAK_MENU;
@@ -53,51 +57,37 @@ class CloakMenu extends Menu {
      * Get the next menu for player
      *
      * @param Player $p
-     * @return string[]
      */
-    public function getNextMenu(Player $p): array {
-        if (count($this->types) > $this->count) {
+    public function getNextMenu(Player $p) {
+        if ($this->count >= count(CloakType::getAll()) - 1) {
             $this->count = 0;
-        }
-        $id = $this->count++;
-        if (!$p->hasPermission(CloakType::getCloakById(null, $id)->getPermissionNode())) {
-            $msg = CoreMain::get()->getMessage($p, 'error.buy-site');
         } else {
-            $msg = "";
+            $this->count++;
         }
-        return [$this->types[$id], $msg];
     }
 
     /**
      * Get the previous menu for player
      *
      * @param Player $p
-     * @return string[]
      */
-    public function getPrevMenu(Player $p): array {
-        if (count($this->types) < $this->count) {
-            $this->count = count($this->types);
-        }
-        $id = $this->count--;
-        if (!$p->hasPermission(CloakType::getCloakById(null, $id)->getPermissionNode())) {
-            $msg = CoreMain::get()->getMessage($p, 'error.buy-site');
+    public function getPrevMenu(Player $p) {
+        if ($this->count <= 0) {
+            $this->count = count(CloakType::getAll()) - 1;
         } else {
-            $msg = "";
+            $this->count--;
         }
-        return [$this->types[$id], $msg];
     }
 
     public function onPlayerSelect(Player $p) {
-        if (!isset($this->count)) {
-            return;
-        }
         $id = $this->count;
-        if (!$p->hasPermission(CloakType::getCloakById(null, $id)->getPermissionNode())) {
+        if (!$p->hasPermission(CloakType::getCloakPermission($id))) {
             $p->sendMessage(CoreMain::get()->getPrefix() . CoreMain::get()->getMessage($p, 'error.buy-site'));
             return;
         }
         CloakManager::equipCloak($p, $id);
-        $p->sendMessage(CoreMain::get()->getMessage($p, 'panel.cloak-selected', ["{CLOAK}" => $this->types[$id]]));
+        $msg = str_replace("{CLOAK}", CloakType::getCloakName($id), CoreMain::get()->getMessage($p, 'panel.cloak-selected'));
+        $p->sendMessage(CoreMain::get()->getPrefix() . $msg);
     }
 
     /**
@@ -106,6 +96,13 @@ class CloakMenu extends Menu {
      * @return array
      */
     public function getMenuData(): array {
-        // TODO: Implement getMenuData() method.
+        $data['cloak'] = true;
+        if (!$this->player->hasPermission(CloakType::getCloakPermission($this->count))) {
+            $data['available'] = false;
+        } else {
+            $data['available'] = true;
+        }
+        $data['name'] = CloakType::getCloakName($this->count);
+        return $data;
     }
 }

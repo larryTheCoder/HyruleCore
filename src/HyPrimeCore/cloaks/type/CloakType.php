@@ -45,13 +45,14 @@ class CloakType {
     const SUPERHERO = 3;
     const SCANNER = 4;
     const SHAMAN = 5;
+    const SUPERWING = 6;
 
     /**
      * @param Player $p
      * @param int $id
      * @return ParticleCloak|null
      */
-    public static function getCloakById(Player $p, int $id): ?ParticleCloak {
+    public static function getCloakById(?Player $p, int $id): ?ParticleCloak {
         switch ($id) {
             case self::FIREWINGS:
                 return new Firewings($p);
@@ -65,8 +66,65 @@ class CloakType {
                 return new Scanner($p);
             case self::SHAMAN:
                 return new Shaman($p);
+            case self::SUPERWING:
+                return new MegaWing($p);
             default:
                 return null;
         }
+    }
+
+    /**
+     * Get the cloak permission node
+     *
+     * @param int $id ID of the cloak
+     * @return string|null
+     */
+    public static function getCloakPermission(int $id): ?string{
+        switch ($id) {
+            case self::FIREWINGS:
+                return "core.cloak.firewings";
+            case self::FIRERINGS:
+                return "core.cloak.firerings";
+            case self::FROSTY:
+                return "core.cloak.frosty";
+            case self::SUPERHERO:
+                return "core.cloak.superhero";
+            case self::SCANNER:
+                return "core.cloak.scanner";
+            case self::SHAMAN:
+                return "core.cloak.shaman";
+            case self::SUPERWING:
+                return "core.cloak.superwing";
+            default:
+                return null;
+        }
+    }
+    /**
+     * @param int $id
+     * @return string
+     */
+    public static function getCloakName(int $id): string {
+        switch ($id) {
+            case self::FIREWINGS:
+                return "Firewings";
+            case self::FIRERINGS:
+                return "Firerings";
+            case self::FROSTY:
+                return "Frosty";
+            case self::SUPERHERO:
+                return "Superhero";
+            case self::SCANNER:
+                return "Scanner";
+            case self::SHAMAN:
+                return "Shaman";
+            case self::SUPERWING:
+                return "Superwing";
+            default:
+                return "Unknown";
+        }
+    }
+
+    public static function getAll(): array {
+        return ["Firerings", "Firewings", "Frosty", "Superhero", "Scanner", "Shaman", "Superwing"];
     }
 }

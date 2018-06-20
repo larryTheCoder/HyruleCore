@@ -6,7 +6,7 @@
 # Config version
 # Will be updated frequently, please make
 # Sure you saved all the changes
-config-version: 2
+config-version: 3
 
 # general settings for this CORE
 general:
@@ -28,6 +28,31 @@ chat:
   # in minecraft client, but this is just a `block` the player
   # message in case they use offensive words
   offensive-block: true
+
+# Message of the day (Client-bound)
+motd:
+  # The Amount of time that you wish for the MOTD Delay.
+  # This doesn't make the client's query change,
+  # this effects the amount of time the server sends the message.
+  # Default: 100
+  delay: 100
+  # Here you can set if you want the shuffle on, or off.
+  # Default: false
+  shuffle: false
+  # The MOTD Messages.
+  # You can add to as much as you like!
+  # Just make sure you copy it correctly.
+  message:
+    - "Message 1"
+    - "Message 2"
+    - "Message 3"
+    - "Message 4"
+    - "Message 5"
+    - "Message 6"
+    - "Message 7"
+    - "Message 8"
+    - "Message 9"
+    - "Message 10"
 
 # Everything related to broadcasts
 broadcast:

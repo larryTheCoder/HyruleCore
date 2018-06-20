@@ -186,6 +186,26 @@ class Utils {
         return "$pos->x:$pos->y:$pos->z:{$pos->getLevel()->getName()}";
     }
 
+    /**
+     * Decode a position form a string
+     *
+     * @param string $decodedPos
+     * @return null|Location
+     */
+    public static function parseLocation(string $decodedPos): ?Location {
+        $piece = explode(":", $decodedPos);
+        if (count($piece) !== 6) {
+            Utils::send("Attempted to decode a non-decoded-location");
+            return null;
+        }
+        $level = Server::getInstance()->getLevelByName($piece[5]);
+        return new Location($piece[0], $piece[1], $piece[2], $piece[3], $piece[4], $level);
+    }
+
+    public static function encodeLocation(Location $pos): string {
+        return "$pos->x:$pos->y:$pos->z:$pos->yaw:$pos->pitch:{$pos->getLevel()->getName()}";
+    }
+
     public static function loadFirst(string $levelName, bool $load = true) {
         Server::getInstance()->generateLevel($levelName);
         if ($load) {

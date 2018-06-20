@@ -31,70 +31,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace HyPrimeCore\buttonInterface\menu;
+namespace HyPrimeCore\buttonInterface\item;
 
 
-use pocketmine\Player;
+class WoodenButton extends Button {
 
-abstract class Menu {
+    protected $id = self::WOODEN_BUTTON;
 
-    const INTERACT_CLOAK_MENU = 0;
-    const INTERACT_KIT_MENU = 1;
-    const INTERACT_CAGES_MENU = 2;
-
-    public abstract function getInteractId(): int;
-
-    public static function getMenuName(int $id): string {
-        switch ($id) {
-            case self::INTERACT_CLOAK_MENU:
-                return "Cloak";
-            case self::INTERACT_KIT_MENU:
-                return "Kit";
-            case self::INTERACT_CAGES_MENU:
-                return "Cages";
-            default:
-                return "Unknown";
-        }
+    public function getName(): string {
+        return "Stone Button";
     }
 
-    public static function getMenu(Player $p, int $id): ?Menu {
-        switch ($id) {
-            case self::INTERACT_CLOAK_MENU:
-                return new CloakMenu($p);
-            case self::INTERACT_KIT_MENU:
-                return new KitMenu($p);
-            case self::INTERACT_CAGES_MENU:
-                return new CageMenu($p);
-            default:
-                return null;
-        }
+    public function getHardness(): float {
+        return 1000000;
     }
 
-    /**
-     * Get the next menu for player
-     *
-     * @param Player $p
-     */
-    public abstract function getNextMenu(Player $p);
-
-    /**
-     * Get the previous menu for player
-     *
-     * @param Player $p
-     */
-    public abstract function getPrevMenu(Player $p);
-
-    /**
-     * Executed when a player select the button
-     *
-     * @param Player $p
-     */
-    public abstract function onPlayerSelect(Player $p);
-
-    /**
-     * Get the data for a menu
-     *
-     * @return array
-     */
-    public abstract function getMenuData(): array;
+    public function getType(): string {
+        return "Wooden";
+    }
 }

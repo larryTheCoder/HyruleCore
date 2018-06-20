@@ -33,17 +33,19 @@
 
 namespace HyPrimeCore;
 
-use HyPrimeCore\broadcast\BroadcastingSystem;
 use HyPrimeCore\buttonInterface\ButtonInterface;
 use HyPrimeCore\formAPI\FormAPI;
 use HyPrimeCore\kits\KitInjectionModule;
 use HyPrimeCore\panel\Panel;
 use HyPrimeCore\player\PlayerData;
+use HyPrimeCore\tasks\BroadcastingSystem;
 use HyPrimeCore\tasks\IdleCheckTask;
+use HyPrimeCore\tasks\SendMOTD;
 use HyPrimeCore\utils\Settings;
 use HyPrimeCore\utils\Utils;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\item\enchantment\Enchantment;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
@@ -56,7 +58,7 @@ use pocketmine\utils\Config;
  */
 class CoreMain extends PluginBase {
 
-    const CONFIG_VERSION = 2;
+    const CONFIG_VERSION = 3;
     const OS = ["unknown", "Android", "iOS", "MacOS", "FireOS", "GearVR", "HoloLens", "Windows10", "Windows", "Dedicated", "Orbis", "NX"];
 
     /** @var CoreMain */
@@ -77,12 +79,13 @@ class CoreMain extends PluginBase {
     private $interface;
 
     public static function sendVersion(CommandSender $sender) {
-        $sender->sendMessage("§e--- HyruleNetwork (C) 2015-2018 ---");
+        $sender->sendMessage("§e--- §6Hyrule§cNetwork §3(C) §72015-2018 §e---");
         $sender->sendMessage("§6Owner: §dAlair069");
         $sender->sendMessage("§6Server Manager: §dMrPotato101");
         $sender->sendMessage("§6Head Management: §d@larryTheCoder");
         $sender->sendMessage("§3HyPrimeCore §aREV#201-394-675d §c(PRIVATE)");
         $sender->sendMessage("§3SkyWarsForPE §av1.9.8-Maya §c(PRIVATE)");
+        $sender->sendMessage("§3ASkyBlock §av0.4.2 §6(OPEN SOURCE) ");
     }
 
     public static function get() {
@@ -91,18 +94,18 @@ class CoreMain extends PluginBase {
 
     public function onLoad() {
         CoreMain::$instance = $this;
-        $this->getServer()->getLogger()->info("§eStarting to load HyruleCore...");
+        $this->getServer()->getLogger()->info("[H] §eStarting to load HyruleCore...");
         Utils::ensureDirectory($this);
-        $this->saveResource("config.yml", true);
+        $this->saveResource("config.yml");
         $this->saveResource("language/en_US.yml", true);
         $this->saveResource("language/pt_BR.yml");
         $cfg = new Config($this->getDataFolder() . "config.yml", Config::YAML);
         if ($cfg->get("config-version") !== CoreMain::CONFIG_VERSION) {
+            $this->getServer()->getLogger()->info($this->getPrefix() . "[H] §cCONFIGURATION UPDATE! UPDATE CONFIG.YML");
             rename($this->getDataFolder() . "config.yml", $this->getDataFolder() . "config.yml.old");
             $this->saveResource("config.yml");
         }
         Settings::load(new Config($this->getDataFolder() . "config.yml", Config::YAML));
-        $this->getServer()->getLogger()->info($this->getPrefix() . "§7Loaded languages");
     }
 
     public function getPrefix() {
@@ -110,9 +113,10 @@ class CoreMain extends PluginBase {
     }
 
     public function onEnable() {
-        $this->getServer()->getLogger()->info($this->getPrefix() . "§aStarting booting sequence 0xFFFFFF");
-        $this->getServer()->getScheduler()->scheduleRepeatingTask(new BroadcastingSystem($this), Settings::$messageInterval * 20);
-        $this->getServer()->getScheduler()->scheduleRepeatingTask(new IdleCheckTask($this), 20);
+        $this->getServer()->getLogger()->info($this->getPrefix() . "§7Starting booting sequence");
+        $this->registerEnchantment();
+        $this->registerScheduler();
+        $this->startModuleStartup();
 
         new KitInjectionModule($this);
         $this->interface = new ButtonInterface($this);
@@ -206,7 +210,6 @@ class CoreMain extends PluginBase {
                 case "en_us":
                     $locale = new Config($this->getDataFolder() . "language/en_US.yml", Config::YAML);
                     if (!$message = $locale->getNested($key)) {
-                        $this->getLogger()->warning("Message $key not found.");
                         $message = "";
                     }
                     break;
@@ -215,14 +218,12 @@ class CoreMain extends PluginBase {
                 case "pt_br":
                     $locale = new Config($this->getDataFolder() . "language/pt_BR.yml", Config::YAML);
                     if (!$message = $locale->getNested($key)) {
-                        $this->getLogger()->warning("Message $key not found.");
                         $message = "";
                     }
                     break;
                 default:
                     $locale = new Config($this->getDataFolder() . "language/en_US.yml", Config::YAML);
                     if (!$message = $locale->getNested($key)) {
-                        $this->getLogger()->warning("Message $key not found.");
                         $message = "";
                     }
                     break;
@@ -239,5 +240,56 @@ class CoreMain extends PluginBase {
             $message = str_replace('{' . $index . '}', $value, $message);
         }
         return $message;
+    }
+
+    /**
+     * This function is used to register some of the pocketmine unregistered enchantments
+     * May not be working fine
+     */
+    private function registerEnchantment() {
+        $this->getServer()->getLogger()->info($this->getPrefix() . "§7Registering Enchantments...");
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::THORNS, "%enchantment.protect.thorns", Enchantment::RARITY_UNCOMMON, Enchantment::SLOT_SWORD, 0, 3));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::DEPTH_STRIDER, "%enchantment.waterspeed", Enchantment::RARITY_UNCOMMON, Enchantment::SLOT_FEET, 0, 3));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::AQUA_AFFINITY, "%enchantment.protect.wateraffinity", Enchantment::RARITY_UNCOMMON, Enchantment::SLOT_FEET, 0, 1));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::SHARPNESS, "%enchantment.weapon.sharpness", Enchantment::RARITY_UNCOMMON, Enchantment::SLOT_SWORD, 0, 5));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::SMITE, "%enchantment.weapon.smite", Enchantment::RARITY_UNCOMMON, Enchantment::SLOT_SWORD, 0, 5));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::BANE_OF_ARTHROPODS, "%enchantment.weapon.arthropods", Enchantment::RARITY_UNCOMMON, Enchantment::SLOT_SWORD, 0, 5));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::KNOCKBACK, "%enchantment.weapon.knockback", Enchantment::RARITY_UNCOMMON, Enchantment::SLOT_SWORD, 0, 2));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::FIRE_ASPECT, "%enchantment.weapon.fireaspect", Enchantment::RARITY_UNCOMMON, Enchantment::SLOT_SWORD, 0, 2));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::LOOTING, "%enchantment.weapon.looting", Enchantment::RARITY_UNCOMMON, Enchantment::SLOT_SWORD, 0, 3));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::FORTUNE, "%enchantment.mining.fortune", Enchantment::RARITY_UNCOMMON, Enchantment::SLOT_TOOL, 0, 3));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::POWER, "%enchantment.bow.power", Enchantment::RARITY_UNCOMMON, Enchantment::SLOT_BOW, 0, 5));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::PUNCH, "%enchantment.bow.knockback", Enchantment::RARITY_UNCOMMON, Enchantment::SLOT_BOW, 0, 2));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::FLAME, "%enchantment.bow.flame", Enchantment::RARITY_UNCOMMON, Enchantment::SLOT_BOW, 0, 1));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::INFINITY, "%enchantment.bow.infinity", Enchantment::RARITY_UNCOMMON, Enchantment::SLOT_BOW, 0, 1));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::LUCK_OF_THE_SEA, "%enchantment.fishing.fortune", Enchantment::RARITY_UNCOMMON, Enchantment::SLOT_FISHING_ROD, 0, 3));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::LURE, "%enchantment.fishing.lure", Enchantment::RARITY_UNCOMMON, Enchantment::SLOT_FISHING_ROD, 0, 3));
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::FROST_WALKER, "%enchantment.waterwalk", Enchantment::RARITY_UNCOMMON, Enchantment::SLOT_ARMOR, 0, 2)); // TODO: verify name
+        Enchantment::registerEnchantment(new Enchantment(Enchantment::MENDING, "%enchantment.mending", Enchantment::RARITY_UNCOMMON, Enchantment::SLOT_ARMOR, 0, 1)); // TODO: verify name
+
+    }
+
+    /**
+     * Register scheduler and task for the Core
+     */
+    private function registerScheduler() {
+        $this->getScheduler()->scheduleRepeatingTask(new BroadcastingSystem($this), Settings::$messageInterval * 20);
+        $this->getScheduler()->scheduleRepeatingTask(new IdleCheckTask($this), 20);
+        $this->getScheduler()->scheduleRepeatingTask(new SendMOTD($this), $this->getConfig()->getNested("motd.delay"));
+    }
+
+    private function startModuleStartup() {
+        $inj = $this->getServer()->getPluginManager()->getPlugin("SkyWarsForPE");
+
+        // Check if injection is available
+        if (is_null($inj)) {
+            $this->getServer()->getLogger()->debug("No SkyWars plugin were found, it is required to use this core.");
+            return;
+        }
+
+        // Forcefully enable this plugin.
+        if (!$inj->isEnabled()) {
+            $inj->setEnabled(true);
+        }
     }
 }

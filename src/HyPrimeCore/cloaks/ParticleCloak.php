@@ -61,7 +61,7 @@ abstract class ParticleCloak {
             }
             $this->moving = false;
             $this->data = $data;
-            $this->task = Server::getInstance()->getScheduler()->scheduleRepeatingTask(new CloakTask($this), $delay);
+            $this->task = CoreMain::get()->getScheduler()->scheduleRepeatingTask(new CloakTask($this), $delay);
             $this->listener = new CloakListener($this);
         }
     }
@@ -77,7 +77,7 @@ abstract class ParticleCloak {
 
     public function clear() {
         if (!is_null($this->task)) {
-            Server::getInstance()->getScheduler()->cancelTask($this->task->getTaskId());
+            CoreMain::get()->getScheduler()->cancelTask($this->task->getTaskId());
             HandlerList::unregisterAll($this->listener);
         }
 

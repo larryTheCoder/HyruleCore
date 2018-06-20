@@ -103,7 +103,7 @@ class NormalKit extends KitsAPI {
      * @return string
      */
     public function getDescription(): string {
-        $this->description;
+        return $this->description;
     }
 
     /**
