@@ -70,6 +70,7 @@ class CoreListener implements Listener {
             $p->sendMessage("- " . $msg);
         }
         $p->sendMessage("§7[----------------------------------------]");
+        $p->sendMessage($this->plugin->getPrefix() . $this->plugin->getMessage($p, 'language-select', ['LANGUAGE' => $p->getLocale()]));
 
         $this->plugin->justJoined[strtolower($p->getName())] = true;
         $this->plugin->idlingTime[strtolower($p->getName())] = microtime(true); // Setup time

@@ -117,22 +117,35 @@ class KitInjectionModule {
                     } else {
                         Server::getInstance()->getLogger()->error(CoreMain::get()->getPrefix() . "§cUnknown EnchantmentID: " . $split[3]);
                     }
+                    $items[] = $item;
                 }
             }
             if (isset($kit[$val]["armour"])) {
-                foreach ($kit[$val]["armour"] as $value) {
-                    if (isset($value['hat'])) {
-                        $armours['helmet'] = $value['hat'];
-                    } else if (isset($value['chestplate'])) {
-                        $armours['helmet'] = $value['chestplate'];
-                    } else if (isset($value['leggings'])) {
-                        $armours['helmet'] = $value['leggings'];
-                    } else if (isset($value['boots'])) {
-                        $armours['helmet'] = $value['boots'];
-                    } else {
-                        Utils::send("&cUnknown value on armour at " . $val);
-                    }
+                if (isset($kit[$val]["armour"]['hat'])) {
+                    $armours['helmet'] = $kit[$val]["armour"]['hat'];
+                } else {
+                    $armours['helmet'] = Item::get(0);
                 }
+                if (isset($kit[$val]["armour"]['chestplate'])) {
+                    $armours['chestplate'] = $kit[$val]["armour"]['chestplate'];
+                } else {
+                    $armours['chestplate'] = Item::get(0);
+                }
+                if (isset($kit[$val]["armour"]['leggings'])) {
+                    $armours['leggings'] = $kit[$val]["armour"]['leggings'];
+                } else {
+                    $armours['leggings'] = Item::get(0);
+                }
+                if (isset($kit[$val]["armour"]['boots'])) {
+                    $armours['boots'] = $kit[$val]["armour"]['boots'];
+                } else {
+                    $armours['boots'] = Item::get(0);
+                }
+            } else {
+                $armours['helmet'] = Item::get(0);
+                $armours['chestplate'] = Item::get(0);
+                $armours['leggings'] = Item::get(0);
+                $armours['boots'] = Item::get(0);
             }
 
             $kitAPI->setInventoryItem($items);

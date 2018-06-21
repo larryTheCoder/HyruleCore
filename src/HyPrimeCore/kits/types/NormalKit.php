@@ -33,7 +33,6 @@
 
 namespace HyPrimeCore\kits\types;
 
-
 use larryTheCoder\kits\KitsAPI;
 use pocketmine\item\Item;
 use pocketmine\Player;

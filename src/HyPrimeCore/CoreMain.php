@@ -48,6 +48,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
+use pocketmine\Server;
 use pocketmine\utils\Config;
 
 /**
@@ -180,7 +181,21 @@ class CoreMain extends PluginBase {
                     $sender->sendMessage("Please use this command in-game");
                     break;
                 }
+                if (!$sender->hasPermission("admin.setup")) {
+                    $sender->sendMessage($this->getMessage($sender, "error.no-permission"));
+                    break;
+                }
                 $this->interface->setupInterface($sender);
+                break;
+            case "showops":
+                if (!$sender->hasPermission("admin.command")) {
+                    $sender->sendMessage($this->getMessage($sender, "error.no-permission"));
+                    break;
+                }
+                $ops = Server::getInstance()->getOps();
+                $var = array_keys($ops->getAll());
+                $split = implode(", ", $var);
+                $sender->sendMessage("Operators[" . count($var) . "]: " . $split);
                 break;
         }
         return true;
@@ -194,13 +209,13 @@ class CoreMain extends PluginBase {
      * Get the translation for the user.
      * Support client localization
      *
-     * @param Player $p
+     * @param Player|CommandSender|null $p
      * @param $key
-     * @param mixed ...$replacement
+     * @param string[] $replacement
      * @return mixed
      */
-    public function getMessage(?Player $p, $key, ...$replacement) {
-        if ($p === null) {
+    public function getMessage($p, $key, array $replacement = []) {
+        if ($p === null || !($p instanceof Player)) {
             if (!$message = (new Config($this->getDataFolder() . "language/en_US.yml", Config::YAML))->getNested($key)) {
                 $this->getLogger()->warning("Message $key not found.");
                 $message = "";

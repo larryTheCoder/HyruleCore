@@ -37,7 +37,6 @@ use HyPrimeCore\CoreMain;
 use HyPrimeCore\tasks\CloakTask;
 use pocketmine\event\HandlerList;
 use pocketmine\Player;
-use pocketmine\Server;
 
 abstract class ParticleCloak {
 

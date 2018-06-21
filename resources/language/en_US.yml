@@ -4,7 +4,7 @@
 ###########################################################################################
 ---
 
-language-select: "§6You selected language: {LANGUAGE}"
+language-select: "§6You selected language: §e{LANGUAGE}"
 
 error:
  no-permission: "§cYou don't have permission to use this."
