@@ -33,8 +33,8 @@
 
 namespace HyPrimeCore\cloaks\type;
 
-
 use HyPrimeCore\cloaks\ParticleCloak;
+use HyPrimeCore\player\FakePlayer;
 use pocketmine\Player;
 
 class CloakType {
@@ -46,13 +46,15 @@ class CloakType {
     const SCANNER = 4;
     const SHAMAN = 5;
     const SUPERWING = 6;
+    const BLOODHOUND = 7;
+    const WISDOM = 8;
 
     /**
-     * @param Player $p
+     * @param Player|FakePlayer $p
      * @param int $id
      * @return ParticleCloak|null
      */
-    public static function getCloakById(?Player $p, int $id): ?ParticleCloak {
+    public static function getCloakById($p, int $id): ?ParticleCloak {
         switch ($id) {
             case self::FIREWINGS:
                 return new Firewings($p);
@@ -68,6 +70,10 @@ class CloakType {
                 return new Shaman($p);
             case self::SUPERWING:
                 return new MegaWing($p);
+            case self::BLOODHOUND:
+                return new BloodHound($p);
+            case self::WISDOM:
+                return new Wisdom($p);
             default:
                 return null;
         }
@@ -95,6 +101,10 @@ class CloakType {
                 return "core.cloak.shaman";
             case self::SUPERWING:
                 return "core.cloak.superwing";
+            case self::BLOODHOUND:
+                return "core.cloak.bloodhound";
+            case self::WISDOM:
+                return "core.cloak.wisdom";
             default:
                 return null;
         }
@@ -119,12 +129,16 @@ class CloakType {
                 return "Shaman";
             case self::SUPERWING:
                 return "Superwing";
+            case self::BLOODHOUND:
+                return "Bloodhound";
+            case self::WISDOM:
+                return "Wisdom";
             default:
                 return "Unknown";
         }
     }
 
     public static function getAll(): array {
-        return ["Firerings", "Firewings", "Frosty", "Superhero", "Scanner", "Shaman", "Superwing"];
+        return ["Firerings", "Firewings", "Frosty", "Superhero", "Scanner", "Shaman", "Superwing", "Bloodhound", "Wisdom"];
     }
 }

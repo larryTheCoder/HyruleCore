@@ -38,6 +38,7 @@ use pocketmine\entity\Skin;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\level\Level;
+use pocketmine\level\Location;
 use pocketmine\level\particle\Particle;
 use pocketmine\network\mcpe\protocol\AddPlayerPacket;
 use pocketmine\network\mcpe\protocol\DataPacket;
@@ -60,16 +61,53 @@ class FakePlayer extends Particle {
     public $uuid;
     /** @var Player */
     private $player;
+    private $title;
 
     /**
+     * @param Location $loc
      * @param Player $player
      * @param Level $level
      */
-    public function __construct(Player $player, Level $level) {
-        parent::__construct($player->x, $player->y, $player->z);
+    public function __construct(Location $loc, Player $player, Level $level) {
+        parent::__construct($loc->x, $loc->y, $loc->z);
         $this->level = $level;
         $this->player = $player;
         $this->uuid = UUID::fromRandom();
+        $this->title = "";
+        $this->yaw = $loc->getYaw();
+        $this->pitch = $loc->getPitch();
+    }
+
+    public function getLocation(): Location {
+        return new Location($this->x, $this->y, $this->z, $this->yaw, $this->pitch, $this->level);
+    }
+
+    /**
+     * Get the entity runtime ID
+     *
+     * @return int
+     */
+    public function getRuntimeId() {
+        return $this->entityId;
+    }
+
+    /**
+     * Get the main player for this NPC
+     *
+     * @return Player
+     */
+    public function getPlayer(): Player {
+        return $this->player;
+    }
+
+    /**
+     * Set the title for the entity
+     * (Need to be spawned by yourself
+     *
+     * @param $title
+     */
+    public function setTitle($title) {
+        $this->title = $title;
     }
 
     /**
@@ -89,7 +127,9 @@ class FakePlayer extends Particle {
 
         $pk = new AddPlayerPacket();
         $pk->uuid = is_null($this->uuid) ? $this->uuid = UUID::fromRandom() : $this->uuid;
-        $pk->username = "";
+        $pk->username = $this->title;
+        $pk->yaw = $this->yaw;
+        $pk->pitch = $this->pitch;
         $pk->entityRuntimeId = $this->entityId;
         $pk->position = $this->asVector3(); // TODO: check offset
         $pk->item = ItemFactory::get(Item::AIR, 0, 0);
@@ -108,5 +148,9 @@ class FakePlayer extends Particle {
         $p[] = $skinPk;
 
         return $p;
+    }
+
+    public function getLevel(): Level {
+        return $this->level;
     }
 }

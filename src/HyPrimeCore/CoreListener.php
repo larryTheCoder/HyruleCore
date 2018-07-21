@@ -81,6 +81,9 @@ class CoreListener implements Listener {
         $p = $e->getPlayer();
         $e->setQuitMessage("");
 
+        if ($this->plugin->getPlayerData($p)->getCloakData() !== null) {
+            $this->plugin->getPlayerData($p)->setCurrentCloak(null);
+        }
         unset($this->plugin->idlingTime[strtolower($p->getName())]);
     }
 
@@ -144,23 +147,33 @@ class CoreListener implements Listener {
 
     /**
      * @param EntityDamageEvent $ev
-     * @priority MONITOR
+     * @priority NORMAL
      */
     public function onPlayerDamaged(EntityDamageEvent $ev) {
         $p = $ev->getEntity();
         // Here is the place where the player can kill in arena
         $arena = SkyWarsPE::getInstance()->getArenaManager()->getPlayerArena($p);
         if ($p instanceof Player && $arena === null) {
+            if (isset($this->plugin->getBypasses()[$p->getName()])) {
+                return;
+            }
             $ev->setCancelled();
+            if ($p->getY() <= 0) {
+                $level = $p->getLevel();
+                $p->teleport($level->getSafeSpawn());
+            }
         }
     }
 
     /**
      * @param PlayerDeathEvent $e
-     * @priority MONITOR
+     * @priority NORMAL
      */
     public function onPlayerDeath(PlayerDeathEvent $e) {
         $p = $e->getPlayer();
+        if (isset($this->plugin->getBypasses()[$p->getName()])) {
+            return;
+        }
         // Here is the place where the player can kill in arena
         $arena = SkyWarsPE::getInstance()->getArenaManager()->getPlayerArena($p);
         if ($p instanceof Player && $arena !== null) {
@@ -173,6 +186,10 @@ class CoreListener implements Listener {
         } else {
             // Not in arena? Cancel them
             $e->setCancelled();
+            if ($p->getY() <= 0) {
+                $level = $p->getLevel();
+                $p->teleport($level->getSafeSpawn());
+            }
         }
     }
 }

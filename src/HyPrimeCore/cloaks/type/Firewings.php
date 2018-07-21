@@ -37,7 +37,7 @@ use HyPrimeCore\cloaks\ParticleCloak;
 use HyPrimeCore\utils\Utils;
 use pocketmine\level\Location;
 use pocketmine\level\particle\FlameParticle;
-use pocketmine\Player;
+
 
 class Firewings extends ParticleCloak {
 
@@ -58,7 +58,7 @@ class Firewings extends ParticleCloak {
         [false, false, false, false, false, false, true, false, false, false, false, false, false, true, false, false, false, false, false, false]
     ];
 
-    public function __construct(Player $player) {
+    public function __construct($player) {
         parent::__construct($player, 2, CloakType::FIREWINGS);
     }
 
@@ -85,7 +85,7 @@ class Firewings extends ParticleCloak {
                     $newVec = $v->add($v2->multiply(-0.2 - $iT));
                     $newLoc = $newVec->add($loc);
                     for ($k = 0; $k < 3; ++$k) {
-                        $this->getPlayer()->getLevel()->addParticle(new FlameParticle($newLoc));
+                        $this->addParticle(new FlameParticle($newLoc));
                     }
                 }
                 $x += $space;

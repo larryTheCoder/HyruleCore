@@ -78,6 +78,37 @@ class CoreMain extends PluginBase {
     public $fly = [];
     /** @var ButtonInterface */
     private $interface;
+    /** @var Player[] */
+    private $bypassDamage = [];
+
+    public function getBypasses() {
+        return $this->bypassDamage;
+    }
+
+    /**
+     * Add bypass to player, ensure that player could kill and
+     * damage the player
+     *
+     * @param Player $p
+     */
+    public static function addBypass(Player $p) {
+        CoreMain::get()->bypassDamage[$p->getName()] = $p;
+    }
+
+    /**
+     * Remove bypass protection for player, used for other
+     * plugin or features
+     *
+     * @param Player $p
+     * @return bool
+     */
+    public static function removeBypass(Player $p): bool {
+        if (isset(CoreMain::get()->bypassDamage[$p->getName()])) {
+            unset(CoreMain::get()->bypassDamage[$p->getName()]);
+            return true;
+        }
+        return false;
+    }
 
     public static function sendVersion(CommandSender $sender) {
         $sender->sendMessage("§e--- §6Hyrule§cNetwork §3(C) §72015-2018 §e---");

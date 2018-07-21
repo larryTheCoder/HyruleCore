@@ -76,7 +76,7 @@ abstract class Button extends Flowable {
         }
         $this->setDamage($this->getDamage() ^ 0x08);
         $this->level->setBlock($this, $this, true, false);
-        $this->level->addSound(new ClickSound($this->add(0.5, 0.5, 0.5)));
+        $this->level->addSound(new ClickSound($this->add(0.5, 0.5, 0.5)), [$player]);
         $this->level->scheduleDelayedBlockUpdate($this, 30);
         return true;
     }
@@ -84,7 +84,6 @@ abstract class Button extends Flowable {
     public function onScheduledUpdate(): void {
         $this->setDamage($this->getDamage() ^ 0x08);
         $this->level->setBlock($this, $this, true, false);
-        $this->level->addSound(new ClickSound($this->add(0.5, 0.5, 0.5)));
     }
 
     public function recalculateBoundingBox(): ?AxisAlignedBB {

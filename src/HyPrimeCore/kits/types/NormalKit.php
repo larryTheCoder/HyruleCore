@@ -118,9 +118,24 @@ class NormalKit extends KitsAPI {
      */
     public function executeKit(Player $p) {
         $p->getInventory()->setContents($this->item);
-        $p->getArmorInventory()->setHelmet($this->armourContent['helmet']);
-        $p->getArmorInventory()->setChestplate($this->armourContent['chestplate']);
-        $p->getArmorInventory()->setLeggings($this->armourContent['leggings']);
-        $p->getArmorInventory()->setBoots($this->armourContent['boots']);
+        $p->getArmorInventory()->setHelmet($this->armourContent[0]);
+        $p->getArmorInventory()->setChestplate($this->armourContent[1]);
+        $p->getArmorInventory()->setLeggings($this->armourContent[2]);
+        $p->getArmorInventory()->setBoots($this->armourContent[3]);
+    }
+
+    /**
+     * @return Item[]
+     */
+    public function getItems(): array {
+        return $this->item;
+    }
+
+    /**
+     * @return Item[]
+     */
+    public function getArmourContents(): array {
+
+        return $this->armourContent;
     }
 }

@@ -33,7 +33,7 @@
 
 namespace HyPrimeCore\cloaks;
 
-use HyPrimeCore\CoreMain;
+use HyPrimeCore\player\FakePlayer;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerMoveEvent;
 
@@ -43,15 +43,23 @@ class CloakListener implements Listener {
 
     public function __construct(ParticleCloak $cloak) {
         $this->cloak = $cloak;
-        CoreMain::get()->getServer()->getPluginManager()->registerEvents($this, CoreMain::get());
     }
 
+    /**
+     * @param PlayerMoveEvent $event
+     * @priority LOWEST
+     */
     public function onPlayerMove(PlayerMoveEvent $event) {
-        if ($event->getPlayer()->getName() != $this->cloak->getPlayer()->getName()) {
+        if ($this->cloak->getPlayer() instanceof FakePlayer) {
             return;
         }
-        if ($event->getPlayer()->getName() != $this->cloak->getPlayer()->getName() && !$this->cloak->moving && ($event->getFrom()->getX() != $event->getTo()->getX() || $event->getFrom()->getY() != $event->getTo()->getY() || $event->getFrom()->getZ() != $event->getTo()->getZ())) {
+        if ($event->getPlayer()->getName() !== $this->cloak->getPlayer()->getName()) {
+            return;
+        }
+        if ($event->getFrom()->distance($event->getTo()) >= 0.1) {
             $this->cloak->moving = true;
+        } else {
+            $this->cloak->moving = false;
         }
     }
 }

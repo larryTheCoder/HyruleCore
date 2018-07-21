@@ -34,6 +34,7 @@
 namespace HyPrimeCore\buttonInterface\menu;
 
 
+use HyPrimeCore\player\FakePlayer;
 use pocketmine\Player;
 
 abstract class Menu {
@@ -72,24 +73,18 @@ abstract class Menu {
 
     /**
      * Get the next menu for player
-     *
-     * @param Player $p
      */
-    public abstract function getNextMenu(Player $p);
+    public abstract function getNextMenu();
 
     /**
      * Get the previous menu for player
-     *
-     * @param Player $p
      */
-    public abstract function getPrevMenu(Player $p);
+    public abstract function getPrevMenu();
 
     /**
      * Executed when a player select the button
-     *
-     * @param Player $p
      */
-    public abstract function onPlayerSelect(Player $p);
+    public abstract function onPlayerSelect();
 
     /**
      * Get the data for a menu
@@ -97,4 +92,13 @@ abstract class Menu {
      * @return array
      */
     public abstract function getMenuData(): array;
+
+    /**
+     * Get the data for a menu
+     *
+     * @param FakePlayer $player
+     * @param bool $cleanup
+     * @return array
+     */
+    public abstract function updateNPC(FakePlayer $player, bool $cleanup);
 }

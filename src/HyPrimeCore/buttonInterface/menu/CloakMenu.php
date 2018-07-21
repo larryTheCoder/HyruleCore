@@ -34,8 +34,10 @@
 namespace HyPrimeCore\buttonInterface\menu;
 
 use HyPrimeCore\cloaks\CloakManager;
+use HyPrimeCore\cloaks\ParticleCloak;
 use HyPrimeCore\cloaks\type\CloakType;
 use HyPrimeCore\CoreMain;
+use HyPrimeCore\player\FakePlayer;
 use pocketmine\Player;
 
 class CloakMenu extends Menu {
@@ -44,6 +46,8 @@ class CloakMenu extends Menu {
     private $count = 0;
     /** @var Player */
     private $player;
+    /** @var ParticleCloak */
+    private $cloak;
 
     public function __construct(Player $p) {
         $this->player = $p;
@@ -55,10 +59,8 @@ class CloakMenu extends Menu {
 
     /**
      * Get the next menu for player
-     *
-     * @param Player $p
      */
-    public function getNextMenu(Player $p) {
+    public function getNextMenu() {
         if ($this->count >= count(CloakType::getAll()) - 1) {
             $this->count = 0;
         } else {
@@ -68,10 +70,8 @@ class CloakMenu extends Menu {
 
     /**
      * Get the previous menu for player
-     *
-     * @param Player $p
      */
-    public function getPrevMenu(Player $p) {
+    public function getPrevMenu() {
         if ($this->count <= 0) {
             $this->count = count(CloakType::getAll()) - 1;
         } else {
@@ -79,15 +79,15 @@ class CloakMenu extends Menu {
         }
     }
 
-    public function onPlayerSelect(Player $p) {
+    public function onPlayerSelect() {
         $id = $this->count;
-        if (!$p->hasPermission(CloakType::getCloakPermission($id))) {
-            $p->sendMessage(CoreMain::get()->getPrefix() . CoreMain::get()->getMessage($p, 'error.buy-site'));
+        if (!$this->player->hasPermission(CloakType::getCloakPermission($id))) {
+            $this->player->sendMessage(CoreMain::get()->getPrefix() . CoreMain::get()->getMessage($this->player, 'error.buy-site'));
             return;
         }
-        CloakManager::equipCloak($p, $id);
-        $msg = str_replace("{CLOAK}", CloakType::getCloakName($id), CoreMain::get()->getMessage($p, 'panel.cloak-selected'));
-        $p->sendMessage(CoreMain::get()->getPrefix() . $msg);
+        CloakManager::equipCloak($this->player, $id);
+        $msg = str_replace("{CLOAK}", CloakType::getCloakName($id), CoreMain::get()->getMessage($this->player, 'panel.cloak-selected'));
+        $this->player->sendMessage(CoreMain::get()->getPrefix() . $msg);
     }
 
     /**
@@ -104,5 +104,24 @@ class CloakMenu extends Menu {
         }
         $data['name'] = CloakType::getCloakName($this->count);
         return $data;
+    }
+
+    /**
+     * Update the NPC interface with player
+     *
+     * @param FakePlayer $player
+     * @param bool $cleanup
+     * @return void
+     */
+    public function updateNPC(FakePlayer $player, bool $cleanup) {
+        if (!isset($this->cloak)) {
+            $this->cloak = CloakType::getCloakById($player, $this->count); // It will start
+            return;
+        }
+        // Clear the cloak first
+        $this->cloak->clear();
+        unset($this->cloak);
+        // Then restart again
+        $this->cloak = CloakType::getCloakById($player, $this->count);
     }
 }

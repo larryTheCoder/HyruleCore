@@ -34,26 +34,34 @@
 namespace HyPrimeCore\cloaks;
 
 use HyPrimeCore\CoreMain;
+use HyPrimeCore\player\FakePlayer;
 use HyPrimeCore\tasks\CloakTask;
 use pocketmine\event\HandlerList;
+use pocketmine\level\particle\Particle;
 use pocketmine\Player;
 
 abstract class ParticleCloak {
 
     /** @var bool */
     public $moving = false;
-    /** @var null|Player */
+    /** @var null|Player|FakePlayer */
     private $player = null;
-    /** @var ParticleCloak */
+    /** @var CloakListener */
     private $listener;
     /** @var int */
     private $data;
     /** @var null|\pocketmine\scheduler\TaskHandler */
     private $task;
 
-    public function __construct(Player $player, int $delay, int $data) {
+    /**
+     * ParticleCloak constructor.
+     * @param null|Player|FakePlayer $player
+     * @param int $delay
+     * @param int $data
+     */
+    public function __construct($player, int $delay, int $data) {
         $this->player = $player;
-        if ($this->player !== null) {
+        if ($this->player instanceof Player) {
             if (!$player->hasPermission($this->getPermissionNode())) {
                 $player->sendMessage(CoreMain::get()->getMessage($player, 'error.buy-site'));
                 return;
@@ -62,6 +70,13 @@ abstract class ParticleCloak {
             $this->data = $data;
             $this->task = CoreMain::get()->getScheduler()->scheduleRepeatingTask(new CloakTask($this), $delay);
             $this->listener = new CloakListener($this);
+            CoreMain::get()->getServer()->getPluginManager()->registerEvents($this->listener, CoreMain::get());
+        } else if ($this->player instanceof FakePlayer) {
+            $this->moving = false;
+            $this->data = $data;
+            $this->task = CoreMain::get()->getScheduler()->scheduleRepeatingTask(new CloakTask($this), $delay);
+            $this->listener = new CloakListener($this);
+            CoreMain::get()->getServer()->getPluginManager()->registerEvents($this->listener, CoreMain::get());
         }
     }
 
@@ -85,9 +100,9 @@ abstract class ParticleCloak {
     }
 
     /**
-     * @return null|Player
+     * @return FakePlayer|null|Player
      */
-    public function getPlayer(): ?Player {
+    public function getPlayer() {
         return $this->player;
     }
 
@@ -95,6 +110,14 @@ abstract class ParticleCloak {
 
     public function isMoving(): bool {
         return $this->moving;
+    }
+
+    public function addParticle(Particle $particle) {
+        if ($this->player instanceof FakePlayer) {
+            $this->player->getLevel()->addParticle($particle, [$this->player->getPlayer()]);
+        } else {
+            $this->player->getLevel()->addParticle($particle);
+        }
     }
 
 }

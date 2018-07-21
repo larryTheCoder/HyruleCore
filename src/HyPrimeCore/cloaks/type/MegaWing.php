@@ -35,9 +35,8 @@ namespace HyPrimeCore\cloaks\type;
 
 
 use HyPrimeCore\cloaks\ParticleCloak;
-use pocketmine\level\particle\CriticalParticle;
+use pocketmine\level\particle\FlameParticle;
 use pocketmine\level\particle\Particle;
-use pocketmine\level\particle\RedstoneParticle;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
@@ -49,29 +48,33 @@ class MegaWing extends ParticleCloak {
     private $startOffset = 30;
     private $stopOffset = 20;
     private $degreesForward = false;
-    private $distanceBetweenParticles = 0.3;
+    private $distanceBetweenParticles = 0.1;
     private $distanceFromPlayer = 0.2;
-    private $startingY = 0.4;
+    private $startingY = 0.3;
     private $particleCoordinates = [];
 
     public function __construct(Player $player) {
-        parent::__construct($player, 1, CloakType::SUPERWING);
+        parent::__construct($player, 4, CloakType::SUPERWING);
         $coordinates = [["-,-,-,-,x,x,x,-,-,-"], ["-,-,-,x,x,x,x,x,-,-"], ["-,-,x,x,x,x,x,x,x,-"], ["-,x,x,x,x,x,x,x,x,-"], ["x,x,x,x,x,x,x,x,x,x"], ["x,x,x,x,x,x,x,x,x,x"], ["x,x,x,x,x,x,x,x,x,x"], ["x,x,x,x,x,x,x,x,x,x"], ["-,-,x,x,x,x,x,x,x,x"], ["-,-,-,x,x,x,x,x,x,x"], ["-,-,-,x,x,x,x,x,x,x"], ["-,-,-,-,x,x,x,x,x,x"], ["-,-,-,-,x,x,x,x,x,x"], ["-,-,-,-,-,x,x,x,x,-"], ["-,-,-,-,-,x,x,x,x,-"], ["-,-,-,-,-,-,x,x,x,-"], ["-,-,-,-,-,-,x,x,x,-"], ["-,-,-,-,-,-,-,x,x,-"], ["-,-,-,-,-,-,-,-,x,-"]];
         $yValue = $this->startingY + $this->distanceBetweenParticles * count($coordinates) - $this->distanceBetweenParticles;
-        for ($i = 0; $i < count($coordinates); ++$i) {
-            $split = explode(",", $coordinates[$i][0]);
+        $particleCoordinates = [];
+        $this->degreesLeft = -$this->startOffset;
+        $this->degreesRight = -$this->startOffset - 180;
+        foreach ($coordinates as $cords){
+            $split = explode(",", $cords[0]);
             $xValue = $this->distanceFromPlayer;
             $yValue -= $this->distanceBetweenParticles;
-            for ($j = 0; $j < count($split); ++$j) {
+            for ($j = 0; $j !== count($split); ++$j) {
                 if ($split[$j] === '-') {
                     $xValue += $this->distanceBetweenParticles;
                 } else {
                     $xValue += $this->distanceBetweenParticles;
                     $coordinates = [$xValue, $yValue];
-                    $this->particleCoordinates[] = $coordinates;
+                    $particleCoordinates[] = $coordinates;
                 }
             }
         }
+        $this->particleCoordinates = $particleCoordinates;
     }
 
     public function getPermissionNode(): string {
@@ -90,8 +93,8 @@ class MegaWing extends ParticleCloak {
         foreach ($this->particleCoordinates as $coordinate) {
             $x = $coordinate[0];
             $y = $coordinate[1];
-            $this->spawnParticle($this->getPlayer(), new CriticalParticle(new Vector3(), 1), $x, $this->degreesLeft, $y);
-            $this->spawnParticle($this->getPlayer(), new CriticalParticle(new Vector3(), 1), $x, $this->degreesRight, $y);
+            $this->spawnParticle($this->getPlayer(), new FlameParticle(new Vector3()), $x, $this->degreesLeft, $y);
+            $this->spawnParticle($this->getPlayer(), new FlameParticle(new Vector3()), $x, $this->degreesRight, $y);
         }
     }
 
@@ -102,6 +105,6 @@ class MegaWing extends ParticleCloak {
         $vec = new Vector3(cos($yaw) * $x, $y, sin($yaw) * $x);
         $vec2 = $loc->add($vec);
         $particle->setComponents($vec2->x, $vec2->y, $vec2->z);
-        $player->getLevel()->addParticle($particle);
+        $this->addParticle($particle);
     }
 }

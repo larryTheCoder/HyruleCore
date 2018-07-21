@@ -33,13 +33,17 @@
 
 namespace HyPrimeCore\buttonInterface\menu;
 
-use larryTheCoder\kits\Kits;
+use HyPrimeCore\kits\types\NormalKit;
+use HyPrimeCore\player\FakePlayer;
 use larryTheCoder\SkyWarsPE;
+use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
+use pocketmine\network\mcpe\protocol\MobArmorEquipmentPacket;
 use pocketmine\Player;
 
 class KitMenu extends Menu {
 
-    /** @var Kits[] */
+    /** @var NormalKit[] */
     private $types;
     /** @var int */
     private $count = 0;
@@ -57,10 +61,8 @@ class KitMenu extends Menu {
 
     /**
      * Get the next menu for player
-     *
-     * @param Player $p
      */
-    public function getNextMenu(Player $p) {
+    public function getNextMenu() {
         if ($this->count >= count($this->types) - 1) {
             $this->count = 0;
         } else {
@@ -70,10 +72,8 @@ class KitMenu extends Menu {
 
     /**
      * Get the previous menu for player
-     *
-     * @param Player $p
      */
-    public function getPrevMenu(Player $p) {
+    public function getPrevMenu() {
         if ($this->count <= 0) {
             $this->count = count($this->types) - 1;
         } else {
@@ -83,11 +83,9 @@ class KitMenu extends Menu {
 
     /**
      * Executed when a player select the button
-     *
-     * @param Player $p
      */
-    public function onPlayerSelect(Player $p) {
-        SkyWarsPE::getInstance()->kit->setPlayerKit($p, $this->types[$this->count]);
+    public function onPlayerSelect() {
+        SkyWarsPE::getInstance()->kit->setPlayerKit($this->player, $this->types[$this->count]);
     }
 
     /**
@@ -106,5 +104,60 @@ class KitMenu extends Menu {
         }
 
         return $data;
+    }
+
+    /**
+     * Update the NPC interface with player
+     * Only send the packets or interactions entity to player.
+     * Cleanup is used to clean all the interface between
+     * the player to make sure the next interface are clean.
+     *
+     * @param FakePlayer $player
+     * @param bool $cleanup
+     * @return void
+     */
+    public function updateNPC(FakePlayer $player, bool $cleanup) {
+        if ($cleanup) {
+            $pk = new MobArmorEquipmentPacket();
+            $pk->entityRuntimeId = $player->getRuntimeId();
+            $pk->slots = $this->getContents(false);
+            $pk->encode();
+        } else {
+            $pk = new MobArmorEquipmentPacket();
+            $pk->entityRuntimeId = $player->getRuntimeId();
+            $pk->slots = $this->getContents(true);
+            $pk->encode();
+        }
+
+        $this->player->dataPacket($pk);
+    }
+
+    /**
+     * @param bool $includeEmpty
+     *
+     * @return Item[]
+     */
+    public function getContents(bool $includeEmpty = false): array {
+        $contents = [];
+        $air = null;
+        $kit = $this->types[$this->count];
+
+        if ($includeEmpty) {
+            foreach ($kit->getArmourContents() as $id => $slot) {
+                if ($slot !== null) {
+                    $contents[$id] = clone $slot;
+                } elseif ($includeEmpty) {
+                    $contents[$id] = $air ?? ($air = ItemFactory::get(Item::AIR, 0, 0));
+                }
+            }
+        } else {
+            $contents[0] = $air ?? ($air = ItemFactory::get(Item::AIR, 0, 0));
+            $contents[1] = $air ?? ($air = ItemFactory::get(Item::AIR, 0, 0));
+            $contents[2] = $air ?? ($air = ItemFactory::get(Item::AIR, 0, 0));
+            $contents[3] = $air ?? ($air = ItemFactory::get(Item::AIR, 0, 0));
+        }
+
+
+        return $contents;
     }
 }

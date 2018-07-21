@@ -38,7 +38,7 @@ use HyPrimeCore\cloaks\ParticleCloak;
 use pocketmine\level\Location;
 use pocketmine\level\particle\CriticalParticle;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+
 
 class Scanner extends ParticleCloak {
 
@@ -53,7 +53,7 @@ class Scanner extends ParticleCloak {
     /** @var int */
     private $locY;
 
-    public function __construct(Player $player) {
+    public function __construct($player) {
         parent::__construct($player, 2, CloakType::SCANNER);
         $this->radius = 0.6;
         $this->particles = 25.0;
@@ -74,7 +74,7 @@ class Scanner extends ParticleCloak {
             $inc = 0.6283185307179586 / $this->particles;
             $angle = $this->step * $inc + $this->stepY + 3.5 * $i2 - 0.2;
             $v = new Vector3(cos($angle) * $this->radius, 0, sin($angle) * $this->radius);
-            $loc->getLevel()->addParticle(new CriticalParticle($loc->add($v)->add(0.0, $this->locY, 0.0), 1));
+            $this->addParticle(new CriticalParticle($loc->add($v)->add(0.0, $this->locY, 0.0), 1));
         }
         if ($this->stepY < 6.0) {
             $this->stepY += 0.045;

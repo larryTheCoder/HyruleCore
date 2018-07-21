@@ -33,6 +33,7 @@
 
 namespace HyPrimeCore\buttonInterface\menu;
 
+use HyPrimeCore\player\FakePlayer;
 use larryTheCoder\cages\Cage;
 use larryTheCoder\SkyWarsPE;
 use pocketmine\Player;
@@ -41,8 +42,6 @@ class CageMenu extends Menu {
 
     /** @var Cage[] */
     private $types;
-    /** @var null|SkyWarsPE */
-    private $plugin;
     /** @var int */
     private $count = 0;
     /** @var Player */
@@ -61,10 +60,8 @@ class CageMenu extends Menu {
 
     /**
      * Get the next menu for player
-     *
-     * @param Player $p
      */
-    public function getNextMenu(Player $p) {
+    public function getNextMenu() {
         if ($this->count >= count($this->types) - 1) {
             $this->count = 0;
         } else {
@@ -74,10 +71,8 @@ class CageMenu extends Menu {
 
     /**
      * Get the previous menu for player
-     *
-     * @param Player $p
      */
-    public function getPrevMenu(Player $p) {
+    public function getPrevMenu() {
         if ($this->count <= 0) {
             $this->count = count($this->types) - 1;
         } else {
@@ -87,11 +82,9 @@ class CageMenu extends Menu {
 
     /**
      * Executed when a player select the button
-     *
-     * @param Player $p
      */
-    public function onPlayerSelect(Player $p) {
-        SkyWarsPE::getInstance()->cage->setPlayerCage($p, $this->types[$this->count]);
+    public function onPlayerSelect() {
+        SkyWarsPE::getInstance()->cage->setPlayerCage($this->player, $this->types[$this->count]);
     }
 
     /**
@@ -111,5 +104,15 @@ class CageMenu extends Menu {
         }
 
         return $data;
+    }
+    /**
+     * Update the NPC interface with player
+     *
+     * @param FakePlayer $player
+     * @param bool $cleanup
+     * @return void
+     */
+    public function updateNPC(FakePlayer $player, bool $cleanup) {
+        // TODO: Implement updateNPC() method.
     }
 }

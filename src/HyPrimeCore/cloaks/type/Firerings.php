@@ -37,13 +37,13 @@ use HyPrimeCore\cloaks\ParticleCloak;
 use HyPrimeCore\utils\Utils;
 use pocketmine\level\particle\FlameParticle;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
+
 
 class Firerings extends ParticleCloak {
 
     private $step;
 
-    public function __construct(Player $player) {
+    public function __construct($player) {
         parent::__construct($player, 1, CloakType::FIRERINGS);
     }
 
@@ -63,7 +63,7 @@ class Firerings extends ParticleCloak {
                 Utils::rotateAroundAxisZ($v, 100.0);
             }
             $loc = clone $this->getPlayer()->getLocation()->add(0.0, 1.0, 0.0)->add($v);
-            $this->getPlayer()->getLevel()->addParticle(new FlameParticle($loc));
+            $this->addParticle(new FlameParticle($loc));
         }
         $this->step += 3;
     }

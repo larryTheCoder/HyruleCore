@@ -37,6 +37,7 @@ namespace HyPrimeCore\player;
  * The Directive Player Handler class
  * This handles player chat, behaviour on default level
  * Which it is basically save player information
+ * NOT GDPR applied
  *
  * @package HPrimeCore\player
  */

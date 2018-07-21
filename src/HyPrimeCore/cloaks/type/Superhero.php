@@ -38,14 +38,14 @@ use HyPrimeCore\utils\Utils;
 use pocketmine\level\Location;
 use pocketmine\level\particle\RedstoneParticle;
 use pocketmine\level\particle\SmokeParticle;
-use pocketmine\Player;
+
 
 class Superhero extends ParticleCloak {
 
     /** @var bool[][] */
     private $shape = [];
 
-    public function __construct(Player $player) {
+    public function __construct($player) {
         parent::__construct($player, 2, CloakType::SUPERHERO);
 
         $this->shape = [
@@ -62,7 +62,7 @@ class Superhero extends ParticleCloak {
     public function onUpdate(): void {
         $this->getPlayer()->getLocation()->add(-0.2, 0, -0.2);
         $this->active($this->getPlayer()->getLocation(), 20);
-        $this->getPlayer()->getLevel()->addParticle(new SmokeParticle($this->getPlayer()->getLocation(), 10));
+        $this->addParticle(new SmokeParticle($this->getPlayer()->getLocation(), 10));
     }
 
     private function active(Location $loc, int $angleDistance) {
@@ -87,7 +87,7 @@ class Superhero extends ParticleCloak {
                         $newLoc->y = $defY;
                     }
                     for ($k = 0; $k < 3; ++$k) {
-                        $this->getPlayer()->getLevel()->addParticle(new RedstoneParticle($newLoc));
+                        $this->addParticle(new RedstoneParticle($newLoc));
                     }
                 }
                 $x += $space;

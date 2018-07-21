@@ -34,6 +34,7 @@
 namespace HyPrimeCore\panel;
 
 use HyPrimeCore\cloaks\CloakManager;
+use HyPrimeCore\cloaks\type\CloakType;
 use HyPrimeCore\CoreMain;
 use HyPrimeCore\formAPI\event\FormRespondedEvent;
 use HyPrimeCore\formAPI\response\FormResponseSimple;
@@ -61,13 +62,9 @@ class Panel implements Listener {
         $form->setContent($this->plugin->getMessage($p, 'panel.cloak-about'));
 
         $pManager = CoreMain::get()->getPlayerData($p);
-        $form->addButton("Firerings");
-        $form->addButton("Firewings");
-        $form->addButton("Frosty");
-        $form->addButton("Superhero");
-        $form->addButton("Scanner");
-        $form->addButton("Shaman");
-        $form->addButton("Superwing");
+        foreach (CloakType::getAll() as $cloak) {
+            $form->addButton($cloak);
+        }
         if ($pManager->getCloakData() !== null) {
             $form->addButton($this->plugin->getMessage($p, 'panel.cloak-remove'));
         }

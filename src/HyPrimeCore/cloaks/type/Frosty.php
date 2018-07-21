@@ -39,7 +39,6 @@ use pocketmine\level\Location;
 use pocketmine\level\particle\CriticalParticle;
 use pocketmine\level\particle\GenericParticle;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
 
 class Frosty extends ParticleCloak {
 
@@ -56,7 +55,7 @@ class Frosty extends ParticleCloak {
     /** @var int */
     private $i = 0;
 
-    public function __construct(Player $player) {
+    public function __construct($player) {
         parent::__construct($player, 2, CloakType::FROSTY);
     }
 
@@ -71,30 +70,30 @@ class Frosty extends ParticleCloak {
         $locs = $this->getCircle($loc->add(0.0, 0.5, 0.0), 1.2, 30);
         $locs2 = $this->getCircleReverse($loc->add(0.0, 0.5, 0.0), 1.2, 30);
         if ($this->i <= 6) {
-            $loc->getLevel()->addParticle(new CriticalParticle($locs[$this->i], 1));
-            $loc->getLevel()->addParticle(new CriticalParticle($locs2[$this->i + 1], 1));
-            $loc->getLevel()->addParticle(new CriticalParticle($locs[$this->i]->add(0.0, 0.8, 0.0), 1));
-            $loc->getLevel()->addParticle(new CriticalParticle($locs2[$this->i + 3]->add(0.0, 0.8, 0.0), 1));
+            $this->addParticle(new CriticalParticle($locs[$this->i], 1));
+            $this->addParticle(new CriticalParticle($locs2[$this->i + 1], 1));
+            $this->addParticle(new CriticalParticle($locs[$this->i]->add(0.0, 0.8, 0.0), 1));
+            $this->addParticle(new CriticalParticle($locs2[$this->i + 3]->add(0.0, 0.8, 0.0), 1));
         } else if ($this->i >= 7 && $this->i <= 12) {
-            $loc->getLevel()->addParticle(new CriticalParticle($locs[$this->i]->add(0.0, 0.8, 0.0), 1));
-            $loc->getLevel()->addParticle(new CriticalParticle($locs2[$this->i]->add(0.0, 0.8, 0.0), 1));
-            $loc->getLevel()->addParticle(new CriticalParticle($locs[$this->i]->add(0.0, 1.3, 0.0), 1));
-            $loc->getLevel()->addParticle(new CriticalParticle($locs2[$this->i]->add(0.0, 1.3, 0.0), 1));
+            $this->addParticle(new CriticalParticle($locs[$this->i]->add(0.0, 0.8, 0.0), 1));
+            $this->addParticle(new CriticalParticle($locs2[$this->i]->add(0.0, 0.8, 0.0), 1));
+            $this->addParticle(new CriticalParticle($locs[$this->i]->add(0.0, 1.3, 0.0), 1));
+            $this->addParticle(new CriticalParticle($locs2[$this->i]->add(0.0, 1.3, 0.0), 1));
         } else if ($this->i >= 13 && $this->i <= 18) {
-            $loc->getLevel()->addParticle(new CriticalParticle($locs[$this->i]->add(0.0, 1.0, 0.0), 1));
-            $loc->getLevel()->addParticle(new CriticalParticle($locs2[$this->i]->add(0.0, 1.0, 0.0), 1));
-            $loc->getLevel()->addParticle(new CriticalParticle($locs[$this->i]->add(0.0, 0.5, 0.0), 1));
-            $loc->getLevel()->addParticle(new CriticalParticle($locs2[$this->i]->add(0.0, 0.5, 0.0), 1));
+            $this->addParticle(new CriticalParticle($locs[$this->i]->add(0.0, 1.0, 0.0), 1));
+            $this->addParticle(new CriticalParticle($locs2[$this->i]->add(0.0, 1.0, 0.0), 1));
+            $this->addParticle(new CriticalParticle($locs[$this->i]->add(0.0, 0.5, 0.0), 1));
+            $this->addParticle(new CriticalParticle($locs2[$this->i]->add(0.0, 0.5, 0.0), 1));
         } else if ($this->i >= 19 && $this->i <= 24) {
-            $loc->getLevel()->addParticle(new CriticalParticle($locs[$this->i]->add(0.0, 0.5, 0.0), 1));
-            $loc->getLevel()->addParticle(new CriticalParticle($locs2[$this->i]->add(0.0, 0.5, 0.0), 1));
-            $loc->getLevel()->addParticle(new CriticalParticle($locs[$this->i], 1));
-            $loc->getLevel()->addParticle(new CriticalParticle($locs2[$this->i], 1));
+            $this->addParticle(new CriticalParticle($locs[$this->i]->add(0.0, 0.5, 0.0), 1));
+            $this->addParticle(new CriticalParticle($locs2[$this->i]->add(0.0, 0.5, 0.0), 1));
+            $this->addParticle(new CriticalParticle($locs[$this->i], 1));
+            $this->addParticle(new CriticalParticle($locs2[$this->i], 1));
         } else if ($this->i >= 25 && $this->i < 30) {
-            $loc->getLevel()->addParticle(new CriticalParticle($locs[$this->i]->add(0.0, 1.3, 0.0), 1));
-            $loc->getLevel()->addParticle(new CriticalParticle($locs2[$this->i]->add(0.0, 1.3, 0.0), 1));
-            $loc->getLevel()->addParticle(new CriticalParticle($locs[$this->i]->add(0.0, 0.5, 0.0), 1));
-            $loc->getLevel()->addParticle(new CriticalParticle($locs2[$this->i]->add(0.0, 0.5, 0.0), 1));
+            $this->addParticle(new CriticalParticle($locs[$this->i]->add(0.0, 1.3, 0.0), 1));
+            $this->addParticle(new CriticalParticle($locs2[$this->i]->add(0.0, 1.3, 0.0), 1));
+            $this->addParticle(new CriticalParticle($locs[$this->i]->add(0.0, 0.5, 0.0), 1));
+            $this->addParticle(new CriticalParticle($locs2[$this->i]->add(0.0, 0.5, 0.0), 1));
         }
         ++$this->i;
         if ($this->i >= 30) {
@@ -160,7 +159,7 @@ class Frosty extends ParticleCloak {
                         $loc->y = $defY;
                     }
                     for ($k = 0; $k < 3; ++$k) {
-                        $this->getPlayer()->getLevel()->addParticle(new GenericParticle($newLoc, 46));
+                        $this->addParticle(new GenericParticle($newLoc, 46));
                     }
                 }
                 $x += $space;

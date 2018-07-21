@@ -103,7 +103,6 @@ class KitInjectionModule {
         foreach (array_keys($kit) as $val) {
             $kitAPI = new NormalKit($kit[$val]["name"], $kit[$val]["price"], "");
             $items = [];
-            $armours = [];
             foreach ($kit[$val]["items"] as $value) {
                 $split = explode(":", $value);
                 if (count($split) === 2) {
@@ -122,30 +121,30 @@ class KitInjectionModule {
             }
             if (isset($kit[$val]["armour"])) {
                 if (isset($kit[$val]["armour"]['hat'])) {
-                    $armours['helmet'] = $kit[$val]["armour"]['hat'];
+                    $armours[] = $kit[$val]["armour"]['hat'];
                 } else {
-                    $armours['helmet'] = Item::get(0);
+                    $armours[] = Item::get(0);
                 }
                 if (isset($kit[$val]["armour"]['chestplate'])) {
-                    $armours['chestplate'] = $kit[$val]["armour"]['chestplate'];
+                    $armours[] = $kit[$val]["armour"]['chestplate'];
                 } else {
-                    $armours['chestplate'] = Item::get(0);
+                    $armours[] = Item::get(0);
                 }
                 if (isset($kit[$val]["armour"]['leggings'])) {
-                    $armours['leggings'] = $kit[$val]["armour"]['leggings'];
+                    $armours[] = $kit[$val]["armour"]['leggings'];
                 } else {
-                    $armours['leggings'] = Item::get(0);
+                    $armours[] = Item::get(0);
                 }
                 if (isset($kit[$val]["armour"]['boots'])) {
-                    $armours['boots'] = $kit[$val]["armour"]['boots'];
+                    $armours[] = $kit[$val]["armour"]['boots'];
                 } else {
-                    $armours['boots'] = Item::get(0);
+                    $armours[] = Item::get(0);
                 }
             } else {
-                $armours['helmet'] = Item::get(0);
-                $armours['chestplate'] = Item::get(0);
-                $armours['leggings'] = Item::get(0);
-                $armours['boots'] = Item::get(0);
+                $armours[] = Item::get(0);
+                $armours[] = Item::get(0);
+                $armours[] = Item::get(0);
+                $armours[] = Item::get(0);
             }
 
             $kitAPI->setInventoryItem($items);

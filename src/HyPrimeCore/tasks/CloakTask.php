@@ -35,9 +35,9 @@ namespace HyPrimeCore\tasks;
 
 use HyPrimeCore\cloaks\ParticleCloak;
 use HyPrimeCore\CoreMain;
+use HyPrimeCore\player\FakePlayer;
 use pocketmine\Player;
 use pocketmine\scheduler\Task;
-use pocketmine\Server;
 
 class CloakTask extends Task {
 
@@ -61,6 +61,10 @@ class CloakTask extends Task {
      * @return void
      */
     public function onRun(int $currentTick) {
+        if ($this->player instanceof FakePlayer) {
+            $this->cloak->onUpdate();
+            return;
+        }
         try {
             if (CoreMain::get()->getPlayerData($this->player)->getCloakData() != null) {
                 if (!$this->player->isOnline()) {
