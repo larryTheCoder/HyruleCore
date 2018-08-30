@@ -42,62 +42,62 @@ use pocketmine\level\particle\SmokeParticle;
 
 class Superhero extends ParticleCloak {
 
-    /** @var bool[][] */
-    private $shape = [];
+	/** @var bool[][] */
+	private $shape = [];
 
-    public function __construct($player) {
-        parent::__construct($player, 2, CloakType::SUPERHERO);
+	public function __construct($player){
+		parent::__construct($player, 2, CloakType::SUPERHERO);
 
-        $this->shape = [
-            [true, true, true, true, true],
-            [true, true, true, true, true],
-            [true, true, true, true, true],
-            [true, true, true, true, true],
-            [true, true, true, true, true],
-            [true, true, true, true, true],
-            [true, true, true, true, true]
-        ];
-    }
+		$this->shape = [
+			[true, true, true, true, true],
+			[true, true, true, true, true],
+			[true, true, true, true, true],
+			[true, true, true, true, true],
+			[true, true, true, true, true],
+			[true, true, true, true, true],
+			[true, true, true, true, true],
+		];
+	}
 
-    public function onUpdate(): void {
-        $this->getPlayer()->getLocation()->add(-0.2, 0, -0.2);
-        $this->active($this->getPlayer()->getLocation(), 20);
-        $this->addParticle(new SmokeParticle($this->getPlayer()->getLocation(), 10));
-    }
+	public function onUpdate(): void{
+		$this->getPlayer()->getLocation()->add(-0.2, 0, -0.2);
+		$this->active($this->getPlayer()->getLocation(), 20);
+		$this->addParticle(new SmokeParticle($this->getPlayer()->getLocation(), 10));
+	}
 
-    private function active(Location $loc, int $angleDistance) {
-        $space = 0.2;
-        $defX = $x = $loc->getX() - $space * count($this->shape[0]) / 2 + $space;
-        $defY = $y = $loc->getY() + 1.3;
-        $angle = -(($loc->getYaw() + 180) / 60);
-        $angle += (($loc->getYaw() < -180) ? 3.25 : 2.985);
-        for ($i = 0; $i < count($this->shape); ++$i) {
-            for ($j = 0; $j < count($this->shape[$i]); ++$j) {
-                if ($this->shape[$i][$j]) {
-                    $target = clone $loc;
-                    $target->x = $x;
-                    $target->y = $y;
-                    $v2 = Utils::getBackVector($loc);
-                    $v = Utils::rotateAroundAxisY($target->subtract($loc->add(-0.1, 0, 0.35)), $angle);
-                    $iT = $i / $angleDistance;
-                    $v2->y = 0;
-                    $newVec = $v->add($v2->multiply(-0.2 - $iT));
-                    $newLoc = $newVec->add($loc);
-                    if ($this->isMoving()) {
-                        $newLoc->y = $defY;
-                    }
-                    for ($k = 0; $k < 3; ++$k) {
-                        $this->addParticle(new RedstoneParticle($newLoc));
-                    }
-                }
-                $x += $space;
-            }
-            $y -= $space;
-            $x = $defX;
-        }
-    }
+	private function active(Location $loc, int $angleDistance){
+		$space = 0.2;
+		$defX = $x = $loc->getX() - $space * count($this->shape[0]) / 2 + $space;
+		$defY = $y = $loc->getY() + 1.3;
+		$angle = -(($loc->getYaw() + 180) / 60);
+		$angle += (($loc->getYaw() < -180) ? 3.25 : 2.985);
+		for($i = 0; $i < count($this->shape); ++$i){
+			for($j = 0; $j < count($this->shape[$i]); ++$j){
+				if($this->shape[$i][$j]){
+					$target = clone $loc;
+					$target->x = $x;
+					$target->y = $y;
+					$v2 = Utils::getBackVector($loc);
+					$v = Utils::rotateAroundAxisY($target->subtract($loc->add(-0.1, 0, 0.35)), $angle);
+					$iT = $i / $angleDistance;
+					$v2->y = 0;
+					$newVec = $v->add($v2->multiply(-0.2 - $iT));
+					$newLoc = $newVec->add($loc);
+					if($this->isMoving()){
+						$newLoc->y = $defY;
+					}
+					for($k = 0; $k < 3; ++$k){
+						$this->addParticle(new RedstoneParticle($newLoc));
+					}
+				}
+				$x += $space;
+			}
+			$y -= $space;
+			$x = $defX;
+		}
+	}
 
-    public function getPermissionNode(): string {
-        return "core.cloak.superhero";
-    }
+	public function getPermissionNode(): string{
+		return "core.cloak.superhero";
+	}
 }

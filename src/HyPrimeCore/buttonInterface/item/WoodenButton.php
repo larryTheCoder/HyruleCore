@@ -36,17 +36,17 @@ namespace HyPrimeCore\buttonInterface\item;
 
 class WoodenButton extends Button {
 
-    protected $id = self::WOODEN_BUTTON;
+	protected $id = self::WOODEN_BUTTON;
 
-    public function getName(): string {
-        return "Stone Button";
-    }
+	public function getName(): string{
+		return "Stone Button";
+	}
 
-    public function getHardness(): float {
-        return 1000000;
-    }
+	public function getHardness(): float{
+		return 1000000;
+	}
 
-    public function getType(): string {
-        return "Wooden";
-    }
+	public function getType(): string{
+		return "Wooden";
+	}
 }

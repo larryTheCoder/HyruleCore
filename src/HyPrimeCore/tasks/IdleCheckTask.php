@@ -39,34 +39,34 @@ use pocketmine\Server;
 
 class IdleCheckTask extends Task {
 
-    /** @var CoreMain */
-    private $plugin;
+	/** @var CoreMain */
+	private $plugin;
 
-    public function __construct(CoreMain $plugin) {
-        $this->plugin = $plugin;
-    }
+	public function __construct(CoreMain $plugin){
+		$this->plugin = $plugin;
+	}
 
-    /**
-     * Actions to execute when run
-     *
-     * @param int $currentTick
-     *
-     * @return void
-     */
-    public function onRun(int $currentTick) {
-        $player = Server::getInstance()->getOnlinePlayers();
+	/**
+	 * Actions to execute when run
+	 *
+	 * @param int $currentTick
+	 *
+	 * @return void
+	 */
+	public function onRun(int $currentTick){
+		$player = Server::getInstance()->getOnlinePlayers();
 
-        $time = intval(microtime(true)); // SECONDS Minute
-        foreach ($player as $p) {
-            if (!$p->spawned) {
-                continue;
-            }
-            $idle = intval($this->plugin->idlingTime[strtolower($p->getName())]);
-            $val = $time - $idle;
-            if ($val >= 600) {
-                $p->kick("You been idling for too long", false);
-            }
-        }
+		$time = intval(microtime(true)); // SECONDS Minute
+		foreach($player as $p){
+			if(!$p->spawned){
+				continue;
+			}
+			$idle = intval($this->plugin->idlingTime[strtolower($p->getName())]);
+			$val = $time - $idle;
+			if($val >= 600){
+				$p->kick("You been idling for too long", false);
+			}
+		}
 
-    }
+	}
 }

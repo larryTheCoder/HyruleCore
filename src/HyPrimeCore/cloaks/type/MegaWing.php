@@ -42,69 +42,69 @@ use pocketmine\Player;
 
 class MegaWing extends ParticleCloak {
 
-    private $degreesLeft = 30;
-    private $degreesRight = 150;
-    private $wingFlapSpeed = 4;
-    private $startOffset = 30;
-    private $stopOffset = 20;
-    private $degreesForward = false;
-    private $distanceBetweenParticles = 0.1;
-    private $distanceFromPlayer = 0.2;
-    private $startingY = 0.3;
-    private $particleCoordinates = [];
+	private $degreesLeft = 30;
+	private $degreesRight = 150;
+	private $wingFlapSpeed = 4;
+	private $startOffset = 30;
+	private $stopOffset = 20;
+	private $degreesForward = false;
+	private $distanceBetweenParticles = 0.1;
+	private $distanceFromPlayer = 0.2;
+	private $startingY = 0.3;
+	private $particleCoordinates = [];
 
-    public function __construct(Player $player) {
-        parent::__construct($player, 4, CloakType::SUPERWING);
-        $coordinates = [["-,-,-,-,x,x,x,-,-,-"], ["-,-,-,x,x,x,x,x,-,-"], ["-,-,x,x,x,x,x,x,x,-"], ["-,x,x,x,x,x,x,x,x,-"], ["x,x,x,x,x,x,x,x,x,x"], ["x,x,x,x,x,x,x,x,x,x"], ["x,x,x,x,x,x,x,x,x,x"], ["x,x,x,x,x,x,x,x,x,x"], ["-,-,x,x,x,x,x,x,x,x"], ["-,-,-,x,x,x,x,x,x,x"], ["-,-,-,x,x,x,x,x,x,x"], ["-,-,-,-,x,x,x,x,x,x"], ["-,-,-,-,x,x,x,x,x,x"], ["-,-,-,-,-,x,x,x,x,-"], ["-,-,-,-,-,x,x,x,x,-"], ["-,-,-,-,-,-,x,x,x,-"], ["-,-,-,-,-,-,x,x,x,-"], ["-,-,-,-,-,-,-,x,x,-"], ["-,-,-,-,-,-,-,-,x,-"]];
-        $yValue = $this->startingY + $this->distanceBetweenParticles * count($coordinates) - $this->distanceBetweenParticles;
-        $particleCoordinates = [];
-        $this->degreesLeft = -$this->startOffset;
-        $this->degreesRight = -$this->startOffset - 180;
-        foreach ($coordinates as $cords){
-            $split = explode(",", $cords[0]);
-            $xValue = $this->distanceFromPlayer;
-            $yValue -= $this->distanceBetweenParticles;
-            for ($j = 0; $j !== count($split); ++$j) {
-                if ($split[$j] === '-') {
-                    $xValue += $this->distanceBetweenParticles;
-                } else {
-                    $xValue += $this->distanceBetweenParticles;
-                    $coordinates = [$xValue, $yValue];
-                    $particleCoordinates[] = $coordinates;
-                }
-            }
-        }
-        $this->particleCoordinates = $particleCoordinates;
-    }
+	public function __construct(Player $player){
+		parent::__construct($player, 4, CloakType::SUPERWING);
+		$coordinates = [["-,-,-,-,x,x,x,-,-,-"], ["-,-,-,x,x,x,x,x,-,-"], ["-,-,x,x,x,x,x,x,x,-"], ["-,x,x,x,x,x,x,x,x,-"], ["x,x,x,x,x,x,x,x,x,x"], ["x,x,x,x,x,x,x,x,x,x"], ["x,x,x,x,x,x,x,x,x,x"], ["x,x,x,x,x,x,x,x,x,x"], ["-,-,x,x,x,x,x,x,x,x"], ["-,-,-,x,x,x,x,x,x,x"], ["-,-,-,x,x,x,x,x,x,x"], ["-,-,-,-,x,x,x,x,x,x"], ["-,-,-,-,x,x,x,x,x,x"], ["-,-,-,-,-,x,x,x,x,-"], ["-,-,-,-,-,x,x,x,x,-"], ["-,-,-,-,-,-,x,x,x,-"], ["-,-,-,-,-,-,x,x,x,-"], ["-,-,-,-,-,-,-,x,x,-"], ["-,-,-,-,-,-,-,-,x,-"]];
+		$yValue = $this->startingY + $this->distanceBetweenParticles * count($coordinates) - $this->distanceBetweenParticles;
+		$particleCoordinates = [];
+		$this->degreesLeft = -$this->startOffset;
+		$this->degreesRight = -$this->startOffset - 180;
+		foreach($coordinates as $cords){
+			$split = explode(",", $cords[0]);
+			$xValue = $this->distanceFromPlayer;
+			$yValue -= $this->distanceBetweenParticles;
+			for($j = 0; $j !== count($split); ++$j){
+				if($split[$j] === '-'){
+					$xValue += $this->distanceBetweenParticles;
+				}else{
+					$xValue += $this->distanceBetweenParticles;
+					$coordinates = [$xValue, $yValue];
+					$particleCoordinates[] = $coordinates;
+				}
+			}
+		}
+		$this->particleCoordinates = $particleCoordinates;
+	}
 
-    public function getPermissionNode(): string {
-        return "core.cloak.superwing";
-    }
+	public function getPermissionNode(): string{
+		return "core.cloak.superwing";
+	}
 
-    public function onUpdate(): void {
-        $this->degreesLeft = ($this->degreesForward ? ($this->degreesLeft + $this->wingFlapSpeed) : ($this->degreesLeft - $this->wingFlapSpeed));
-        $this->degreesRight = ($this->degreesForward ? ($this->degreesRight - $this->wingFlapSpeed) : ($this->degreesRight + $this->wingFlapSpeed));
-        if ($this->degreesLeft >= -$this->startOffset) {
-            $this->degreesForward = false;
-        }
-        if ($this->degreesLeft <= $this->stopOffset - 90) {
-            $this->degreesForward = true;
-        }
-        foreach ($this->particleCoordinates as $coordinate) {
-            $x = $coordinate[0];
-            $y = $coordinate[1];
-            $this->spawnParticle($this->getPlayer(), new FlameParticle(new Vector3()), $x, $this->degreesLeft, $y);
-            $this->spawnParticle($this->getPlayer(), new FlameParticle(new Vector3()), $x, $this->degreesRight, $y);
-        }
-    }
+	public function onUpdate(): void{
+		$this->degreesLeft = ($this->degreesForward ? ($this->degreesLeft + $this->wingFlapSpeed) : ($this->degreesLeft - $this->wingFlapSpeed));
+		$this->degreesRight = ($this->degreesForward ? ($this->degreesRight - $this->wingFlapSpeed) : ($this->degreesRight + $this->wingFlapSpeed));
+		if($this->degreesLeft >= -$this->startOffset){
+			$this->degreesForward = false;
+		}
+		if($this->degreesLeft <= $this->stopOffset - 90){
+			$this->degreesForward = true;
+		}
+		foreach($this->particleCoordinates as $coordinate){
+			$x = $coordinate[0];
+			$y = $coordinate[1];
+			$this->spawnParticle($this->getPlayer(), new FlameParticle(new Vector3()), $x, $this->degreesLeft, $y);
+			$this->spawnParticle($this->getPlayer(), new FlameParticle(new Vector3()), $x, $this->degreesRight, $y);
+		}
+	}
 
-    public function spawnParticle(Player $player, Particle $particle, float $x, int $degrees, float $y) {
-        $loc = clone $player->getLocation();
-        $angle = $loc->getYaw() + $degrees;
-        $yaw = $angle * 3.141592653589793 / 180.0;
-        $vec = new Vector3(cos($yaw) * $x, $y, sin($yaw) * $x);
-        $vec2 = $loc->add($vec);
-        $particle->setComponents($vec2->x, $vec2->y, $vec2->z);
-        $this->addParticle($particle);
-    }
+	public function spawnParticle(Player $player, Particle $particle, float $x, int $degrees, float $y){
+		$loc = clone $player->getLocation();
+		$angle = $loc->getYaw() + $degrees;
+		$yaw = $angle * 3.141592653589793 / 180.0;
+		$vec = new Vector3(cos($yaw) * $x, $y, sin($yaw) * $x);
+		$vec2 = $loc->add($vec);
+		$particle->setComponents($vec2->x, $vec2->y, $vec2->z);
+		$this->addParticle($particle);
+	}
 }

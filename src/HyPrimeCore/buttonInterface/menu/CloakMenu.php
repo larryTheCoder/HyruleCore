@@ -42,86 +42,89 @@ use pocketmine\Player;
 
 class CloakMenu extends Menu {
 
-    /** @var int */
-    private $count = 0;
-    /** @var Player */
-    private $player;
-    /** @var ParticleCloak */
-    private $cloak;
+	/** @var int */
+	private $count = 0;
+	/** @var Player */
+	private $player;
+	/** @var ParticleCloak */
+	private $cloak;
 
-    public function __construct(Player $p) {
-        $this->player = $p;
-    }
+	public function __construct(Player $p){
+		$this->player = $p;
+	}
 
-    public function getInteractId(): int {
-        return self::INTERACT_CLOAK_MENU;
-    }
+	public function getInteractId(): int{
+		return self::INTERACT_CLOAK_MENU;
+	}
 
-    /**
-     * Get the next menu for player
-     */
-    public function getNextMenu() {
-        if ($this->count >= count(CloakType::getAll()) - 1) {
-            $this->count = 0;
-        } else {
-            $this->count++;
-        }
-    }
+	/**
+	 * Get the next menu for player
+	 */
+	public function getNextMenu(){
+		if($this->count >= count(CloakType::getAll()) - 1){
+			$this->count = 0;
+		}else{
+			$this->count++;
+		}
+	}
 
-    /**
-     * Get the previous menu for player
-     */
-    public function getPrevMenu() {
-        if ($this->count <= 0) {
-            $this->count = count(CloakType::getAll()) - 1;
-        } else {
-            $this->count--;
-        }
-    }
+	/**
+	 * Get the previous menu for player
+	 */
+	public function getPrevMenu(){
+		if($this->count <= 0){
+			$this->count = count(CloakType::getAll()) - 1;
+		}else{
+			$this->count--;
+		}
+	}
 
-    public function onPlayerSelect() {
-        $id = $this->count;
-        if (!$this->player->hasPermission(CloakType::getCloakPermission($id))) {
-            $this->player->sendMessage(CoreMain::get()->getPrefix() . CoreMain::get()->getMessage($this->player, 'error.buy-site'));
-            return;
-        }
-        CloakManager::equipCloak($this->player, $id);
-        $msg = str_replace("{CLOAK}", CloakType::getCloakName($id), CoreMain::get()->getMessage($this->player, 'panel.cloak-selected'));
-        $this->player->sendMessage(CoreMain::get()->getPrefix() . $msg);
-    }
+	public function onPlayerSelect(){
+		$id = $this->count;
+		if(!$this->player->hasPermission(CloakType::getCloakPermission($id))){
+			$this->player->sendMessage(CoreMain::get()->getPrefix() . CoreMain::get()->getMessage($this->player, 'error.buy-site'));
 
-    /**
-     * Get the data for a menu
-     *
-     * @return array
-     */
-    public function getMenuData(): array {
-        $data['cloak'] = true;
-        if (!$this->player->hasPermission(CloakType::getCloakPermission($this->count))) {
-            $data['available'] = false;
-        } else {
-            $data['available'] = true;
-        }
-        $data['name'] = CloakType::getCloakName($this->count);
-        return $data;
-    }
+			return;
+		}
+		CloakManager::equipCloak($this->player, $id);
+		$msg = str_replace("{CLOAK}", CloakType::getCloakName($id), CoreMain::get()->getMessage($this->player, 'panel.cloak-selected'));
+		$this->player->sendMessage(CoreMain::get()->getPrefix() . $msg);
+	}
 
-    /**
-     * Update the NPC interface with player
-     *
-     * @param FakePlayer $player
-     * @param bool $cleanup
-     * @return void
-     */
-    public function updateNPC(FakePlayer $player, bool $cleanup) {
-        if (!isset($this->cloak)) {
-            $this->cloak = CloakType::getCloakById($player, $this->count); // It will start
-            return;
-        }
-        // Clear the cloak first
-        $this->cloak->clear();
-        unset($this->cloak);
-        // Then restart again
-        $this->cloak = CloakType::getCloakById($player, $this->count);
-    }
+	/**
+	 * Get the data for a menu
+	 *
+	 * @return array
+	 */
+	public function getMenuData(): array{
+		$data['cloak'] = true;
+		if(!$this->player->hasPermission(CloakType::getCloakPermission($this->count))){
+			$data['available'] = false;
+		}else{
+			$data['available'] = true;
+		}
+		$data['name'] = CloakType::getCloakName($this->count);
+
+		return $data;
+	}
+
+	/**
+	 * Update the NPC interface with player
+	 *
+	 * @param FakePlayer $player
+	 * @param bool $cleanup
+	 * @return void
+	 */
+	public function updateNPC(FakePlayer $player, bool $cleanup){
+		if(!isset($this->cloak)){
+			$this->cloak = CloakType::getCloakById($player, $this->count); // It will start
+
+			return;
+		}
+		// Clear the cloak first
+		$this->cloak->clear();
+		unset($this->cloak);
+		// Then restart again
+		$this->cloak = CloakType::getCloakById($player, $this->count);
+	}
 }

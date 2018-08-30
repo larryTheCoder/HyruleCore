@@ -38,28 +38,28 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerMoveEvent;
 
 class CloakListener implements Listener {
-    /** @var ParticleCloak */
-    private $cloak;
+	/** @var ParticleCloak */
+	private $cloak;
 
-    public function __construct(ParticleCloak $cloak) {
-        $this->cloak = $cloak;
-    }
+	public function __construct(ParticleCloak $cloak){
+		$this->cloak = $cloak;
+	}
 
-    /**
-     * @param PlayerMoveEvent $event
-     * @priority LOWEST
-     */
-    public function onPlayerMove(PlayerMoveEvent $event) {
-        if ($this->cloak->getPlayer() instanceof FakePlayer) {
-            return;
-        }
-        if ($event->getPlayer()->getName() !== $this->cloak->getPlayer()->getName()) {
-            return;
-        }
-        if ($event->getFrom()->distance($event->getTo()) >= 0.1) {
-            $this->cloak->moving = true;
-        } else {
-            $this->cloak->moving = false;
-        }
-    }
+	/**
+	 * @param PlayerMoveEvent $event
+	 * @priority LOWEST
+	 */
+	public function onPlayerMove(PlayerMoveEvent $event){
+		if($this->cloak->getPlayer() instanceof FakePlayer){
+			return;
+		}
+		if($event->getPlayer()->getName() !== $this->cloak->getPlayer()->getName()){
+			return;
+		}
+		if($event->getFrom()->distance($event->getTo()) >= 0.1){
+			$this->cloak->moving = true;
+		}else{
+			$this->cloak->moving = false;
+		}
+	}
 }

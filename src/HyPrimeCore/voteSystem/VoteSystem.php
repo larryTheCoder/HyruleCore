@@ -35,5 +35,5 @@ namespace HyPrimeCore\voteSystem;
 
 
 class VoteSystem {
-    // TODO: VoteSystem cURL usage dummy things ARGH
+	// TODO: VoteSystem cURL usage dummy things ARGH
 }

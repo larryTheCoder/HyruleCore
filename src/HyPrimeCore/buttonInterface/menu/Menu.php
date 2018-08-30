@@ -39,66 +39,66 @@ use pocketmine\Player;
 
 abstract class Menu {
 
-    const INTERACT_CLOAK_MENU = 0;
-    const INTERACT_KIT_MENU = 1;
-    const INTERACT_CAGES_MENU = 2;
+	const INTERACT_CLOAK_MENU = 0;
+	const INTERACT_KIT_MENU = 1;
+	const INTERACT_CAGES_MENU = 2;
 
-    public abstract function getInteractId(): int;
+	public static function getMenuName(int $id): string{
+		switch($id){
+			case self::INTERACT_CLOAK_MENU:
+				return "Cloak";
+			case self::INTERACT_KIT_MENU:
+				return "Kit";
+			case self::INTERACT_CAGES_MENU:
+				return "Cages";
+			default:
+				return "Unknown";
+		}
+	}
 
-    public static function getMenuName(int $id): string {
-        switch ($id) {
-            case self::INTERACT_CLOAK_MENU:
-                return "Cloak";
-            case self::INTERACT_KIT_MENU:
-                return "Kit";
-            case self::INTERACT_CAGES_MENU:
-                return "Cages";
-            default:
-                return "Unknown";
-        }
-    }
+	public static function getMenu(Player $p, int $id): ?Menu{
+		switch($id){
+			case self::INTERACT_CLOAK_MENU:
+				return new CloakMenu($p);
+			case self::INTERACT_KIT_MENU:
+				return new KitMenu($p);
+			case self::INTERACT_CAGES_MENU:
+				return new CageMenu($p);
+			default:
+				return null;
+		}
+	}
 
-    public static function getMenu(Player $p, int $id): ?Menu {
-        switch ($id) {
-            case self::INTERACT_CLOAK_MENU:
-                return new CloakMenu($p);
-            case self::INTERACT_KIT_MENU:
-                return new KitMenu($p);
-            case self::INTERACT_CAGES_MENU:
-                return new CageMenu($p);
-            default:
-                return null;
-        }
-    }
+	public abstract function getInteractId(): int;
 
-    /**
-     * Get the next menu for player
-     */
-    public abstract function getNextMenu();
+	/**
+	 * Get the next menu for player
+	 */
+	public abstract function getNextMenu();
 
-    /**
-     * Get the previous menu for player
-     */
-    public abstract function getPrevMenu();
+	/**
+	 * Get the previous menu for player
+	 */
+	public abstract function getPrevMenu();
 
-    /**
-     * Executed when a player select the button
-     */
-    public abstract function onPlayerSelect();
+	/**
+	 * Executed when a player select the button
+	 */
+	public abstract function onPlayerSelect();
 
-    /**
-     * Get the data for a menu
-     *
-     * @return array
-     */
-    public abstract function getMenuData(): array;
+	/**
+	 * Get the data for a menu
+	 *
+	 * @return array
+	 */
+	public abstract function getMenuData(): array;
 
-    /**
-     * Get the data for a menu
-     *
-     * @param FakePlayer $player
-     * @param bool $cleanup
-     * @return array
-     */
-    public abstract function updateNPC(FakePlayer $player, bool $cleanup);
+	/**
+	 * Get the data for a menu
+	 *
+	 * @param FakePlayer $player
+	 * @param bool $cleanup
+	 * @return array
+	 */
+	public abstract function updateNPC(FakePlayer $player, bool $cleanup);
 }

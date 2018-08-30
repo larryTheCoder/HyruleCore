@@ -41,34 +41,34 @@ use pocketmine\math\Vector3;
 
 class Firerings extends ParticleCloak {
 
-    private $step;
+	private $step;
 
-    public function __construct($player) {
-        parent::__construct($player, 1, CloakType::FIRERINGS);
-    }
+	public function __construct($player){
+		parent::__construct($player, 1, CloakType::FIRERINGS);
+	}
 
-    public function onUpdate(): void {
-        for ($i = 0; $i < 2; $i++) {
-            $inc = 0.07853981633974483;
-            $toAdd = 0.0;
-            if ($i == 1) {
-                $toAdd = 3.5;
-            }
-            $angle = $this->step * $inc + $toAdd;
-            $v = new Vector3();
-            $v->setComponents(cos($angle), 0, sin($angle));
-            if ($i == 0) {
-                Utils::rotateAroundAxisZ($v, 10.0);
-            } else {
-                Utils::rotateAroundAxisZ($v, 100.0);
-            }
-            $loc = clone $this->getPlayer()->getLocation()->add(0.0, 1.0, 0.0)->add($v);
-            $this->addParticle(new FlameParticle($loc));
-        }
-        $this->step += 3;
-    }
+	public function onUpdate(): void{
+		for($i = 0; $i < 2; $i++){
+			$inc = 0.07853981633974483;
+			$toAdd = 0.0;
+			if($i == 1){
+				$toAdd = 3.5;
+			}
+			$angle = $this->step * $inc + $toAdd;
+			$v = new Vector3();
+			$v->setComponents(cos($angle), 0, sin($angle));
+			if($i == 0){
+				Utils::rotateAroundAxisZ($v, 10.0);
+			}else{
+				Utils::rotateAroundAxisZ($v, 100.0);
+			}
+			$loc = clone $this->getPlayer()->getLocation()->add(0.0, 1.0, 0.0)->add($v);
+			$this->addParticle(new FlameParticle($loc));
+		}
+		$this->step += 3;
+	}
 
-    public function getPermissionNode(): string {
-        return "core.cloak.firerings";
-    }
+	public function getPermissionNode(): string{
+		return "core.cloak.firerings";
+	}
 }

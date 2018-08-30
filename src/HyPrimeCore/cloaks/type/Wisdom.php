@@ -44,113 +44,113 @@ use pocketmine\Player;
 class Wisdom extends ParticleCloak {
 
 
-    private $degreesLeft = 0;
-    private $degreesRight = 0;
-    private $wingFlapSpeed = 0;
-    private $startOffset = 20;
-    private $stopOffset = 0;
-    private $degreesForward = false;
-    private $distanceBetweenParticles = 0.2;
-    private $distanceFromPlayer = 0.4;
-    private $startingY = 0.4;
-    private $particleCoordinates = [];
-    private $wingAnimation = false;
+	private $degreesLeft = 0;
+	private $degreesRight = 0;
+	private $wingFlapSpeed = 0;
+	private $startOffset = 20;
+	private $stopOffset = 0;
+	private $degreesForward = false;
+	private $distanceBetweenParticles = 0.2;
+	private $distanceFromPlayer = 0.4;
+	private $startingY = 0.4;
+	private $particleCoordinates = [];
+	private $wingAnimation = false;
 
-    public function __construct($player) {
-        parent::__construct($player, 4, CloakType::BLOODHOUND);
-        $coordinates = [
-            ["-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,x,+"],
-            ["-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,x,+,-"],
-            ["-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,x,+,-,-"],
-            ["-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,x,x,x,-,-,-"],
-            ["-,-,-,-,-,-,-,-,-,-,-,-,-,-,x,x,x,+,-,-,-"],
-            ["-,-,-,-,-,-,-,-,-,-,-,-,-,x,x,x,+,-,-,-,-"],
-            ["-,-,-,-,-,-,-,-,-,-,-,x,x,x,x,+,-,-,-,-,-"],
-            ["-,-,-,-,-,-,-,-,-,-,x,x,x,+,-,-,-,-,x,+,-"],
-            ["-,-,-,-,-,-,-,-,-,x,x,x,+,-,-,-,x,x,+,-,-"],
-            ["-,-,-,-,-,-,-,x,x,x,+,-,-,-,-,x,x,+,-,-,-"],
-            ["-,-,-,-,-,-,x,x,+,-,-,-,-,x,x,+,-,-,-,-,-"],
-            ["-,-,-,-,x,x,x,+,-,-,-,x,x,x,+,-,-,-,-,-,-"],
-            ["-,-,-,x,x,+,-,-,-,x,x,x,+,-,-,-,-,-,-,-,-"],
-            ["-,-,x,x,x,-,-,x,x,x,+,-,-,-,-,-,x,+,-,-,-"],
-            ["-,-,-,x,x,x,x,x,+,-,-,-,-,x,x,x,+,-,-,-,-"],
-            ["-,-,-,-,x,x,x,+,-,-,x,x,x,x,+,-,-,-,-,-,-"],
-            ["-,-,-,-,x,x,x,-,-,x,x,x,+,-,-,-,-,-,-,-,-"],
-            ["-,-,-,-,-,x,x,x,x,x,+,-,-,-,-,x,+,-,-,-,-"],
-            ["-,-,-,-,-,x,x,x,+,-,-,-,x,x,x,+,-,-,-,-,-"],
-            ["-,-,-,-,x,x,x,+,-,-,-,x,x,+,-,-,-,-,-,-,-"],
-            ["-,-,-,-,x,x,x,-,-,x,x,+,-,-,-,-,-,-,-,-,-"],
-            ["-,-,-,x,x,x,x,x,x,x,+,-,-,-,-,-,-,-,-,-,-"],
-            ["x,x,x,x,x,x,x,x,-,-,-,-,-,-,-,-,-,-,-,-,-"],
-            ["-,x,x,-,-,-,x,x,-,-,-,-,-,-,-,-,-,-,-,-,-"],
-            ["-,-,x,x,-,-,-,x,x,-,-,-,-,-,-,-,-,-,-,-,-"],
-            ["-,-,-,x,x,-,-,-,x,x,-,-,-,-,-,-,-,-,-,-,-"],
-            ["-,-,-,-,x,x,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-"],
-        ];
-        $yValue = $this->startingY + $this->distanceBetweenParticles * count($coordinates) - $this->distanceBetweenParticles;
-        $particleCoordinates = [];
-        $this->degreesLeft = 0;
-        $this->degreesRight = 180;
-        foreach ($coordinates as $cords) {
-            $split = explode(",", $cords[0]);
-            $xValue = $this->distanceFromPlayer;
-            $yValue -= $this->distanceBetweenParticles;
-            for ($j = 0; $j !== count($split); ++$j) {
-                if ($split[$j] === '-') {
-                    $xValue += $this->distanceBetweenParticles;
-                } else if ($split[$j] === 'x') {
-                    $xValue += $this->distanceBetweenParticles;
-                    $coordinates = [$xValue, $yValue];
-                    $particleCoordinates[] = ['redstone', $coordinates];
-                } else {
-                    $xValue += $this->distanceBetweenParticles;
-                    $coordinates = [$xValue, $yValue];
-                    $particleCoordinates[] = ['flame', $coordinates];
-                }
-            }
-        }
-        $this->particleCoordinates = $particleCoordinates;
-    }
+	public function __construct($player){
+		parent::__construct($player, 4, CloakType::BLOODHOUND);
+		$coordinates = [
+			["-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,x,+"],
+			["-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,x,+,-"],
+			["-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,x,+,-,-"],
+			["-,-,-,-,-,-,-,-,-,-,-,-,-,-,-,x,x,x,-,-,-"],
+			["-,-,-,-,-,-,-,-,-,-,-,-,-,-,x,x,x,+,-,-,-"],
+			["-,-,-,-,-,-,-,-,-,-,-,-,-,x,x,x,+,-,-,-,-"],
+			["-,-,-,-,-,-,-,-,-,-,-,x,x,x,x,+,-,-,-,-,-"],
+			["-,-,-,-,-,-,-,-,-,-,x,x,x,+,-,-,-,-,x,+,-"],
+			["-,-,-,-,-,-,-,-,-,x,x,x,+,-,-,-,x,x,+,-,-"],
+			["-,-,-,-,-,-,-,x,x,x,+,-,-,-,-,x,x,+,-,-,-"],
+			["-,-,-,-,-,-,x,x,+,-,-,-,-,x,x,+,-,-,-,-,-"],
+			["-,-,-,-,x,x,x,+,-,-,-,x,x,x,+,-,-,-,-,-,-"],
+			["-,-,-,x,x,+,-,-,-,x,x,x,+,-,-,-,-,-,-,-,-"],
+			["-,-,x,x,x,-,-,x,x,x,+,-,-,-,-,-,x,+,-,-,-"],
+			["-,-,-,x,x,x,x,x,+,-,-,-,-,x,x,x,+,-,-,-,-"],
+			["-,-,-,-,x,x,x,+,-,-,x,x,x,x,+,-,-,-,-,-,-"],
+			["-,-,-,-,x,x,x,-,-,x,x,x,+,-,-,-,-,-,-,-,-"],
+			["-,-,-,-,-,x,x,x,x,x,+,-,-,-,-,x,+,-,-,-,-"],
+			["-,-,-,-,-,x,x,x,+,-,-,-,x,x,x,+,-,-,-,-,-"],
+			["-,-,-,-,x,x,x,+,-,-,-,x,x,+,-,-,-,-,-,-,-"],
+			["-,-,-,-,x,x,x,-,-,x,x,+,-,-,-,-,-,-,-,-,-"],
+			["-,-,-,x,x,x,x,x,x,x,+,-,-,-,-,-,-,-,-,-,-"],
+			["x,x,x,x,x,x,x,x,-,-,-,-,-,-,-,-,-,-,-,-,-"],
+			["-,x,x,-,-,-,x,x,-,-,-,-,-,-,-,-,-,-,-,-,-"],
+			["-,-,x,x,-,-,-,x,x,-,-,-,-,-,-,-,-,-,-,-,-"],
+			["-,-,-,x,x,-,-,-,x,x,-,-,-,-,-,-,-,-,-,-,-"],
+			["-,-,-,-,x,x,-,-,-,-,-,-,-,-,-,-,-,-,-,-,-"],
+		];
+		$yValue = $this->startingY + $this->distanceBetweenParticles * count($coordinates) - $this->distanceBetweenParticles;
+		$particleCoordinates = [];
+		$this->degreesLeft = 0;
+		$this->degreesRight = 180;
+		foreach($coordinates as $cords){
+			$split = explode(",", $cords[0]);
+			$xValue = $this->distanceFromPlayer;
+			$yValue -= $this->distanceBetweenParticles;
+			for($j = 0; $j !== count($split); ++$j){
+				if($split[$j] === '-'){
+					$xValue += $this->distanceBetweenParticles;
+				}elseif($split[$j] === 'x'){
+					$xValue += $this->distanceBetweenParticles;
+					$coordinates = [$xValue, $yValue];
+					$particleCoordinates[] = ['redstone', $coordinates];
+				}else{
+					$xValue += $this->distanceBetweenParticles;
+					$coordinates = [$xValue, $yValue];
+					$particleCoordinates[] = ['flame', $coordinates];
+				}
+			}
+		}
+		$this->particleCoordinates = $particleCoordinates;
+	}
 
-    public function getPermissionNode(): string {
-        return "core.cloak.wisdom";
-    }
+	public function getPermissionNode(): string{
+		return "core.cloak.wisdom";
+	}
 
-    public function onUpdate(): void {
-        if ($this->isMoving()) {
-            return;
-        }
-        if ($this->wingAnimation) {
-            $this->degreesLeft = ($this->degreesForward ? ($this->degreesLeft + $this->wingFlapSpeed) : ($this->degreesLeft - $this->wingFlapSpeed));
-            $this->degreesRight = ($this->degreesForward ? ($this->degreesRight - $this->wingFlapSpeed) : ($this->degreesRight + $this->wingFlapSpeed));
-            if ($this->degreesLeft >= -$this->startOffset) {
-                $this->degreesForward = false;
-            }
-            if ($this->degreesLeft <= $this->stopOffset - 90) {
-                $this->degreesForward = true;
-            }
-        }
-        foreach ($this->particleCoordinates as $coordinate) {
-            $type = $coordinate[0];
-            $x = $coordinate[1][0];
-            $y = $coordinate[1][1];
-            if ($type === "redstone") {
-                $this->spawnParticle($this->getPlayer(), new EnchantmentTableParticle(new Vector3()), $x, $this->degreesLeft, $y);
-                $this->spawnParticle($this->getPlayer(), new EnchantmentTableParticle(new Vector3()), $x, $this->degreesRight, $y);
-            } else {
-                $this->spawnParticle($this->getPlayer(), new PortalParticle(new Vector3()), $x, $this->degreesLeft, $y);
-                $this->spawnParticle($this->getPlayer(), new PortalParticle(new Vector3()), $x, $this->degreesRight, $y);
-            }
-        }
-    }
+	public function onUpdate(): void{
+		if($this->isMoving()){
+			return;
+		}
+		if($this->wingAnimation){
+			$this->degreesLeft = ($this->degreesForward ? ($this->degreesLeft + $this->wingFlapSpeed) : ($this->degreesLeft - $this->wingFlapSpeed));
+			$this->degreesRight = ($this->degreesForward ? ($this->degreesRight - $this->wingFlapSpeed) : ($this->degreesRight + $this->wingFlapSpeed));
+			if($this->degreesLeft >= -$this->startOffset){
+				$this->degreesForward = false;
+			}
+			if($this->degreesLeft <= $this->stopOffset - 90){
+				$this->degreesForward = true;
+			}
+		}
+		foreach($this->particleCoordinates as $coordinate){
+			$type = $coordinate[0];
+			$x = $coordinate[1][0];
+			$y = $coordinate[1][1];
+			if($type === "redstone"){
+				$this->spawnParticle($this->getPlayer(), new EnchantmentTableParticle(new Vector3()), $x, $this->degreesLeft, $y);
+				$this->spawnParticle($this->getPlayer(), new EnchantmentTableParticle(new Vector3()), $x, $this->degreesRight, $y);
+			}else{
+				$this->spawnParticle($this->getPlayer(), new PortalParticle(new Vector3()), $x, $this->degreesLeft, $y);
+				$this->spawnParticle($this->getPlayer(), new PortalParticle(new Vector3()), $x, $this->degreesRight, $y);
+			}
+		}
+	}
 
-    public function spawnParticle(Player $player, Particle $particle, float $x, int $degrees, float $y) {
-        $loc = clone $player->getLocation();
-        $angle = $loc->getYaw() + $degrees;
-        $yaw = $angle * 3.141592653589793 / 180.0;
-        $vec = new Vector3(cos($yaw) * $x, $y, sin($yaw) * $x);
-        $vec2 = $loc->add($vec);
-        $particle->setComponents($vec2->x, $vec2->y, $vec2->z);
-        $this->addParticle($particle);
-    }
+	public function spawnParticle(Player $player, Particle $particle, float $x, int $degrees, float $y){
+		$loc = clone $player->getLocation();
+		$angle = $loc->getYaw() + $degrees;
+		$yaw = $angle * 3.141592653589793 / 180.0;
+		$vec = new Vector3(cos($yaw) * $x, $y, sin($yaw) * $x);
+		$vec2 = $loc->add($vec);
+		$particle->setComponents($vec2->x, $vec2->y, $vec2->z);
+		$this->addParticle($particle);
+	}
 }

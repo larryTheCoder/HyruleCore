@@ -36,160 +36,108 @@ namespace HyPrimeCore;
 use HyPrimeCore\cloaks\CloakManager;
 use HyPrimeCore\utils\Utils;
 use larryTheCoder\events\PlayerJoinArenaEvent;
-use larryTheCoder\SkyWarsPE;
-use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerCommandPreprocessEvent;
-use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\RemoteServerCommandEvent;
 use pocketmine\event\server\ServerCommandEvent;
-use pocketmine\Player;
 use pocketmine\Server;
 
 class CoreListener implements Listener {
 
-    const VERSION_COMMANDS = ["version", "ver", "about"];
+	const VERSION_COMMANDS = ["version", "ver", "about"];
 
-    /** @var CoreMain */
-    private $plugin;
+	/** @var CoreMain */
+	private $plugin;
 
-    public function __construct(CoreMain $plugin) {
-        $this->plugin = $plugin;
-    }
+	public function __construct(CoreMain $plugin){
+		$this->plugin = $plugin;
+	}
 
-    public function onPlayerJoin(PlayerJoinEvent $event) {
-        $p = $event->getPlayer();
-        $event->setJoinMessage("");
+	public function onPlayerJoin(PlayerJoinEvent $event){
+		$p = $event->getPlayer();
+		$event->setJoinMessage("");
 
-        $p->sendMessage("§7[----------------------------------------]");
-        foreach ($this->plugin->getMessage($p, 'login-message') as $msg) {
-            $msg = Utils::center(str_replace(["{PLAYER}", "{ONLINE}"], [$p->getName(), count(Server::getInstance()->getOnlinePlayers())], $msg));
-            $p->sendMessage("- " . $msg);
-        }
-        $p->sendMessage("§7[----------------------------------------]");
-        $p->sendMessage($this->plugin->getPrefix() . $this->plugin->getMessage($p, 'language-select', ['LANGUAGE' => $p->getLocale()]));
+		$p->sendMessage("§7[----------------------------------------]");
+		foreach($this->plugin->getMessage($p, 'login-message') as $msg){
+			$msg = Utils::center(str_replace(["{PLAYER}", "{ONLINE}"], [$p->getName(), count(Server::getInstance()->getOnlinePlayers())], $msg));
+			$p->sendMessage("- " . $msg);
+		}
+		$p->sendMessage("§7[----------------------------------------]");
+		$p->sendMessage($this->plugin->getPrefix() . $this->plugin->getMessage($p, 'language-select', ['LANGUAGE' => $p->getLocale()]));
 
-        $this->plugin->justJoined[strtolower($p->getName())] = true;
-        $this->plugin->idlingTime[strtolower($p->getName())] = microtime(true); // Setup time
-        Server::getInstance()->getLogger()->info($this->plugin->getPrefix() . "§7Player §a{$p->getName()} §7logged in with language: §a{$p->getLocale()}");
-    }
+		$this->plugin->justJoined[strtolower($p->getName())] = true;
+		$this->plugin->idlingTime[strtolower($p->getName())] = microtime(true); // Setup time
+		Server::getInstance()->getLogger()->info($this->plugin->getPrefix() . "§7Player §a{$p->getName()} §7logged in with language: §a{$p->getLocale()}");
+	}
 
-    public function onPlayerLeave(PlayerQuitEvent $e) {
-        $p = $e->getPlayer();
-        $e->setQuitMessage("");
+	public function onPlayerLeave(PlayerQuitEvent $e){
+		$p = $e->getPlayer();
+		$e->setQuitMessage("");
 
-        if ($this->plugin->getPlayerData($p)->getCloakData() !== null) {
-            $this->plugin->getPlayerData($p)->setCurrentCloak(null);
-        }
-        unset($this->plugin->idlingTime[strtolower($p->getName())]);
-    }
+		if($this->plugin->getPlayerData($p)->getCloakData() !== null){
+			$this->plugin->getPlayerData($p)->setCurrentCloak(null);
+		}
+		unset($this->plugin->idlingTime[strtolower($p->getName())]);
+	}
 
-    public function onPlayerMove(PlayerMoveEvent $e) {
-        $p = $e->getPlayer();
+	public function onPlayerMove(PlayerMoveEvent $e){
+		$p = $e->getPlayer();
 
-        // TODO: check if the player trying to annoy the server
-        $this->plugin->idlingTime[strtolower($p->getName())] = microtime(true);
-    }
+		// TODO: check if the player trying to annoy the server
+		$this->plugin->idlingTime[strtolower($p->getName())] = microtime(true);
+	}
 
-    /**
-     * @param PlayerCommandPreprocessEvent $ev
-     *
-     * @priority LOWEST
-     */
-    public function onPlayerCommandPreProcess(PlayerCommandPreprocessEvent $ev) {
-        if ($ev->isCancelled()) return;
-        if (in_array(substr($ev->getMessage(), 1), self::VERSION_COMMANDS) && !$ev->isCancelled()) {
-            $ev->setCancelled();
-            CoreMain::sendVersion($ev->getPlayer());
-        }
-    }
+	/**
+	 * @param PlayerCommandPreprocessEvent $ev
+	 *
+	 * @priority LOWEST
+	 */
+	public function onPlayerCommandPreProcess(PlayerCommandPreprocessEvent $ev){
+		if($ev->isCancelled()) return;
+		if(in_array(substr($ev->getMessage(), 1), self::VERSION_COMMANDS) && !$ev->isCancelled()){
+			$ev->setCancelled();
+			CoreMain::sendVersion($ev->getPlayer());
+		}
+	}
 
-    /**
-     * @param ServerCommandEvent $ev
-     *
-     * @priority LOWEST
-     */
-    public function onServerCommand(ServerCommandEvent $ev) {
-        if ($ev->isCancelled()) return;
-        if (Utils::in_arrayi($ev->getCommand(), self::VERSION_COMMANDS) && !$ev->isCancelled()) {
-            $ev->setCancelled();
-            CoreMain::sendVersion($ev->getSender());
-        }
-    }
+	/**
+	 * @param ServerCommandEvent $ev
+	 *
+	 * @priority LOWEST
+	 */
+	public function onServerCommand(ServerCommandEvent $ev){
+		if($ev->isCancelled()) return;
+		if(Utils::in_arrayi($ev->getCommand(), self::VERSION_COMMANDS) && !$ev->isCancelled()){
+			$ev->setCancelled();
+			CoreMain::sendVersion($ev->getSender());
+		}
+	}
 
-    /**
-     * @param RemoteServerCommandEvent $ev
-     *
-     * @priority LOWEST
-     */
-    public function onRemoteServerCommand(RemoteServerCommandEvent $ev) {
-        if ($ev->isCancelled()) return;
-        if (Utils::in_arrayi($ev->getCommand(), self::VERSION_COMMANDS) && !$ev->isCancelled()) {
-            $ev->setCancelled();
-            CoreMain::sendVersion($ev->getSender());
-        }
-    }
+	/**
+	 * @param RemoteServerCommandEvent $ev
+	 *
+	 * @priority LOWEST
+	 */
+	public function onRemoteServerCommand(RemoteServerCommandEvent $ev){
+		if($ev->isCancelled()) return;
+		if(Utils::in_arrayi($ev->getCommand(), self::VERSION_COMMANDS) && !$ev->isCancelled()){
+			$ev->setCancelled();
+			CoreMain::sendVersion($ev->getSender());
+		}
+	}
 
 
-    /**
-     * @param PlayerJoinArenaEvent $event
-     * @priority LOW
-     */
-    public function onPlayerJoinArena(PlayerJoinArenaEvent $event) {
-        $p = $event->getPlayer();
+	/**
+	 * @param PlayerJoinArenaEvent $event
+	 * @priority LOW
+	 */
+	public function onPlayerJoinArena(PlayerJoinArenaEvent $event){
+		$p = $event->getPlayer();
 
-        $p->setAllowFlight(false);
-        CloakManager::unequipCloak($p);
-    }
-
-    /**
-     * @param EntityDamageEvent $ev
-     * @priority NORMAL
-     */
-    public function onPlayerDamaged(EntityDamageEvent $ev) {
-        $p = $ev->getEntity();
-        // Here is the place where the player can kill in arena
-        $arena = SkyWarsPE::getInstance()->getArenaManager()->getPlayerArena($p);
-        if ($p instanceof Player && $arena === null) {
-            if (isset($this->plugin->getBypasses()[$p->getName()])) {
-                return;
-            }
-            $ev->setCancelled();
-            if ($p->getY() <= 0) {
-                $level = $p->getLevel();
-                $p->teleport($level->getSafeSpawn());
-            }
-        }
-    }
-
-    /**
-     * @param PlayerDeathEvent $e
-     * @priority NORMAL
-     */
-    public function onPlayerDeath(PlayerDeathEvent $e) {
-        $p = $e->getPlayer();
-        if (isset($this->plugin->getBypasses()[$p->getName()])) {
-            return;
-        }
-        // Here is the place where the player can kill in arena
-        $arena = SkyWarsPE::getInstance()->getArenaManager()->getPlayerArena($p);
-        if ($p instanceof Player && $arena !== null) {
-            if ($e->isCancelled()) {
-                return;
-            }
-            if ($arena->getPlayerMode($p) === 0) {
-                // TODO: Various silly messages
-            }
-        } else {
-            // Not in arena? Cancel them
-            $e->setCancelled();
-            if ($p->getY() <= 0) {
-                $level = $p->getLevel();
-                $p->teleport($level->getSafeSpawn());
-            }
-        }
-    }
+		$p->setAllowFlight(false);
+		CloakManager::unequipCloak($p);
+	}
 }

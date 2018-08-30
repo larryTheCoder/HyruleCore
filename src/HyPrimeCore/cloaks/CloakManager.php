@@ -40,30 +40,30 @@ use pocketmine\Player;
 
 class CloakManager {
 
-    /**
-     * @param Player $p
-     * @param int $type
-     */
-    public static function equipCloak(Player $p, int $type) {
-        $pManager = CoreMain::get()->getPlayerData($p);
-        if ($pManager->getCloakData() !== null) {
-            CloakManager::unequipCloak($p);
-        }
+	/**
+	 * @param Player $p
+	 * @param int $type
+	 */
+	public static function equipCloak(Player $p, int $type){
+		$pManager = CoreMain::get()->getPlayerData($p);
+		if($pManager->getCloakData() !== null){
+			CloakManager::unequipCloak($p);
+		}
 
-        $cloak = CloakType::getCloakById($p, $type);
-        $pManager->setCurrentCloak($cloak);
-    }
+		$cloak = CloakType::getCloakById($p, $type);
+		$pManager->setCurrentCloak($cloak);
+	}
 
-    /**
-     * @param Player $p
-     */
-    public static function unequipCloak(Player $p) {
-        if ($p == null) {
-            return;
-        }
-        $pManager = CoreMain::get()->getPlayerData($p);
-        $pManager->setCurrentCloak(null);
-        CoreMain::get()->savePlayerData($p, $pManager);
-    }
+	/**
+	 * @param Player $p
+	 */
+	public static function unequipCloak(Player $p){
+		if($p == null){
+			return;
+		}
+		$pManager = CoreMain::get()->getPlayerData($p);
+		$pManager->setCurrentCloak(null);
+		CoreMain::get()->savePlayerData($p, $pManager);
+	}
 
 }

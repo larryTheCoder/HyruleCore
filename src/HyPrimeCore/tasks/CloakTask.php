@@ -41,59 +41,62 @@ use pocketmine\scheduler\Task;
 
 class CloakTask extends Task {
 
-    /** @var null|Player */
-    private $player;
-    /** @var ParticleCloak */
-    private $cloak;
-    /** @var int */
-    private $timeout = 10;
+	/** @var null|Player */
+	private $player;
+	/** @var ParticleCloak */
+	private $cloak;
+	/** @var int */
+	private $timeout = 10;
 
-    public function __construct(ParticleCloak $cloak) {
-        $this->player = $cloak->getPlayer();
-        $this->cloak = $cloak;
-    }
+	public function __construct(ParticleCloak $cloak){
+		$this->player = $cloak->getPlayer();
+		$this->cloak = $cloak;
+	}
 
-    /**
-     * Actions to execute when run
-     *
-     * @param int $currentTick
-     *
-     * @return void
-     */
-    public function onRun(int $currentTick) {
-        if ($this->player instanceof FakePlayer) {
-            $this->cloak->onUpdate();
-            return;
-        }
-        try {
-            if (CoreMain::get()->getPlayerData($this->player)->getCloakData() != null) {
-                if (!$this->player->isOnline()) {
-                    CoreMain::get()->getPlayerData($this->player)->setCurrentCloak(null);
-                    CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
-                    return;
-                }
-                if (CoreMain::get()->getPlayerData($this->player)->getCloakData()->getType() !== $this->cloak->getType()) {
-                    if ($this->timeout === 0) {
-                        CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
-                    }
-                    $this->timeout--;
-                    return;
-                }
-                if ($this->cloak->isMoving()) {
-                    $this->cloak->moving = false;
-                } else {
-                    $this->cloak->onUpdate();
-                }
-                $this->timeout = 10;
-            } else {
-                if ($this->timeout === 0) {
-                    CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
-                }
-                $this->timeout--;
-            }
-        } catch (\Exception $e) {
-            $this->cloak->clear();
-            CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
-        }
-    }
+	/**
+	 * Actions to execute when run
+	 *
+	 * @param int $currentTick
+	 *
+	 * @return void
+	 */
+	public function onRun(int $currentTick){
+		if($this->player instanceof FakePlayer){
+			$this->cloak->onUpdate();
+
+			return;
+		}
+		try{
+			if(CoreMain::get()->getPlayerData($this->player)->getCloakData() != null){
+				if(!$this->player->isOnline()){
+					CoreMain::get()->getPlayerData($this->player)->setCurrentCloak(null);
+					CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
+
+					return;
+				}
+				if(CoreMain::get()->getPlayerData($this->player)->getCloakData()->getType() !== $this->cloak->getType()){
+					if($this->timeout === 0){
+						CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
+					}
+					$this->timeout--;
+
+					return;
+				}
+				if($this->cloak->isMoving()){
+					$this->cloak->moving = false;
+				}else{
+					$this->cloak->onUpdate();
+				}
+				$this->timeout = 10;
+			}else{
+				if($this->timeout === 0){
+					CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
+				}
+				$this->timeout--;
+			}
+		}catch(\Exception $e){
+			$this->cloak->clear();
+			CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
+		}
+	}
 }

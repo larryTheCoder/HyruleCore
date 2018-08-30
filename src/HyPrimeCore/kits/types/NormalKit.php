@@ -39,103 +39,103 @@ use pocketmine\Player;
 
 class NormalKit extends KitsAPI {
 
-    /** @var string */
-    private $description;
-    /** @var string */
-    private $name;
-    /** @var int */
-    private $price;
-    /** @var Item[] */
-    private $item;
-    /** @var Item[] */
-    private $armourContent;
+	/** @var string */
+	private $description;
+	/** @var string */
+	private $name;
+	/** @var int */
+	private $price;
+	/** @var Item[] */
+	private $item;
+	/** @var Item[] */
+	private $armourContent;
 
-    public function __construct(string $name, int $price, string $description) {
-        parent::__construct();
+	public function __construct(string $name, int $price, string $description){
+		parent::__construct();
 
-        $this->name = $name;
-        $this->price = $price;
-        $this->description = $description;
-    }
+		$this->name = $name;
+		$this->price = $price;
+		$this->description = $description;
+	}
 
-    /**
-     * Set the inventory item
-     *
-     * @param Item[] $item
-     */
-    public function setInventoryItem(array $item) {
-        $this->item =  $item;
-    }
+	/**
+	 * Set the inventory item
+	 *
+	 * @param Item[] $item
+	 */
+	public function setInventoryItem(array $item){
+		$this->item = $item;
+	}
 
-    /**
-     * Set the armour inventory content
-     *
-     * @param Item[] $item
-     */
-    public function setArmourItem(array $item){
-        $this->armourContent = $item;
-    }
+	/**
+	 * Set the armour inventory content
+	 *
+	 * @param Item[] $item
+	 */
+	public function setArmourItem(array $item){
+		$this->armourContent = $item;
+	}
 
-    /**
-     * Get the kit name for the Kit
-     * @return string
-     */
-    public function getKitName(): string {
-        return $this->name;
-    }
+	/**
+	 * Get the kit name for the Kit
+	 * @return string
+	 */
+	public function getKitName(): string{
+		return $this->name;
+	}
 
-    /**
-     * The price for the kits, depends on the
-     * server if they installed any Economy
-     * plugins
-     *
-     * @return int
-     */
-    public function getKitPrice(): int {
-        return $this->price;
-    }
+	/**
+	 * The price for the kits, depends on the
+	 * server if they installed any Economy
+	 * plugins
+	 *
+	 * @return int
+	 */
+	public function getKitPrice(): int{
+		return $this->price;
+	}
 
-    /**
-     * Get the description for the Kit
-     * put 'null' if you don't want them
-     *
-     * @return string
-     */
-    public function getDescription(): string {
-        return $this->description;
-    }
+	/**
+	 * Get the description for the Kit
+	 * put 'null' if you don't want them
+	 *
+	 * @return string
+	 */
+	public function getDescription(): string{
+		return $this->description;
+	}
 
-    /**
-     * What will the provides when the kit was
-     * given to player, Use this to handle the
-     * item, or events, then use method <code>eventExecution(Event $event)</code>
-     *
-     * TIP: Add some NBT Tag to ensure that the kit is THE KIT. The code
-     * eventExecution will execute everything when player is interacting
-     * will any kind of objects.
-     *
-     * @param Player $p
-     */
-    public function executeKit(Player $p) {
-        $p->getInventory()->setContents($this->item);
-        $p->getArmorInventory()->setHelmet($this->armourContent[0]);
-        $p->getArmorInventory()->setChestplate($this->armourContent[1]);
-        $p->getArmorInventory()->setLeggings($this->armourContent[2]);
-        $p->getArmorInventory()->setBoots($this->armourContent[3]);
-    }
+	/**
+	 * What will the provides when the kit was
+	 * given to player, Use this to handle the
+	 * item, or events, then use method <code>eventExecution(Event $event)</code>
+	 *
+	 * TIP: Add some NBT Tag to ensure that the kit is THE KIT. The code
+	 * eventExecution will execute everything when player is interacting
+	 * will any kind of objects.
+	 *
+	 * @param Player $p
+	 */
+	public function executeKit(Player $p){
+		$p->getInventory()->setContents($this->item);
+		$p->getArmorInventory()->setHelmet($this->armourContent[0]);
+		$p->getArmorInventory()->setChestplate($this->armourContent[1]);
+		$p->getArmorInventory()->setLeggings($this->armourContent[2]);
+		$p->getArmorInventory()->setBoots($this->armourContent[3]);
+	}
 
-    /**
-     * @return Item[]
-     */
-    public function getItems(): array {
-        return $this->item;
-    }
+	/**
+	 * @return Item[]
+	 */
+	public function getItems(): array{
+		return $this->item;
+	}
 
-    /**
-     * @return Item[]
-     */
-    public function getArmourContents(): array {
+	/**
+	 * @return Item[]
+	 */
+	public function getArmourContents(): array{
 
-        return $this->armourContent;
-    }
+		return $this->armourContent;
+	}
 }

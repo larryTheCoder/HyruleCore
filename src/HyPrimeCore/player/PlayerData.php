@@ -37,30 +37,30 @@ use HyPrimeCore\cloaks\ParticleCloak;
 
 class PlayerData {
 
-    /**
-     * @var ParticleCloak
-     */
-    private $cloakData;
+	/**
+	 * @var ParticleCloak
+	 */
+	private $cloakData;
 
-    /**
-     * @return ParticleCloak
-     */
-    public function getCloakData() {
-        return $this->cloakData;
-    }
+	/**
+	 * @return ParticleCloak
+	 */
+	public function getCloakData(){
+		return $this->cloakData;
+	}
 
-    /**
-     * @param ParticleCloak $cloakData
-     */
-    public function setCurrentCloak(?ParticleCloak $cloakData): void {
-        $this->removeCloak();
-        $this->cloakData = $cloakData;
-    }
+	/**
+	 * @param ParticleCloak $cloakData
+	 */
+	public function setCurrentCloak(?ParticleCloak $cloakData): void{
+		$this->removeCloak();
+		$this->cloakData = $cloakData;
+	}
 
-    public function removeCloak() {
-        if (!is_null($this->cloakData)) {
-            $this->cloakData->clear();
-        }
-        $this->cloakData = null;
-    }
+	public function removeCloak(){
+		if(!is_null($this->cloakData)){
+			$this->cloakData->clear();
+		}
+		$this->cloakData = null;
+	}
 }

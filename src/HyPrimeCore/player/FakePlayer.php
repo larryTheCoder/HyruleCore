@@ -42,115 +42,123 @@ use pocketmine\level\Location;
 use pocketmine\level\particle\Particle;
 use pocketmine\network\mcpe\protocol\AddPlayerPacket;
 use pocketmine\network\mcpe\protocol\DataPacket;
-use pocketmine\network\mcpe\protocol\PlayerSkinPacket;
+use pocketmine\network\mcpe\protocol\PlayerListPacket;
 use pocketmine\network\mcpe\protocol\RemoveEntityPacket;
+use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
 use pocketmine\Player;
 use pocketmine\utils\UUID;
 
 class FakePlayer extends Particle {
 
-    public $entityId = -1;
-    public $invisible = false;
-    /** @var Skin */
-    public $skin;
-    /** @var float */
-    public $yaw = 0, $pitch = 0;
-    /** @var Level */
-    public $level;
-    /** @var UUID */
-    public $uuid;
-    /** @var Player */
-    private $player;
-    private $title;
+	public $entityId = -1;
+	public $invisible = false;
+	/** @var Skin */
+	public $skin;
+	/** @var float */
+	public $yaw = 0, $pitch = 0;
+	/** @var Level */
+	public $level;
+	/** @var UUID */
+	public $uuid;
+	/** @var Player */
+	private $player;
+	private $title;
 
-    /**
-     * @param Location $loc
-     * @param Player $player
-     * @param Level $level
-     */
-    public function __construct(Location $loc, Player $player, Level $level) {
-        parent::__construct($loc->x, $loc->y, $loc->z);
-        $this->level = $level;
-        $this->player = $player;
-        $this->uuid = UUID::fromRandom();
-        $this->title = "";
-        $this->yaw = $loc->getYaw();
-        $this->pitch = $loc->getPitch();
-    }
+	/**
+	 * @param Location $loc
+	 * @param Player $player
+	 * @param Level $level
+	 */
+	public function __construct(Location $loc, Player $player, Level $level){
+		parent::__construct($loc->x, $loc->y, $loc->z);
+		$this->level = $level;
+		$this->player = $player;
+		$this->uuid = UUID::fromRandom();
+		$this->title = "";
+		$this->yaw = $loc->getYaw();
+		$this->pitch = $loc->getPitch();
+	}
 
-    public function getLocation(): Location {
-        return new Location($this->x, $this->y, $this->z, $this->yaw, $this->pitch, $this->level);
-    }
+	public function getLocation(): Location{
+		return new Location($this->x, $this->y, $this->z, $this->yaw, $this->pitch, $this->level);
+	}
 
-    /**
-     * Get the entity runtime ID
-     *
-     * @return int
-     */
-    public function getRuntimeId() {
-        return $this->entityId;
-    }
+	/**
+	 * Get the entity runtime ID
+	 *
+	 * @return int
+	 */
+	public function getRuntimeId(){
+		return $this->entityId;
+	}
 
-    /**
-     * Get the main player for this NPC
-     *
-     * @return Player
-     */
-    public function getPlayer(): Player {
-        return $this->player;
-    }
+	/**
+	 * Get the main player for this NPC
+	 *
+	 * @return Player
+	 */
+	public function getPlayer(): Player{
+		return $this->player;
+	}
 
-    /**
-     * Set the title for the entity
-     * (Need to be spawned by yourself
-     *
-     * @param $title
-     */
-    public function setTitle($title) {
-        $this->title = $title;
-    }
+	/**
+	 * Set the title for the entity
+	 * (Need to be spawned by yourself
+	 *
+	 * @param $title
+	 */
+	public function setTitle($title){
+		$this->title = $title;
+	}
 
-    /**
-     * @return DataPacket|DataPacket[]
-     */
-    public function encode() {
-        $p = [];
+	/**
+	 * @return DataPacket|DataPacket[]
+	 */
+	public function encode(){
+		$p = [];
 
-        if ($this->entityId === -1) {
-            $this->entityId = Entity::$entityCount++;
-        } else {
-            $pk0 = new RemoveEntityPacket();
-            $pk0->entityUniqueId = $this->entityId;
+		if($this->entityId === -1){
+			$this->entityId = Entity::$entityCount++;
+		}else{
+			$pk0 = new RemoveEntityPacket();
+			$pk0->entityUniqueId = $this->entityId;
 
-            $p[] = $pk0;
-        }
+			$p[] = $pk0;
+		}
 
-        $pk = new AddPlayerPacket();
-        $pk->uuid = is_null($this->uuid) ? $this->uuid = UUID::fromRandom() : $this->uuid;
-        $pk->username = $this->title;
-        $pk->yaw = $this->yaw;
-        $pk->pitch = $this->pitch;
-        $pk->entityRuntimeId = $this->entityId;
-        $pk->position = $this->asVector3(); // TODO: check offset
-        $pk->item = ItemFactory::get(Item::AIR, 0, 0);
-        $flags = (
-            1 << Entity::DATA_FLAG_IMMOBILE
-        );
-        $pk->metadata = [
-            Entity::DATA_FLAGS => [Entity::DATA_TYPE_LONG, $flags],
-            Entity::DATA_SCALE => [Entity::DATA_TYPE_FLOAT, 1],
-        ];
-        $p[] = $pk;
+		$name = $this->title;;
 
-        $skinPk = new PlayerSkinPacket();
-        $skinPk->uuid = $this->uuid;
-        $skinPk->skin = $this->player->getSkin();
-        $p[] = $skinPk;
+		$add = new PlayerListPacket();
+		$add->type = PlayerListPacket::TYPE_ADD;
+		$add->entries = [PlayerListEntry::createAdditionEntry($this->uuid, $this->entityId, $name, $name, 0, $this->player->getSkin())];
+		$p[] = $add;
 
-        return $p;
-    }
+		$pk = new AddPlayerPacket();
+		$pk->uuid = $this->uuid;
+		$pk->username = $name;
+		$pk->entityRuntimeId = $this->entityId;
+		$pk->position = $this->asVector3(); // TODO: check offset
+		$pk->item = ItemFactory::get(Item::AIR, 0, 0);
 
-    public function getLevel(): Level {
-        return $this->level;
-    }
+		$flags = (
+			1 << Entity::DATA_FLAG_IMMOBILE
+		);
+		$pk->metadata = [
+			Entity::DATA_FLAGS => [Entity::DATA_TYPE_LONG, $flags],
+			Entity::DATA_SCALE => [Entity::DATA_TYPE_FLOAT, 0.5],
+		];
+
+		$p[] = $pk;
+
+		$remove = new PlayerListPacket();
+		$remove->type = PlayerListPacket::TYPE_REMOVE;
+		$remove->entries = [PlayerListEntry::createRemovalEntry($this->uuid)];
+		$p[] = $remove;
+
+		return $p;
+	}
+
+	public function getLevel(): Level{
+		return $this->level;
+	}
 }

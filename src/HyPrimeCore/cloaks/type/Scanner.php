@@ -42,54 +42,54 @@ use pocketmine\math\Vector3;
 
 class Scanner extends ParticleCloak {
 
-    /** @var float */
-    private $radius;
-    /** @var int */
-    private $particles;
-    /** @var int */
-    private $step;
-    /** @var int */
-    private $stepY;
-    /** @var int */
-    private $locY;
+	/** @var float */
+	private $radius;
+	/** @var int */
+	private $particles;
+	/** @var int */
+	private $step;
+	/** @var int */
+	private $stepY;
+	/** @var int */
+	private $locY;
 
-    public function __construct($player) {
-        parent::__construct($player, 2, CloakType::SCANNER);
-        $this->radius = 0.6;
-        $this->particles = 25.0;
-        $this->step = 0;
-        $this->stepY = 0.0;
-    }
+	public function __construct($player){
+		parent::__construct($player, 2, CloakType::SCANNER);
+		$this->radius = 0.6;
+		$this->particles = 25.0;
+		$this->step = 0;
+		$this->stepY = 0.0;
+	}
 
-    public function onUpdate(): void {
-        $this->active($this->getPlayer()->getLocation());
-    }
+	public function onUpdate(): void{
+		$this->active($this->getPlayer()->getLocation());
+	}
 
-    private function active(Location $loc) {
-        if ($this->step > 16) {
-            $this->locY = 0;
-            $this->step = 0;
-        }
-        for ($i2 = 0; $i2 < 9; ++$i2) {
-            $inc = 0.6283185307179586 / $this->particles;
-            $angle = $this->step * $inc + $this->stepY + 3.5 * $i2 - 0.2;
-            $v = new Vector3(cos($angle) * $this->radius, 0, sin($angle) * $this->radius);
-            $this->addParticle(new CriticalParticle($loc->add($v)->add(0.0, $this->locY, 0.0), 1));
-        }
-        if ($this->stepY < 6.0) {
-            $this->stepY += 0.045;
-        } else {
-            $this->stepY = 0.0;
-        }
-        if ($this->step <= 8) {
-            $this->locY += 0.25;
-        } else {
-            $this->locY -= 0.25;
-        }
-        ++$this->step;
-    }
+	private function active(Location $loc){
+		if($this->step > 16){
+			$this->locY = 0;
+			$this->step = 0;
+		}
+		for($i2 = 0; $i2 < 9; ++$i2){
+			$inc = 0.6283185307179586 / $this->particles;
+			$angle = $this->step * $inc + $this->stepY + 3.5 * $i2 - 0.2;
+			$v = new Vector3(cos($angle) * $this->radius, 0, sin($angle) * $this->radius);
+			$this->addParticle(new CriticalParticle($loc->add($v)->add(0.0, $this->locY, 0.0), 1));
+		}
+		if($this->stepY < 6.0){
+			$this->stepY += 0.045;
+		}else{
+			$this->stepY = 0.0;
+		}
+		if($this->step <= 8){
+			$this->locY += 0.25;
+		}else{
+			$this->locY -= 0.25;
+		}
+		++$this->step;
+	}
 
-    public function getPermissionNode(): string {
-        return "core.cloak.scanner";
-    }
+	public function getPermissionNode(): string{
+		return "core.cloak.scanner";
+	}
 }

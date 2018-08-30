@@ -25,6 +25,10 @@ commands:
     description: "Show the list of operators"
     default: op
     permission: "admin.command"
+  setblock:
+    description: "Set a temporary show block"
+    default: op
+    permission: "admin.command"
 
 permissions:
   admin.command:

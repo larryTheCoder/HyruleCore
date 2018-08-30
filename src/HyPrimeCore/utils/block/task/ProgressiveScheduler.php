@@ -31,40 +31,77 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace HyPrimeCore\event;
+namespace HyPrimeCore\utils\block\task;
 
-use pocketmine\event\Event;
-use pocketmine\level\Position;
-use pocketmine\Player;
+use HyPrimeCore\utils\block\ArmorStand;
+use pocketmine\scheduler\Task;
 
-/**
- * Event that will called when a player pushed or used
- * a button
- *
- * @package HyPrimeCore\event
- */
-class ButtonPushEvent extends Event {
+class ProgressiveScheduler extends Task {
 
-	public static $handlerList = null;
-	protected $player;
-	protected $pos;
+	public $tick = 0;
+	public $y = 0;
+	/** @var ArmorStand */
+	private $armorStand;
+	/** @var bool */
+	private $reverse;
+	/** @var int */
+	private $yaw = 0;
+	private $rate = 1;
+	private $yRate = 0.004;
+	private $pause = 0;
 
-	public function __construct(Player $player, Position $pos){
-		$this->player = $player;
-		$this->pos = $pos;
+	public function __construct(ArmorStand $armorStand){
+		$this->armorStand = $armorStand;
 	}
 
 	/**
-	 * @return Player
+	 * Actions to execute when run
+	 *
+	 * @param int $currentTick
+	 *
+	 * @return void
 	 */
-	public function getPlayer(){
-		return $this->player;
+	public function onRun(int $currentTick){
+		$this->tick++;
+		$this->y += 0.004;
+		// Pause the block from moving, this ensure that
+		// The block isn't too _robot_
+		if($this->pause > 0){
+			$this->pause--;
+
+			return;
+		}
+		// Vise versa
+		if($this->reverse){
+			$this->yaw -= $this->rate;
+			$this->y += $this->yRate;
+			if($this->yaw <= 0){
+				$this->reverse = false;
+				$this->rate = 1;
+				$this->yRate = 0.004;
+				$this->pause = 20;
+			}elseif($this->yaw <= 20){
+				$this->rate -= 0.5;
+				$this->yRate -= 0.0002;
+			}
+		}else{
+			$this->yaw++;
+			$this->y -= $this->yRate;
+			if($this->yaw >= 360){
+				$this->reverse = true;
+				$this->rate = 1;
+				$this->yRate = 0.004;
+				$this->pause = 20;
+			}elseif($this->yaw >= 340){
+				$this->rate -= 0.5;
+				$this->yRate -= 0.0002;
+			}
+		}
+
+		// Then update them
+		$this->armorStand->yaw = $this->yaw;
+		$this->armorStand->y = $this->y;
+
 	}
 
-	/**
-	 * @return Position
-	 */
-	public function getPos(): Position{
-		return $this->pos;
-	}
 }

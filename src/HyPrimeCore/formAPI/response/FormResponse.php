@@ -22,7 +22,7 @@ namespace HyPrimeCore\formAPI\response;
 
 abstract class FormResponse {
 
-    public $closed;
+	public $closed;
 
-    public abstract function setData(string $data);
+	public abstract function setData(string $data);
 }

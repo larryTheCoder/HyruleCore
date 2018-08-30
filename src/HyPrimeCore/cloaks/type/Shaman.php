@@ -42,45 +42,45 @@ use pocketmine\math\Vector3;
 
 class Shaman extends ParticleCloak {
 
-    /** @var float */
-    private $i;
+	/** @var float */
+	private $i;
 
-    public function __construct($player) {
-        parent::__construct($player, 2, CloakType::SHAMAN);
-        $this->i = 0.0;
-    }
+	public function __construct($player){
+		parent::__construct($player, 2, CloakType::SHAMAN);
+		$this->i = 0.0;
+	}
 
-    public function onUpdate(): void {
-        $this->active($this->getPlayer()->getLocation());
-    }
+	public function onUpdate(): void{
+		$this->active($this->getPlayer()->getLocation());
+	}
 
-    private function active(Location $loc) {
-        # Particle Tier 1
-        $angle1 = $this->i * 0.07853981633974483;
-        $angle2 = $this->i * 0.07853981633974483 + 3.0;
-        $v1 = new Vector3(cos($angle1) * 0.6, 0, sin($angle1) * 0.6);
-        $v2 = new Vector3(cos($angle2) * 0.6, 0, sin($angle2) * 0.6);
-        $this->addParticle(new GenericParticle($loc->add($v1)->add(0, 2), 46));
-        $this->addParticle(new GenericParticle($loc->add($v2)->add(0, 2), 46));
-        # Particle Tier 2
-        $angle3 = $this->i * 0.07853981633974483 + 3.0;
-        $angle4 = $this->i * 0.07853981633974483 + 6.0;
-        $v3 = new Vector3(cos($angle3) * 0.4, 0, sin($angle3) * 0.4);
-        $v4 = new Vector3(cos($angle4) * 0.4, 0, sin($angle4) * 0.4);
-        $this->addParticle(new GenericParticle($loc->add($v3)->add(0, 1.25), 46));
-        $this->addParticle(new GenericParticle($loc->add($v4)->add(0, 1.25), 46));
-        # Particle Tier 3
-        $angle5 = $this->i * 0.07853981633974483;
-        $angle6 = $this->i * 0.07853981633974483 + 3.0;
-        $v5 = new Vector3(cos($angle5) * 0.25, 0, sin($angle5) * 0.25);
-        $v6 = new Vector3(cos($angle6) * 0.25, 0, sin($angle6) * 0.25);
-        $this->addParticle(new GenericParticle($loc->add($v5)->add(0, 0.65), 46));
-        $this->addParticle(new GenericParticle($loc->add($v6)->add(0, 0.65), 46));
+	private function active(Location $loc){
+		# Particle Tier 1
+		$angle1 = $this->i * 0.07853981633974483;
+		$angle2 = $this->i * 0.07853981633974483 + 3.0;
+		$v1 = new Vector3(cos($angle1) * 0.6, 0, sin($angle1) * 0.6);
+		$v2 = new Vector3(cos($angle2) * 0.6, 0, sin($angle2) * 0.6);
+		$this->addParticle(new GenericParticle($loc->add($v1)->add(0, 2), 46));
+		$this->addParticle(new GenericParticle($loc->add($v2)->add(0, 2), 46));
+		# Particle Tier 2
+		$angle3 = $this->i * 0.07853981633974483 + 3.0;
+		$angle4 = $this->i * 0.07853981633974483 + 6.0;
+		$v3 = new Vector3(cos($angle3) * 0.4, 0, sin($angle3) * 0.4);
+		$v4 = new Vector3(cos($angle4) * 0.4, 0, sin($angle4) * 0.4);
+		$this->addParticle(new GenericParticle($loc->add($v3)->add(0, 1.25), 46));
+		$this->addParticle(new GenericParticle($loc->add($v4)->add(0, 1.25), 46));
+		# Particle Tier 3
+		$angle5 = $this->i * 0.07853981633974483;
+		$angle6 = $this->i * 0.07853981633974483 + 3.0;
+		$v5 = new Vector3(cos($angle5) * 0.25, 0, sin($angle5) * 0.25);
+		$v6 = new Vector3(cos($angle6) * 0.25, 0, sin($angle6) * 0.25);
+		$this->addParticle(new GenericParticle($loc->add($v5)->add(0, 0.65), 46));
+		$this->addParticle(new GenericParticle($loc->add($v6)->add(0, 0.65), 46));
 
-        $this->i += 4.0;
-    }
+		$this->i += 4.0;
+	}
 
-    public function getPermissionNode(): string {
-        return "core.cloak.shaman";
-    }
+	public function getPermissionNode(): string{
+		return "core.cloak.shaman";
+	}
 }

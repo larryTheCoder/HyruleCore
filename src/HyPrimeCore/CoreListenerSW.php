@@ -31,71 +31,76 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace HyPrimeCore\panel;
+namespace HyPrimeCore;
 
 use HyPrimeCore\cloaks\CloakManager;
-use HyPrimeCore\cloaks\type\CloakType;
-use HyPrimeCore\CoreMain;
-use HyPrimeCore\formAPI\event\FormRespondedEvent;
-use HyPrimeCore\formAPI\response\FormResponseSimple;
+use larryTheCoder\events\PlayerJoinArenaEvent;
+use larryTheCoder\SkyWarsPE;
+use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\Player;
 
-class Panel implements Listener {
+class CoreListenerSW implements Listener {
 
-	const CLOAK_CONFIGURATION = 0;
-
-	/** @var int[] */
-	private $forms;
 	/** @var CoreMain */
 	private $plugin;
 
 	public function __construct(CoreMain $plugin){
 		$this->plugin = $plugin;
-		$plugin->getServer()->getPluginManager()->registerEvents($this, $plugin);
-		$plugin->getServer()->getLogger()->info($plugin->getPrefix() . "§bIndexed Panel container.");
-	}
-
-	public function showCloakConfiguration(Player $p){
-		$form = $this->plugin->getFormAPI()->createSimpleForm();
-		$form->setTitle($this->plugin->getMessage($p, 'panel.cloak-title'));
-		$form->setContent($this->plugin->getMessage($p, 'panel.cloak-about'));
-
-		$pManager = CoreMain::get()->getPlayerData($p);
-		foreach(CloakType::getAll() as $cloak){
-			$form->addButton($cloak);
-		}
-		if($pManager->getCloakData() !== null){
-			$form->addButton($this->plugin->getMessage($p, 'panel.cloak-remove'));
-		}
-		$form->sendToPlayer($p);
-		$this->forms[$form->getId()] = Panel::CLOAK_CONFIGURATION;
 	}
 
 	/**
-	 * @param FormRespondedEvent $event
-	 * @priority MONITOR
+	 * @param PlayerJoinArenaEvent $event
+	 * @priority LOW
 	 */
-	public function onResponse(FormRespondedEvent $event){
-		$id = $event->getId();
-		if(isset($this->forms[$id])){
-			$p = $event->getPlayer();
-			$response = $event->getResponse();
-			$command = $this->forms[$id];
-			unset($this->forms[$id]);
-			switch($command){
-				case self::CLOAK_CONFIGURATION:
-					if($response->closed){
-						$p->sendMessage($this->plugin->getMessage($p, 'panel.panel-cancelled'));
-						break;
-					}
-					/** @var FormResponseSimple $sForm */
-					$sForm = $response;
-					CloakManager::equipCloak($p, $sForm->getClickedButtonId());
-					$p->sendMessage($this->plugin->getPrefix() . str_replace("{CLOAK}", $sForm->getClickedButton()->getText(), $this->plugin->getMessage($p, 'panel.cloak-selected')));
-					break;
+	public function onPlayerJoinArena(PlayerJoinArenaEvent $event){
+		$p = $event->getPlayer();
+
+		$p->setAllowFlight(false);
+		CloakManager::unequipCloak($p);
+	}
+
+	/**
+	 * @param EntityDamageEvent $ev
+	 * @priority NORMAL
+	 */
+	public function onPlayerDamaged(EntityDamageEvent $ev){
+		$p = $ev->getEntity();
+		// Here is the place where the player can kill in arena
+		$arena = SkyWarsPE::getInstance()->getArenaManager()->getPlayerArena($p);
+		if($p instanceof Player && $arena === null){
+			if(isset($this->plugin->getBypasses()[$p->getName()])){
+				return;
+			}
+			$ev->setCancelled();
+			if($p->getY() <= 0){
+				$level = $p->getLevel();
+				$p->teleport($level->getSafeSpawn());
 			}
 		}
 	}
 
+	/**
+	 * @param PlayerDeathEvent $e
+	 * @priority NORMAL
+	 */
+	public function onPlayerDeath(PlayerDeathEvent $e){
+		$p = $e->getPlayer();
+		if(isset($this->plugin->getBypasses()[$p->getName()])){
+			return;
+		}
+		// Here is the place where the player can kill in arena
+		$arena = SkyWarsPE::getInstance()->getArenaManager()->getPlayerArena($p);
+		if($p instanceof Player && $arena !== null){
+			if($arena->getPlayerMode($p) === 0){
+				// TODO: Various silly messages
+			}
+		}else{
+			if($p->getY() <= 0){
+				$level = $p->getLevel();
+				$p->teleport($level->getSafeSpawn());
+			}
+		}
+	}
 }

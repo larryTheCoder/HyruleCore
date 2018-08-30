@@ -45,36 +45,36 @@ use pocketmine\scheduler\Task;
  */
 class SendMOTD extends Task {
 
-    /** @var CoreMain */
-    private $plugin;
-    /** @var int */
-    private $line;
+	/** @var CoreMain */
+	private $plugin;
+	/** @var int */
+	private $line;
 
-    public function __construct(CoreMain $plugin) {
-        $this->plugin = $plugin;
-        $this->line = -1;
-        $this->plugin->getServer()->getLogger()->info($plugin->getPrefix() . "§7Starting motd messages");
-    }
+	public function __construct(CoreMain $plugin){
+		$this->plugin = $plugin;
+		$this->line = -1;
+		$this->plugin->getServer()->getLogger()->info($plugin->getPrefix() . "§7Starting motd messages");
+	}
 
-    /**
-     * Actions to execute when run
-     *
-     * @param int $currentTick
-     *
-     * @return void
-     */
-    public function onRun(int $currentTick) {
-        $getMOTD = $this->plugin->getConfig()->getNested("motd.message");
-        if ($this->plugin->getConfig()->getNested("motd.shuffle") == true) {
-            $msg = $getMOTD[mt_rand(0, count($getMOTD) - 1)];
-            $this->plugin->getServer()->getNetwork()->setName($msg);
-        } else {
-            $this->line++;
-            $msg = $getMOTD[$this->line];
-            $this->plugin->getServer()->getNetwork()->setName($msg);
-            if ($this->line === count($getMOTD) - 1) {
-                $this->line = -1;
-            }
-        }
-    }
+	/**
+	 * Actions to execute when run
+	 *
+	 * @param int $currentTick
+	 *
+	 * @return void
+	 */
+	public function onRun(int $currentTick){
+		$getMOTD = $this->plugin->getConfig()->getNested("motd.message");
+		if($this->plugin->getConfig()->getNested("motd.shuffle") == true){
+			$msg = $getMOTD[mt_rand(0, count($getMOTD) - 1)];
+			$this->plugin->getServer()->getNetwork()->setName($msg);
+		}else{
+			$this->line++;
+			$msg = $getMOTD[$this->line];
+			$this->plugin->getServer()->getNetwork()->setName($msg);
+			if($this->line === count($getMOTD) - 1){
+				$this->line = -1;
+			}
+		}
+	}
 }

@@ -42,82 +42,83 @@ use pocketmine\Player;
 
 abstract class ParticleCloak {
 
-    /** @var bool */
-    public $moving = false;
-    /** @var null|Player|FakePlayer */
-    private $player = null;
-    /** @var CloakListener */
-    private $listener;
-    /** @var int */
-    private $data;
-    /** @var null|\pocketmine\scheduler\TaskHandler */
-    private $task;
+	/** @var bool */
+	public $moving = false;
+	/** @var null|Player|FakePlayer */
+	private $player = null;
+	/** @var CloakListener */
+	private $listener;
+	/** @var int */
+	private $data;
+	/** @var null|\pocketmine\scheduler\TaskHandler */
+	private $task;
 
-    /**
-     * ParticleCloak constructor.
-     * @param null|Player|FakePlayer $player
-     * @param int $delay
-     * @param int $data
-     */
-    public function __construct($player, int $delay, int $data) {
-        $this->player = $player;
-        if ($this->player instanceof Player) {
-            if (!$player->hasPermission($this->getPermissionNode())) {
-                $player->sendMessage(CoreMain::get()->getMessage($player, 'error.buy-site'));
-                return;
-            }
-            $this->moving = false;
-            $this->data = $data;
-            $this->task = CoreMain::get()->getScheduler()->scheduleRepeatingTask(new CloakTask($this), $delay);
-            $this->listener = new CloakListener($this);
-            CoreMain::get()->getServer()->getPluginManager()->registerEvents($this->listener, CoreMain::get());
-        } else if ($this->player instanceof FakePlayer) {
-            $this->moving = false;
-            $this->data = $data;
-            $this->task = CoreMain::get()->getScheduler()->scheduleRepeatingTask(new CloakTask($this), $delay);
-            $this->listener = new CloakListener($this);
-            CoreMain::get()->getServer()->getPluginManager()->registerEvents($this->listener, CoreMain::get());
-        }
-    }
+	/**
+	 * ParticleCloak constructor.
+	 * @param null|Player|FakePlayer $player
+	 * @param int $delay
+	 * @param int $data
+	 */
+	public function __construct($player, int $delay, int $data){
+		$this->player = $player;
+		if($this->player instanceof Player){
+			if(!$player->hasPermission($this->getPermissionNode())){
+				$player->sendMessage(CoreMain::get()->getMessage($player, 'error.buy-site'));
 
-    public abstract function getPermissionNode(): string;
+				return;
+			}
+			$this->moving = false;
+			$this->data = $data;
+			$this->task = CoreMain::get()->getScheduler()->scheduleRepeatingTask(new CloakTask($this), $delay);
+			$this->listener = new CloakListener($this);
+			CoreMain::get()->getServer()->getPluginManager()->registerEvents($this->listener, CoreMain::get());
+		}elseif($this->player instanceof FakePlayer){
+			$this->moving = false;
+			$this->data = $data;
+			$this->task = CoreMain::get()->getScheduler()->scheduleRepeatingTask(new CloakTask($this), $delay);
+			$this->listener = new CloakListener($this);
+			CoreMain::get()->getServer()->getPluginManager()->registerEvents($this->listener, CoreMain::get());
+		}
+	}
 
-    /**
-     * @return int
-     */
-    public function getType(): int {
-        return $this->data;
-    }
+	public abstract function getPermissionNode(): string;
 
-    public function clear() {
-        if (!is_null($this->task)) {
-            CoreMain::get()->getScheduler()->cancelTask($this->task->getTaskId());
-            HandlerList::unregisterAll($this->listener);
-        }
+	/**
+	 * @return int
+	 */
+	public function getType(): int{
+		return $this->data;
+	}
 
-        $this->moving = false;
-        $this->player = null;
-    }
+	public function clear(){
+		if(!is_null($this->task)){
+			CoreMain::get()->getScheduler()->cancelTask($this->task->getTaskId());
+			HandlerList::unregisterAll($this->listener);
+		}
 
-    /**
-     * @return FakePlayer|null|Player
-     */
-    public function getPlayer() {
-        return $this->player;
-    }
+		$this->moving = false;
+		$this->player = null;
+	}
 
-    public abstract function onUpdate(): void;
+	/**
+	 * @return FakePlayer|null|Player
+	 */
+	public function getPlayer(){
+		return $this->player;
+	}
 
-    public function isMoving(): bool {
-        return $this->moving;
-    }
+	public abstract function onUpdate(): void;
 
-    public function addParticle(Particle $particle) {
-        if ($this->player instanceof FakePlayer) {
-            $this->player->getLevel()->addParticle($particle, [$this->player->getPlayer()]);
-        } else {
-            $this->player->getLevel()->addParticle($particle);
-        }
-    }
+	public function isMoving(): bool{
+		return $this->moving;
+	}
+
+	public function addParticle(Particle $particle){
+		if($this->player instanceof FakePlayer){
+			$this->player->getLevel()->addParticle($particle, [$this->player->getPlayer()]);
+		}else{
+			$this->player->getLevel()->addParticle($particle);
+		}
+	}
 
 }

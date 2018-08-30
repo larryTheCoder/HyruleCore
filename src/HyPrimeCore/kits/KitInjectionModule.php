@@ -46,110 +46,112 @@ use pocketmine\utils\Config;
 
 class KitInjectionModule {
 
-    /** @var CoreMain */
-    private $plugin;
-    /** @var SkyWarsPE */
-    private $injection;
+	/** @var CoreMain */
+	private $plugin;
+	/** @var SkyWarsPE */
+	private $injection;
 
-    public function __construct(CoreMain $plugin) {
-        $this->plugin = $plugin;
-        /** @var PluginBase $inj */
-        $inj = $plugin->getServer()->getPluginManager()->getPlugin("SkyWarsForPE");
+	public function __construct(CoreMain $plugin){
+		$this->plugin = $plugin;
+		/** @var PluginBase $inj */
+		$inj = $plugin->getServer()->getPluginManager()->getPlugin("SkyWarsForPE");
 
-        // Check if injection is available
-        if (is_null($inj)) {
-            $plugin->getServer()->getLogger()->error("Could not inject KitAPI to SkyWarsForPE");
-            return;
-        }
+		// Check if injection is available
+		if(is_null($inj)){
+			$plugin->getServer()->getLogger()->error("Could not inject KitAPI to SkyWarsForPE");
 
-        $this->injection = $inj;
-        $this->load();
-    }
+			return;
+		}
 
-    private function load() {
-        $this->plugin->saveResource("kits.yml");
-        $kit = new Config($this->plugin->getDataFolder() . "kits.yml", Config::YAML);
-        $array = $kit->get("kits");
-        if (!is_array($array)) {
-            $this->plugin->getServer()->getLogger()->error("Kits is not in array!");
-            return;
-        }
-        $kit = [];
-        foreach (array_keys($array) as $val) {
-            try {
-                $kit[$val]["name"] = $array[$val]["name"];
-                $kit[$val]["price"] = $array[$val]["price"];
-                $kit[$val]["items"] = $array[$val]["items"];
-                if (isset($kit[$val]["armour"])) {
-                    if (isset($kit[$val]["armour"]["hat"])) {
-                        $kit[$val]["armour"]["hat"] = $array[$val]["armour"]["hat"];
-                    }
-                    if (isset($kit[$val]["armour"]["chestplate"])) {
-                        $kit[$val]["armour"]["hat"] = $array[$val]["armour"]["chestplate"];
-                    }
-                    if (isset($kit[$val]["armour"]["leggings"])) {
-                        $kit[$val]["armour"]["hat"] = $array[$val]["armour"]["leggings"];
-                    }
-                    if (isset($kit[$val]["armour"]["boot"])) {
-                        $kit[$val]["armour"]["hat"] = $array[$val]["armour"]["boot"];
-                    }
-                }
-            } catch (\Exception $ex) {
-                Utils::send("&cError on loading kit: &d" . $val);
-                continue;
-            }
-        }
+		$this->injection = $inj;
+		$this->load();
+	}
 
-        foreach (array_keys($kit) as $val) {
-            $kitAPI = new NormalKit($kit[$val]["name"], $kit[$val]["price"], "");
-            $items = [];
-            foreach ($kit[$val]["items"] as $value) {
-                $split = explode(":", $value);
-                if (count($split) === 2) {
-                    $items[] = Item::get($split[0], 0, $split[1]);
-                } else if (count($split) === 3) {
-                    $items[] = Item::get($split[0], $split[2], $split[1]);
-                } else if (count($split) === 5) {
-                    $item = Item::get($split[0], $split[2], $split[1]);
-                    if (Enchantment::getEnchantment($split[3]) !== null) {
-                        $item->addEnchantment(new EnchantmentInstance(Enchantment::getEnchantment($split[3]), $split[4]));
-                    } else {
-                        Server::getInstance()->getLogger()->error(CoreMain::get()->getPrefix() . "§cUnknown EnchantmentID: " . $split[3]);
-                    }
-                    $items[] = $item;
-                }
-            }
-            if (isset($kit[$val]["armour"])) {
-                if (isset($kit[$val]["armour"]['hat'])) {
-                    $armours[] = $kit[$val]["armour"]['hat'];
-                } else {
-                    $armours[] = Item::get(0);
-                }
-                if (isset($kit[$val]["armour"]['chestplate'])) {
-                    $armours[] = $kit[$val]["armour"]['chestplate'];
-                } else {
-                    $armours[] = Item::get(0);
-                }
-                if (isset($kit[$val]["armour"]['leggings'])) {
-                    $armours[] = $kit[$val]["armour"]['leggings'];
-                } else {
-                    $armours[] = Item::get(0);
-                }
-                if (isset($kit[$val]["armour"]['boots'])) {
-                    $armours[] = $kit[$val]["armour"]['boots'];
-                } else {
-                    $armours[] = Item::get(0);
-                }
-            } else {
-                $armours[] = Item::get(0);
-                $armours[] = Item::get(0);
-                $armours[] = Item::get(0);
-                $armours[] = Item::get(0);
-            }
+	private function load(){
+		$this->plugin->saveResource("kits.yml");
+		$kit = new Config($this->plugin->getDataFolder() . "kits.yml", Config::YAML);
+		$array = $kit->get("kits");
+		if(!is_array($array)){
+			$this->plugin->getServer()->getLogger()->error("Kits is not in array!");
 
-            $kitAPI->setInventoryItem($items);
-            $kitAPI->setArmourItem($armours);
-            $this->injection->kit->registerKit($kitAPI);
-        }
-    }
+			return;
+		}
+		$kit = [];
+		foreach(array_keys($array) as $val){
+			try{
+				$kit[$val]["name"] = $array[$val]["name"];
+				$kit[$val]["price"] = $array[$val]["price"];
+				$kit[$val]["items"] = $array[$val]["items"];
+				if(isset($kit[$val]["armour"])){
+					if(isset($kit[$val]["armour"]["hat"])){
+						$kit[$val]["armour"]["hat"] = $array[$val]["armour"]["hat"];
+					}
+					if(isset($kit[$val]["armour"]["chestplate"])){
+						$kit[$val]["armour"]["hat"] = $array[$val]["armour"]["chestplate"];
+					}
+					if(isset($kit[$val]["armour"]["leggings"])){
+						$kit[$val]["armour"]["hat"] = $array[$val]["armour"]["leggings"];
+					}
+					if(isset($kit[$val]["armour"]["boot"])){
+						$kit[$val]["armour"]["hat"] = $array[$val]["armour"]["boot"];
+					}
+				}
+			}catch(\Exception $ex){
+				Utils::send("&cError on loading kit: &d" . $val);
+				continue;
+			}
+		}
+
+		foreach(array_keys($kit) as $val){
+			$kitAPI = new NormalKit($kit[$val]["name"], $kit[$val]["price"], "");
+			$items = [];
+			foreach($kit[$val]["items"] as $value){
+				$split = explode(":", $value);
+				if(count($split) === 2){
+					$items[] = Item::get($split[0], 0, $split[1]);
+				}elseif(count($split) === 3){
+					$items[] = Item::get($split[0], $split[2], $split[1]);
+				}elseif(count($split) === 5){
+					$item = Item::get($split[0], $split[2], $split[1]);
+					if(Enchantment::getEnchantment($split[3]) !== null){
+						$item->addEnchantment(new EnchantmentInstance(Enchantment::getEnchantment($split[3]), $split[4]));
+					}else{
+						Server::getInstance()->getLogger()->error(CoreMain::get()->getPrefix() . "§cUnknown EnchantmentID: " . $split[3]);
+					}
+					$items[] = $item;
+				}
+			}
+			if(isset($kit[$val]["armour"])){
+				if(isset($kit[$val]["armour"]['hat'])){
+					$armours[] = $kit[$val]["armour"]['hat'];
+				}else{
+					$armours[] = Item::get(0);
+				}
+				if(isset($kit[$val]["armour"]['chestplate'])){
+					$armours[] = $kit[$val]["armour"]['chestplate'];
+				}else{
+					$armours[] = Item::get(0);
+				}
+				if(isset($kit[$val]["armour"]['leggings'])){
+					$armours[] = $kit[$val]["armour"]['leggings'];
+				}else{
+					$armours[] = Item::get(0);
+				}
+				if(isset($kit[$val]["armour"]['boots'])){
+					$armours[] = $kit[$val]["armour"]['boots'];
+				}else{
+					$armours[] = Item::get(0);
+				}
+			}else{
+				$armours[] = Item::get(0);
+				$armours[] = Item::get(0);
+				$armours[] = Item::get(0);
+				$armours[] = Item::get(0);
+			}
+
+			$kitAPI->setInventoryItem($items);
+			$kitAPI->setArmourItem($armours);
+			$this->injection->kit->registerKit($kitAPI);
+		}
+	}
 }

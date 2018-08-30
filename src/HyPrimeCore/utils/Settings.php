@@ -38,37 +38,37 @@ use pocketmine\utils\Config;
 
 class Settings {
 
-    /** @var string */
-    public static $prefix;
-    /** @var string */
-    public static $chatTag;
-    /** @var bool */
-    public static $offensiveChat = true;
-    /** @var int */
-    public static $messageInterval = 0;
-    /** @var bool */
-    public static $messagePrefix = true;
-    /** @var bool */
-    public static $messageRandom = false;
-    /** @var bool */
-    public static $loginBroadcast = false;
+	/** @var string */
+	public static $prefix;
+	/** @var string */
+	public static $chatTag;
+	/** @var bool */
+	public static $offensiveChat = true;
+	/** @var int */
+	public static $messageInterval = 0;
+	/** @var bool */
+	public static $messagePrefix = true;
+	/** @var bool */
+	public static $messageRandom = false;
+	/** @var bool */
+	public static $loginBroadcast = false;
 
-    public static function load(Config $config) {
-        $general = $config->get("general");
+	public static function load(Config $config){
+		$general = $config->get("general");
 
-        self::$prefix = str_replace("&", "§", $general['prefix']);
+		self::$prefix = str_replace("&", "§", $general['prefix']);
 
-        $chat = $config->get("chat");
+		$chat = $config->get("chat");
 
-        self::$chatTag = $chat['chat-tag'];
-        self::$offensiveChat = $chat['offensive-block'];
+		self::$chatTag = $chat['chat-tag'];
+		self::$offensiveChat = $chat['offensive-block'];
 
-        $broadcast = $config->get("broadcast");
-        self::$messageInterval = $broadcast['message-interval'];
-        self::$offensiveChat = $broadcast['message-prefix'];
-        self::$messageRandom = $broadcast['message-randomize'];
-        self::$loginBroadcast = $broadcast['login-broadcast'];
+		$broadcast = $config->get("broadcast");
+		self::$messageInterval = $broadcast['message-interval'];
+		self::$offensiveChat = $broadcast['message-prefix'];
+		self::$messageRandom = $broadcast['message-randomize'];
+		self::$loginBroadcast = $broadcast['login-broadcast'];
 
-        Server::getInstance()->getLogger()->info(self::$prefix . "§7Loaded Hyrule configuration into system.");
-    }
+		Server::getInstance()->getLogger()->info(self::$prefix . "§7Loaded Hyrule configuration into system.");
+	}
 }

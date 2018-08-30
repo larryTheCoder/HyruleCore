@@ -41,61 +41,61 @@ use pocketmine\level\particle\FlameParticle;
 
 class Firewings extends ParticleCloak {
 
-    /** @var boolean[][] */
-    private $shape = [
-        [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
-        [false, false, false, false, false, true, false, false, false, false, false, false, false, false, true, false, false, false, false, false],
-        [false, false, false, false, true, true, true, false, false, false, false, false, false, true, true, true, false, false, false, false],
-        [false, false, false, true, true, true, true, true, false, false, false, false, true, true, true, true, true, false, false, false],
-        [false, false, false, false, true, true, true, true, true, false, false, true, true, true, true, true, false, false, false, false],
-        [false, false, false, false, false, true, true, true, true, false, false, true, true, true, true, false, false, false, false, false],
-        [false, false, false, false, false, false, true, true, true, true, true, true, true, true, false, false, false, false, false, false],
-        [false, false, false, false, false, false, false, true, true, true, true, true, true, false, false, false, false, false, false, false],
-        [false, false, false, false, false, false, false, false, true, true, true, true, false, false, false, false, false, false, false, false],
-        [false, false, false, false, false, false, false, true, true, false, false, true, true, false, false, false, false, false, false, false],
-        [false, false, false, false, false, false, true, true, true, false, false, true, true, true, false, false, false, false, false, false],
-        [false, false, false, false, false, false, true, true, false, false, false, false, true, true, false, false, false, false, false, false],
-        [false, false, false, false, false, false, true, false, false, false, false, false, false, true, false, false, false, false, false, false]
-    ];
+	/** @var boolean[][] */
+	private $shape = [
+		[false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+		[false, false, false, false, false, true, false, false, false, false, false, false, false, false, true, false, false, false, false, false],
+		[false, false, false, false, true, true, true, false, false, false, false, false, false, true, true, true, false, false, false, false],
+		[false, false, false, true, true, true, true, true, false, false, false, false, true, true, true, true, true, false, false, false],
+		[false, false, false, false, true, true, true, true, true, false, false, true, true, true, true, true, false, false, false, false],
+		[false, false, false, false, false, true, true, true, true, false, false, true, true, true, true, false, false, false, false, false],
+		[false, false, false, false, false, false, true, true, true, true, true, true, true, true, false, false, false, false, false, false],
+		[false, false, false, false, false, false, false, true, true, true, true, true, true, false, false, false, false, false, false, false],
+		[false, false, false, false, false, false, false, false, true, true, true, true, false, false, false, false, false, false, false, false],
+		[false, false, false, false, false, false, false, true, true, false, false, true, true, false, false, false, false, false, false, false],
+		[false, false, false, false, false, false, true, true, true, false, false, true, true, true, false, false, false, false, false, false],
+		[false, false, false, false, false, false, true, true, false, false, false, false, true, true, false, false, false, false, false, false],
+		[false, false, false, false, false, false, true, false, false, false, false, false, false, true, false, false, false, false, false, false],
+	];
 
-    public function __construct($player) {
-        parent::__construct($player, 2, CloakType::FIREWINGS);
-    }
+	public function __construct($player){
+		parent::__construct($player, 2, CloakType::FIREWINGS);
+	}
 
-    public function onUpdate(): void {
-        $this->active($this->getPlayer()->getLocation());
-    }
+	public function onUpdate(): void{
+		$this->active($this->getPlayer()->getLocation());
+	}
 
-    private function active(Location $loc) {
-        $space = 0.2;
-        $defX = $x = $loc->getX() - $space * count($this->shape[0]) / 2 + $space / 2;
-        $y = $loc->getY() + 2.8;
-        $angle = -(($loc->getYaw() + 180) / 60);
-        $angle += (($loc->getYaw() < -180) ? 3.25 : 2.985);
-        for ($i = 0; $i < count($this->shape); ++$i) {
-            for ($j = 0; $j < count($this->shape[$i]); ++$j) {
-                if ($this->shape[$i][$j]) {
-                    $target = clone $loc;
-                    $target->x = $x;
-                    $target->y = $y;
-                    $v2 = Utils::getBackVector($loc);
-                    $v = Utils::rotateAroundAxisY($target->subtract($loc->add(-0.5, 0, 0.35)), $angle);
-                    $iT = $i / 18.0;
-                    $v2->y = 0;
-                    $newVec = $v->add($v2->multiply(-0.2 - $iT));
-                    $newLoc = $newVec->add($loc);
-                    for ($k = 0; $k < 3; ++$k) {
-                        $this->addParticle(new FlameParticle($newLoc));
-                    }
-                }
-                $x += $space;
-            }
-            $y -= $space;
-            $x = $defX;
-        }
-    }
+	private function active(Location $loc){
+		$space = 0.2;
+		$defX = $x = $loc->getX() - $space * count($this->shape[0]) / 2 + $space / 2;
+		$y = $loc->getY() + 2.8;
+		$angle = -(($loc->getYaw() + 180) / 60);
+		$angle += (($loc->getYaw() < -180) ? 3.25 : 2.985);
+		for($i = 0; $i < count($this->shape); ++$i){
+			for($j = 0; $j < count($this->shape[$i]); ++$j){
+				if($this->shape[$i][$j]){
+					$target = clone $loc;
+					$target->x = $x;
+					$target->y = $y;
+					$v2 = Utils::getBackVector($loc);
+					$v = Utils::rotateAroundAxisY($target->subtract($loc->add(-0.5, 0, 0.35)), $angle);
+					$iT = $i / 18.0;
+					$v2->y = 0;
+					$newVec = $v->add($v2->multiply(-0.2 - $iT));
+					$newLoc = $newVec->add($loc);
+					for($k = 0; $k < 3; ++$k){
+						$this->addParticle(new FlameParticle($newLoc));
+					}
+				}
+				$x += $space;
+			}
+			$y -= $space;
+			$x = $defX;
+		}
+	}
 
-    public function getPermissionNode(): string {
-        return "core.cloak.firewings";
-    }
+	public function getPermissionNode(): string{
+		return "core.cloak.firewings";
+	}
 }

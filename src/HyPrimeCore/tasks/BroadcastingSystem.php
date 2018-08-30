@@ -40,53 +40,53 @@ use pocketmine\Server;
 
 class BroadcastingSystem extends Task {
 
-    /** @var CoreMain */
-    private $plugin;
-    /** @var int[] */
-    private $currentMessage = [];
+	/** @var CoreMain */
+	private $plugin;
+	/** @var int[] */
+	private $currentMessage = [];
 
-    public function __construct(CoreMain $plugin) {
-        $this->plugin = $plugin;
-    }
+	public function __construct(CoreMain $plugin){
+		$this->plugin = $plugin;
+	}
 
-    /**
-     * Actions to execute when run
-     *
-     * @param int $currentTick
-     *
-     * @return void
-     */
-    public function onRun(int $currentTick) {
-        $pl = Server::getInstance()->getOnlinePlayers();
+	/**
+	 * Actions to execute when run
+	 *
+	 * @param int $currentTick
+	 *
+	 * @return void
+	 */
+	public function onRun(int $currentTick){
+		$pl = Server::getInstance()->getOnlinePlayers();
 
-        foreach ($pl as $p) {
-            // Just joined, cancel the first message
-            if (isset($this->plugin->justJoined[strtolower($p->getName())])) {
-                unset($this->plugin->justJoined[strtolower($p->getName())]);
-                continue;
-            }
+		foreach($pl as $p){
+			// Just joined, cancel the first message
+			if(isset($this->plugin->justJoined[strtolower($p->getName())])){
+				unset($this->plugin->justJoined[strtolower($p->getName())]);
+				continue;
+			}
 
-            if (!isset($this->currentMessage[$p->getName()])) {
-                $this->currentMessage[$p->getName()] = 0;
-            }
+			if(!isset($this->currentMessage[$p->getName()])){
+				$this->currentMessage[$p->getName()] = 0;
+			}
 
-            if ($this->currentMessage[$p->getName()] >= count($this->plugin->getMessage($p, 'broadcast'))) {
-                $this->currentMessage[$p->getName()] = 0;
-            }
+			if($this->currentMessage[$p->getName()] >= count($this->plugin->getMessage($p, 'broadcast'))){
+				$this->currentMessage[$p->getName()] = 0;
+			}
 
-            if (Settings::$messageRandom) {
-                $this->currentMessage[$p->getName()] = rand(0, count($this->plugin->getMessage($p, 'broadcast')));
-            }
+			if(Settings::$messageRandom){
+				$this->currentMessage[$p->getName()] = rand(0, count($this->plugin->getMessage($p, 'broadcast')));
+			}
 
-            $array = $this->plugin->getMessage($p, 'broadcast');
-            if ($p->getLevel()->getName() === "world") {
-                if (Settings::$messagePrefix) {
-                    $p->sendMessage(Settings::$prefix . $array[$this->currentMessage[$p->getName()]]);
-                } else {
-                    $p->sendMessage($array[$this->currentMessage[$p->getName()]]);
-                }
-            }
-            $this->currentMessage[$p->getName()]++;
-        }
-    }
+			$array = $this->plugin->getMessage($p, 'broadcast');
+			if($p->getLevel()->getName() === "world"){
+				if(Settings::$messagePrefix){
+					$p->sendMessage(Settings::$prefix . $array[$this->currentMessage[$p->getName()]]);
+				}else{
+					$p->sendMessage($array[$this->currentMessage[$p->getName()]]);
+				}
+			}
+			$this->currentMessage[$p->getName()]++;
+		}
+	}
 }

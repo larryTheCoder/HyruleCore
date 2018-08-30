@@ -21,21 +21,21 @@ namespace HyPrimeCore\formAPI\response;
 
 
 class FormResponseData {
-    /** @var int */
-    private $elementID;
-    /** @var string */
-    private $elementContent;
+	/** @var int */
+	private $elementID;
+	/** @var string */
+	private $elementContent;
 
-    public function __construct(int $id, string $content) {
-        $this->elementID = $id;
-        $this->elementContent = $content;
-    }
+	public function __construct(int $id, string $content){
+		$this->elementID = $id;
+		$this->elementContent = $content;
+	}
 
-    public function getElementID() {
-        return $this->elementID;
-    }
+	public function getElementID(){
+		return $this->elementID;
+	}
 
-    public function getElementContent() {
-        return $this->elementContent;
-    }
+	public function getElementContent(){
+		return $this->elementContent;
+	}
 }
