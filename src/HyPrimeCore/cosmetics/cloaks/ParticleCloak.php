@@ -31,7 +31,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace HyPrimeCore\cloaks;
+namespace HyPrimeCore\cosmetics\cloaks;
 
 use HyPrimeCore\CoreMain;
 use HyPrimeCore\player\FakePlayer;

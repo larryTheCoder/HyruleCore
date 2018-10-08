@@ -33,10 +33,10 @@
 
 namespace HyPrimeCore\buttonInterface\menu;
 
-use HyPrimeCore\cloaks\CloakManager;
-use HyPrimeCore\cloaks\ParticleCloak;
-use HyPrimeCore\cloaks\type\CloakType;
 use HyPrimeCore\CoreMain;
+use HyPrimeCore\cosmetics\cloaks\CloakManager;
+use HyPrimeCore\cosmetics\cloaks\ParticleCloak;
+use HyPrimeCore\cosmetics\cloaks\type\CloakType;
 use HyPrimeCore\player\FakePlayer;
 use pocketmine\Player;
 

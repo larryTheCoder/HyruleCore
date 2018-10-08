@@ -31,39 +31,59 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace HyPrimeCore\cloaks;
+namespace HyPrimeCore\cosmetics\gadgets;
 
 
-use HyPrimeCore\cloaks\type\CloakType;
 use HyPrimeCore\CoreMain;
-use pocketmine\Player;
+use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerInteractEvent;
 
-class CloakManager {
+class GadgetListener implements Listener {
 
-	/**
-	 * @param Player $p
-	 * @param int $type
-	 */
-	public static function equipCloak(Player $p, int $type){
-		$pManager = CoreMain::get()->getPlayerData($p);
-		if($pManager->getCloakData() !== null){
-			CloakManager::unequipCloak($p);
-		}
+	private $gadget;
 
-		$cloak = CloakType::getCloakById($p, $type);
-		$pManager->setCurrentCloak($cloak);
+	public function __construct(Gadget $gadget){
+		$this->gadget = $gadget;
 	}
 
-	/**
-	 * @param Player $p
-	 */
-	public static function unequipCloak(Player $p){
-		if($p == null){
+	public function onPlayerActivateGadget(PlayerInteractEvent $event){
+		$player = $event->getPlayer();
+		if($event->getAction() != PlayerInteractEvent::RIGHT_CLICK_AIR && $event->getAction() != PlayerInteractEvent::RIGHT_CLICK_BLOCK){
 			return;
 		}
-		$pManager = CoreMain::get()->getPlayerData($p);
-		$pManager->setCurrentCloak(null);
-		CoreMain::get()->savePlayerData($p, $pManager);
-	}
+		if(!$player->getInventory()->getItemInHand()->hasCustomName()){
+			return;
+		}
+		if(!$player->getInventory()->getItemInHand()->getCustomName() === $this->gadget->getItem()->getCustomName() ||
+			$player->getInventory()->getItemInHand()->getId() != $this->gadget->getItem()->getId()){
+			return;
+		}
+		$data = CoreMain::get()->getPlayerData($player);
+		if(isset($data->getCooldown()[$this->gadget->getType()]) && !$player->isOp()){
+			if($data->getCooldown()[$this->gadget->getType()] - microtime() > 0){
+				$player->sendMessage("Cooldown dude");
+				$event->setCancelled();
 
+				return;
+			}
+			$data->unsetCooldownData($this->gadget->getType());
+		}
+
+		if(!$player->hasPermission($this->gadget->getPermission()) && !$player->isOp()){
+			$player->sendMessage("You don't have permission to do this");
+			$data->save($player);
+
+			return;
+		}
+
+		if($this->gadget->checkRequirements()){
+			$this->gadget->onClick();
+			if(!$player->isOp()){
+				$data->addCooldownData($this->gadget->getType(), microtime() + (5 * 1000)); // 5 Seconds
+				$data->save($player);
+			}
+		}
+
+		$event->setCancelled();
+	}
 }

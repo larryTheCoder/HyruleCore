@@ -235,7 +235,7 @@ class CoreMain extends PluginBase {
 		$this->data[$p->getName()] = $data;
 	}
 
-	public function getPlayerData(Player $p){
+	public function getPlayerData(Player $p): PlayerData{
 		if(isset($this->data[$p->getName()])){
 			return $this->data[$p->getName()];
 		}
@@ -307,6 +307,11 @@ class CoreMain extends PluginBase {
 				$this->task->registerTemporary($sender, BlockTaskingManager::BLOCK_DIAMOND);
 				$sender->sendMessage("Registered successfully");
 				break;
+			case "trampoline":
+				if(!$sender->hasPermission("admin.command")){
+					$sender->sendMessage($this->getMessage($sender, "error.no-permission"));
+					break;
+				}
 		}
 
 		return true;

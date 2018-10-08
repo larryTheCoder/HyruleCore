@@ -33,15 +33,20 @@
 
 namespace HyPrimeCore\player;
 
-use HyPrimeCore\cloaks\ParticleCloak;
+
+use HyPrimeCore\CoreMain;
+use HyPrimeCore\cosmetics\cloaks\ParticleCloak;
+use HyPrimeCore\cosmetics\gadgets\Gadget;
+use pocketmine\Player;
 
 class PlayerData {
 
-	/**
-	 * @var ParticleCloak
-	 */
-	private $cloakData;
-
+	/** @var ParticleCloak */
+	private $cloakData = null;
+	/** @var Gadget */
+	private $gadget = null;
+	/** @var int[] */
+	private $cooldown = [];
 	/**
 	 * @return ParticleCloak
 	 */
@@ -62,5 +67,40 @@ class PlayerData {
 			$this->cloakData->clear();
 		}
 		$this->cloakData = null;
+	}
+
+	public function getGadgetData(){
+		return $this->gadget;
+	}
+
+	public function removeGadget(){
+		if(!is_null($this->gadget)){
+			$this->gadget->clear();
+		}
+		$this->gadget = null;
+	}
+
+	/**
+	 * @param Gadget $cloakData
+	 */
+	public function setCurrentGadget(?Gadget $cloakData): void{
+		$this->removeGadget();
+		$this->cloakData = $cloakData;
+	}
+
+	public function getCooldown(){
+		return $this->cooldown;
+	}
+
+	public function unsetCooldownData(int $data){
+		unset($this->cooldown[$data]);
+	}
+
+	public function addCooldownData(int $data, int $fromTo){
+		$this->cooldown[$data] = $fromTo;
+	}
+
+	public function save(Player $p){
+		CoreMain::get()->savePlayerData($p, $this);
 	}
 }

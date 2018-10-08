@@ -33,7 +33,7 @@
 
 namespace HyPrimeCore;
 
-use HyPrimeCore\cloaks\CloakManager;
+use HyPrimeCore\cosmetics\cloaks\CloakManager;
 use HyPrimeCore\utils\Utils;
 use larryTheCoder\events\PlayerJoinArenaEvent;
 use pocketmine\event\Listener;

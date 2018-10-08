@@ -31,72 +31,39 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace HyPrimeCore\tasks;
+namespace HyPrimeCore\cosmetics\gadgets;
 
-use HyPrimeCore\cosmetics\cloaks\ParticleCloak;
+
 use HyPrimeCore\CoreMain;
-use HyPrimeCore\player\FakePlayer;
 use pocketmine\Player;
-use pocketmine\scheduler\Task;
 
-class CloakTask extends Task {
+class GadgetManager {
 
-	/** @var null|Player */
-	private $player;
-	/** @var ParticleCloak */
-	private $cloak;
-	/** @var int */
-	private $timeout = 10;
 
-	public function __construct(ParticleCloak $cloak){
-		$this->player = $cloak->getPlayer();
-		$this->cloak = $cloak;
+	/**
+	 * @param Player $p
+	 * @param int $type
+	 */
+	public static function equipCloak(Player $p, int $type){
+		$pManager = CoreMain::get()->getPlayerData($p);
+		if($pManager->getCloakData() !== null){
+			GadgetManager::unequipCloak($p);
+		}
+
+		$gadget = Gadget::getGadgetById($p, $type);
+		$pManager->setCurrentGadget($gadget);
+		CoreMain::get()->savePlayerData($p, $pManager);
 	}
 
 	/**
-	 * Actions to execute when run
-	 *
-	 * @param int $currentTick
-	 *
-	 * @return void
+	 * @param Player $p
 	 */
-	public function onRun(int $currentTick){
-		if($this->player instanceof FakePlayer){
-			$this->cloak->onUpdate();
-
+	public static function unequipCloak(Player $p){
+		if($p == null){
 			return;
 		}
-		try{
-			if(CoreMain::get()->getPlayerData($this->player)->getCloakData() != null){
-				if(!$this->player->isOnline()){
-					CoreMain::get()->getPlayerData($this->player)->setCurrentCloak(null);
-					CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
-
-					return;
-				}
-				if(CoreMain::get()->getPlayerData($this->player)->getCloakData()->getType() !== $this->cloak->getType()){
-					if($this->timeout === 0){
-						CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
-					}
-					$this->timeout--;
-
-					return;
-				}
-				if($this->cloak->isMoving()){
-					$this->cloak->moving = false;
-				}else{
-					$this->cloak->onUpdate();
-				}
-				$this->timeout = 10;
-			}else{
-				if($this->timeout === 0){
-					CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
-				}
-				$this->timeout--;
-			}
-		}catch(\Exception $e){
-			$this->cloak->clear();
-			CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
-		}
+		$pManager = CoreMain::get()->getPlayerData($p);
+		$pManager->setCurrentGadget(null);
+		CoreMain::get()->savePlayerData($p, $pManager);
 	}
 }

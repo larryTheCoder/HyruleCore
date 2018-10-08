@@ -33,7 +33,7 @@
 
 namespace HyPrimeCore;
 
-use HyPrimeCore\cloaks\CloakManager;
+use HyPrimeCore\cosmetics\cloaks\CloakManager;
 use larryTheCoder\events\PlayerJoinArenaEvent;
 use larryTheCoder\SkyWarsPE;
 use pocketmine\event\entity\EntityDamageEvent;

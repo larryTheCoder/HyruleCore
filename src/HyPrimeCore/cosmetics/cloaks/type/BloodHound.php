@@ -31,18 +31,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace HyPrimeCore\cloaks\type;
+namespace HyPrimeCore\cosmetics\cloaks\type;
 
-
-use HyPrimeCore\cloaks\ParticleCloak;
-use pocketmine\level\particle\EnchantmentTableParticle;
+use HyPrimeCore\cosmetics\cloaks\ParticleCloak;
+use HyPrimeCore\player\FakePlayer;
+use pocketmine\level\particle\FlameParticle;
 use pocketmine\level\particle\Particle;
-use pocketmine\level\particle\PortalParticle;
+use pocketmine\level\particle\RedstoneParticle;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 
-class Wisdom extends ParticleCloak {
-
+class BloodHound extends ParticleCloak {
 
 	private $degreesLeft = 0;
 	private $degreesRight = 0;
@@ -113,7 +112,7 @@ class Wisdom extends ParticleCloak {
 	}
 
 	public function getPermissionNode(): string{
-		return "core.cloak.wisdom";
+		return "core.cloak.bloodhound";
 	}
 
 	public function onUpdate(): void{
@@ -135,16 +134,23 @@ class Wisdom extends ParticleCloak {
 			$x = $coordinate[1][0];
 			$y = $coordinate[1][1];
 			if($type === "redstone"){
-				$this->spawnParticle($this->getPlayer(), new EnchantmentTableParticle(new Vector3()), $x, $this->degreesLeft, $y);
-				$this->spawnParticle($this->getPlayer(), new EnchantmentTableParticle(new Vector3()), $x, $this->degreesRight, $y);
+				$this->spawnParticle($this->getPlayer(), new RedstoneParticle(new Vector3(), 1), $x, $this->degreesLeft, $y);
+				$this->spawnParticle($this->getPlayer(), new RedstoneParticle(new Vector3(), 1), $x, $this->degreesRight, $y);
 			}else{
-				$this->spawnParticle($this->getPlayer(), new PortalParticle(new Vector3()), $x, $this->degreesLeft, $y);
-				$this->spawnParticle($this->getPlayer(), new PortalParticle(new Vector3()), $x, $this->degreesRight, $y);
+				$this->spawnParticle($this->getPlayer(), new FlameParticle(new Vector3()), $x, $this->degreesLeft, $y);
+				$this->spawnParticle($this->getPlayer(), new FlameParticle(new Vector3()), $x, $this->degreesRight, $y);
 			}
 		}
 	}
 
-	public function spawnParticle(Player $player, Particle $particle, float $x, int $degrees, float $y){
+	/**
+	 * @param FakePlayer|Player $player
+	 * @param Particle $particle
+	 * @param float $x
+	 * @param int $degrees
+	 * @param float $y
+	 */
+	public function spawnParticle($player, Particle $particle, float $x, int $degrees, float $y){
 		$loc = clone $player->getLocation();
 		$angle = $loc->getYaw() + $degrees;
 		$yaw = $angle * 3.141592653589793 / 180.0;

@@ -31,72 +31,44 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace HyPrimeCore\tasks;
+namespace HyPrimeCore\cosmetics\cloaks\type;
 
 use HyPrimeCore\cosmetics\cloaks\ParticleCloak;
-use HyPrimeCore\CoreMain;
-use HyPrimeCore\player\FakePlayer;
-use pocketmine\Player;
-use pocketmine\scheduler\Task;
+use HyPrimeCore\utils\Utils;
+use pocketmine\level\particle\FlameParticle;
+use pocketmine\math\Vector3;
 
-class CloakTask extends Task {
 
-	/** @var null|Player */
-	private $player;
-	/** @var ParticleCloak */
-	private $cloak;
-	/** @var int */
-	private $timeout = 10;
+class Firerings extends ParticleCloak {
 
-	public function __construct(ParticleCloak $cloak){
-		$this->player = $cloak->getPlayer();
-		$this->cloak = $cloak;
+	private $step;
+
+	public function __construct($player){
+		parent::__construct($player, 1, CloakType::FIRERINGS);
 	}
 
-	/**
-	 * Actions to execute when run
-	 *
-	 * @param int $currentTick
-	 *
-	 * @return void
-	 */
-	public function onRun(int $currentTick){
-		if($this->player instanceof FakePlayer){
-			$this->cloak->onUpdate();
-
-			return;
-		}
-		try{
-			if(CoreMain::get()->getPlayerData($this->player)->getCloakData() != null){
-				if(!$this->player->isOnline()){
-					CoreMain::get()->getPlayerData($this->player)->setCurrentCloak(null);
-					CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
-
-					return;
-				}
-				if(CoreMain::get()->getPlayerData($this->player)->getCloakData()->getType() !== $this->cloak->getType()){
-					if($this->timeout === 0){
-						CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
-					}
-					$this->timeout--;
-
-					return;
-				}
-				if($this->cloak->isMoving()){
-					$this->cloak->moving = false;
-				}else{
-					$this->cloak->onUpdate();
-				}
-				$this->timeout = 10;
-			}else{
-				if($this->timeout === 0){
-					CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
-				}
-				$this->timeout--;
+	public function onUpdate(): void{
+		for($i = 0; $i < 2; $i++){
+			$inc = 0.07853981633974483;
+			$toAdd = 0.0;
+			if($i == 1){
+				$toAdd = 3.5;
 			}
-		}catch(\Exception $e){
-			$this->cloak->clear();
-			CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
+			$angle = $this->step * $inc + $toAdd;
+			$v = new Vector3();
+			$v->setComponents(cos($angle), 0, sin($angle));
+			if($i == 0){
+				Utils::rotateAroundAxisZ($v, 10.0);
+			}else{
+				Utils::rotateAroundAxisZ($v, 100.0);
+			}
+			$loc = clone $this->getPlayer()->getLocation()->add(0.0, 1.0, 0.0)->add($v);
+			$this->addParticle(new FlameParticle($loc));
 		}
+		$this->step += 3;
+	}
+
+	public function getPermissionNode(): string{
+		return "core.cloak.firerings";
 	}
 }

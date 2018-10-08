@@ -31,10 +31,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace HyPrimeCore\cloaks\type;
+namespace HyPrimeCore\cosmetics\cloaks\type;
 
 
-use HyPrimeCore\cloaks\ParticleCloak;
+use HyPrimeCore\cosmetics\cloaks\ParticleCloak;
 use pocketmine\level\Location;
 use pocketmine\level\particle\GenericParticle;
 use pocketmine\math\Vector3;

@@ -33,8 +33,8 @@
 
 namespace HyPrimeCore\panel;
 
-use HyPrimeCore\cloaks\CloakManager;
-use HyPrimeCore\cloaks\type\CloakType;
+use HyPrimeCore\cosmetics\cloaks\CloakManager;
+use HyPrimeCore\cosmetics\cloaks\type\CloakType;
 use HyPrimeCore\CoreMain;
 use HyPrimeCore\formAPI\event\FormRespondedEvent;
 use HyPrimeCore\formAPI\response\FormResponseSimple;

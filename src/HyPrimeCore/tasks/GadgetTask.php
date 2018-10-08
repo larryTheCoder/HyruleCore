@@ -31,35 +31,69 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace HyPrimeCore\cloaks;
+namespace HyPrimeCore\tasks;
 
+use HyPrimeCore\CoreMain;
+use HyPrimeCore\cosmetics\gadgets\Gadget;
 use HyPrimeCore\player\FakePlayer;
-use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerMoveEvent;
+use pocketmine\Player;
+use pocketmine\scheduler\Task;
 
-class CloakListener implements Listener {
-	/** @var ParticleCloak */
-	private $cloak;
+class GadgetTask extends Task {
 
-	public function __construct(ParticleCloak $cloak){
-		$this->cloak = $cloak;
+	/** @var null|Player */
+	private $player;
+	/** @var Gadget */
+	private $gadget;
+	/** @var int */
+	private $timeout = 10;
+
+	public function __construct(Gadget $cloak){
+		$this->player = $cloak->getPlayer();
+		$this->gadget = $cloak;
 	}
 
 	/**
-	 * @param PlayerMoveEvent $event
-	 * @priority LOWEST
+	 * Actions to execute when run
+	 *
+	 * @param int $currentTick
+	 *
+	 * @return void
 	 */
-	public function onPlayerMove(PlayerMoveEvent $event){
-		if($this->cloak->getPlayer() instanceof FakePlayer){
+	public function onRun(int $currentTick){
+		if($this->player instanceof FakePlayer){
+			$this->gadget->onUpdate();
+
 			return;
 		}
-		if($event->getPlayer()->getName() !== $this->cloak->getPlayer()->getName()){
-			return;
-		}
-		if($event->getFrom()->distance($event->getTo()) >= 0.1){
-			$this->cloak->moving = true;
-		}else{
-			$this->cloak->moving = false;
+		// Fail-safe
+		try{
+			if(CoreMain::get()->getPlayerData($this->player)->getGadgetData() != null){
+				if(!$this->player->isOnline()){
+					CoreMain::get()->getPlayerData($this->player)->setCurrentCloak(null);
+					CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
+
+					return;
+				}
+				if(CoreMain::get()->getPlayerData($this->player)->getCloakData()->getType() !== $this->gadget->getType()){
+					if($this->timeout === 0){
+						CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
+					}
+					$this->timeout--;
+
+					return;
+				}
+				$this->gadget->onUpdate();
+				$this->timeout = 10;
+			}else{
+				if($this->timeout === 0){
+					CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
+				}
+				$this->timeout--;
+			}
+		}catch(\Exception $e){
+			$this->gadget->clear();
+			CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
 		}
 	}
 }

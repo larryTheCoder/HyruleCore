@@ -37,6 +37,7 @@ use HyPrimeCore\CoreMain;
 use pocketmine\block\Block;
 use pocketmine\block\BlockIds;
 use pocketmine\entity\Entity;
+use pocketmine\entity\Living;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
 use pocketmine\level\Location;
@@ -62,6 +63,21 @@ class Utils {
 	/** @var integer[][] */
 	public static $helixMathMap = [];
 
+	/**
+	 * @param Position $pos
+	 * @param float $range
+	 * @return Living[]
+	 */
+	public static function getNearbyLivingEntities(Position $pos, float $range): array {
+		$livingEntities = [];
+		foreach($pos->getLevel()->getEntities() as $entity){
+			if($entity instanceof Living && $entity->distance($pos) <= $range){
+				$livingEntities[] = $entity;
+			}
+		}
+
+		return $livingEntities;
+	}
 	public static function rotateAroundAxisY(Vector3 $v, float $angle): Vector3{
 		$cos = cos($angle);
 		$sin = sin($angle);

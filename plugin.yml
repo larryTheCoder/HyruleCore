@@ -58,6 +58,9 @@ permissions:
   core.cloak.superhero:
     desription: "Superhero particle for all"
     default: op
+  core.gadget.trampoline:
+    description: "Gadget trampoline!"
+    default: op
 
 
 
