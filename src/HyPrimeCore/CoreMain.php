@@ -34,8 +34,14 @@
 namespace HyPrimeCore;
 
 use HyPrimeCore\buttonInterface\ButtonInterface;
+use HyPrimeCore\cosmetics\gadgets\Gadget;
+use HyPrimeCore\cosmetics\gadgets\GadgetManager;
 use HyPrimeCore\formAPI\FormAPI;
 use HyPrimeCore\kits\KitInjectionModule;
+use HyPrimeCore\nms\CoreListener;
+use HyPrimeCore\nms\CoreListenerSW;
+use HyPrimeCore\nms\ListenerLegacy;
+use HyPrimeCore\nms\ListenerUpdated;
 use HyPrimeCore\panel\Panel;
 use HyPrimeCore\player\PlayerData;
 use HyPrimeCore\tasks\BroadcastingSystem;
@@ -49,6 +55,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\item\enchantment\Enchantment;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
+use pocketmine\scheduler\TaskScheduler;
 use pocketmine\Server;
 use pocketmine\utils\Config;
 
@@ -69,6 +76,8 @@ class CoreMain extends PluginBase {
 	public $idlingTime = [];
 	/** @var bool[] */
 	public $justJoined = [];
+	/** @var bool[] */
+	public $playersGadget = [];
 	/** @var Player[] */
 	public $fly = [];
 	/** @var PlayerData[] */
@@ -77,8 +86,8 @@ class CoreMain extends PluginBase {
 	private $formAPI;
 	/** @var Panel */
 	private $panel;
-	/** @var ButtonInterface */
-	private $interface;
+	/** @var null|ButtonInterface */
+	private $interface = null;
 	/** @var Player[] */
 	private $bypassDamage = [];
 
@@ -156,22 +165,39 @@ class CoreMain extends PluginBase {
 		$this->registerScheduler();
 		$this->startModuleStartup();
 
-		new KitInjectionModule($this);
-		$this->interface = new ButtonInterface($this);
 		$this->formAPI = new FormAPI($this);
 		$this->panel = new Panel($this);
 		$this->task = new BlockTaskingManager($this);
 
-		$this->getServer()->getPluginManager()->registerEvents(new CoreListener($this), $this);
 		$inj = $this->getServer()->getPluginManager()->getPlugin("SkyWarsForPE");
 
-		if(!is_null($inj)){
-			$this->getServer()->getPluginManager()->registerEvents(new CoreListenerSW($this), $this);
-
-			return;
-		}
+		$this->startListener(!is_null($inj));
 	}
 
+	public function startListener(bool $implementation){
+		$eventLoader = $this->getServer()->getPluginManager();
+		$eventLoader->registerEvents(new CoreListener($this), $this);
+		if($implementation){
+			$eventLoader->registerEvents(new CoreListenerSW($this), $this);
+			$this->interface = new ButtonInterface($this);
+			new KitInjectionModule($this);
+		}
+		try{
+			$reflection = new \ReflectionClass(get_class($this->getServer()));
+			foreach($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method){
+				if(!$method->isStatic()){
+					$parameters = $method->getParameters();
+					if(count($parameters) === 0 && $method->getName() === "getScheduler"){
+						$eventLoader->registerEvents(new ListenerLegacy(), $this);
+						return;
+					}
+				}
+			}
+		}catch(\ReflectionException $e){
+			// Ignored
+		}
+		$eventLoader->registerEvents(new ListenerUpdated(), $this);
+	}
 	/**
 	 * This function is used to register some of the pocketmine unregistered enchantments
 	 * May not be working fine
@@ -196,16 +222,15 @@ class CoreMain extends PluginBase {
 		Enchantment::registerEnchantment(new Enchantment(Enchantment::LURE, "%enchantment.fishing.lure", Enchantment::RARITY_UNCOMMON, Enchantment::SLOT_FISHING_ROD, 0, 3));
 		Enchantment::registerEnchantment(new Enchantment(Enchantment::FROST_WALKER, "%enchantment.waterwalk", Enchantment::RARITY_UNCOMMON, Enchantment::SLOT_ARMOR, 0, 2)); // TODO: verify name
 		Enchantment::registerEnchantment(new Enchantment(Enchantment::MENDING, "%enchantment.mending", Enchantment::RARITY_UNCOMMON, Enchantment::SLOT_ARMOR, 0, 1)); // TODO: verify name
-
 	}
 
 	/**
 	 * Register scheduler and task for the Core
 	 */
 	private function registerScheduler(){
-		$this->getScheduler()->scheduleRepeatingTask(new BroadcastingSystem($this), Settings::$messageInterval * 20);
-		$this->getScheduler()->scheduleRepeatingTask(new IdleCheckTask($this), 20);
-		$this->getScheduler()->scheduleRepeatingTask(new SendMOTD($this), $this->getConfig()->getNested("motd.delay"));
+		$this->getSchedulerForce()->scheduleRepeatingTask(new BroadcastingSystem($this), Settings::$messageInterval * 20);
+		$this->getSchedulerForce()->scheduleRepeatingTask(new IdleCheckTask($this), 20);
+		$this->getSchedulerForce()->scheduleRepeatingTask(new SendMOTD($this), $this->getConfig()->getNested("motd.delay"));
 	}
 
 	private function startModuleStartup(){
@@ -283,6 +308,10 @@ class CoreMain extends PluginBase {
 					$sender->sendMessage($this->getMessage($sender, "error.no-permission"));
 					break;
 				}
+				if(is_null($this->interface)){
+					$sender->sendMessage("There is no SkyWarsForPE plugin detected. Sorry man");
+					break;
+				}
 				$this->interface->setupInterface($sender);
 				break;
 			case "showops":
@@ -308,10 +337,20 @@ class CoreMain extends PluginBase {
 				$sender->sendMessage("Registered successfully");
 				break;
 			case "trampoline":
+				if(!($sender instanceof Player)){
+					$sender->sendMessage("Please use this command in-game");
+					break;
+				}
 				if(!$sender->hasPermission("admin.command")){
 					$sender->sendMessage($this->getMessage($sender, "error.no-permission"));
 					break;
 				}
+				if(!isset($this->playersGadget[$sender->getName()])){
+					GadgetManager::equipCloak($sender, Gadget::TRAMPOLINE);
+				}else{
+					GadgetManager::unequipCloak($sender);
+				}
+				break;
 		}
 
 		return true;
@@ -372,5 +411,30 @@ class CoreMain extends PluginBase {
 		}
 
 		return $message;
+	}
+
+	/**
+	 * Force to get the scheduler instance.
+	 * Warning, using this to get async pool is NOT SUPPORTED
+	 * create async pool by checking it by yourself.
+	 *
+	 * @return \pocketmine\scheduler\ServerScheduler|TaskScheduler
+	 */
+	public function getSchedulerForce(){
+		try{
+			$reflection = new \ReflectionClass(get_class($this->getServer()));
+			foreach($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method){
+				if(!$method->isStatic()){
+					$parameters = $method->getParameters();
+					if(count($parameters) === 0 && $method->getName() === "getScheduler"){
+						return $this->getServer()->getSchedulerForce();
+					}
+				}
+			}
+		}catch(\ReflectionException $e){
+			// Ignored
+		}
+
+		return parent::getScheduler();
 	}
 }

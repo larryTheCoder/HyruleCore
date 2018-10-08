@@ -34,6 +34,7 @@
 namespace HyPrimeCore\cosmetics\gadgets;
 
 use HyPrimeCore\CoreMain;
+use HyPrimeCore\cosmetics\gadgets\type\GadgetTrampoline;
 use HyPrimeCore\tasks\GadgetTask;
 use pocketmine\event\HandlerList;
 use pocketmine\event\Listener;
@@ -65,7 +66,7 @@ abstract class Gadget implements Listener {
 				return;
 			}
 
-			$this->task = CoreMain::get()->getScheduler()->scheduleRepeatingTask(new GadgetTask($this), 1);
+			$this->task = CoreMain::get()->getSchedulerForce()->scheduleRepeatingTask(new GadgetTask($this), 1);
 			$this->listener = new GadgetListener($this);
 			CoreMain::get()->getServer()->getPluginManager()->registerEvents($this->listener, CoreMain::get());
 		}
@@ -73,38 +74,27 @@ abstract class Gadget implements Listener {
 
 	public abstract function getPermission(): String;
 
-	public static function getGadgetById($p, $type): Gadget{
-		if($p === null){
-			return;
+	public static function getGadgetById(Player $p, int $type): Gadget{
+		// Get the gadget type
+		switch($type){
+			case self::TRAMPOLINE:
+				$gadget = new GadgetTrampoline($p);
+				break;
+			default:
+				$gadget = null;
+				break;
 		}
-
-//        if (pManager == null) {
-//            return;
-//        }
-//        final int slot = GadgetsMenu.getGadgetsMenuData().getGadgetSlot();
-//        if (player.getInventory().getItem(slot) != null) {
-//            CategoryManager.removeHotbarCosmetic(player);
-//            if (player.getInventory().getItem(slot) != null) {
-//                if (CategoryManager.checkEquipRequirement(player, MessageType.REMOVE_ITEM_FROM_SLOT_TO_EQUIP_GADGET.getFormatMessage().replace("{SLOT}", String.valueOf(slot)).replace("{ITEM}", player.getInventory().getItem(slot).getType().name()))) {
-//                    return;
-//                }
-//                if (GadgetsMenu.getGadgetsMenuData().getEquipCosmeticItemToSlotAction() == EnumEquipType.DROP) {
-//                    player.getWorld().dropItemNaturally(player.getLocation(), player.getInventory().getItem(slot).clone());
-//                    player.getInventory().setItem(slot, (ItemStack)null);
-//                    player.updateInventory();
-//                }
-//            }
-//        }
-//        player.getInventory().setItem(slot, type.getItemStack());
-//        player.updateInventory();
-//        type.equip(player);
-//        pManager.setSelectedCategoryGadget(GadgetCategoryType.valueOf(type.getGroup()));
-//        pManager.setSelectedGadget(type);
+		// Put them in the inventory
+		if($p->getInventory()->contains($gadget->getItem())){
+			$p->getInventory()->remove($gadget->getItem());
+		}
+		$p->getInventory()->setHeldItemIndex(0);
+		$p->getInventory()->setItemInHand($gadget->getItem());
 	}
 
 	public function clear(){
 		if(!is_null($this->task)){
-			CoreMain::get()->getScheduler()->cancelTask($this->task->getTaskId());
+			CoreMain::get()->getSchedulerForce()->cancelTask($this->task->getTaskId());
 			HandlerList::unregisterAll($this->listener);
 		}
 

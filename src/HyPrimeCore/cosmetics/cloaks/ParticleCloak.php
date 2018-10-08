@@ -69,13 +69,13 @@ abstract class ParticleCloak {
 			}
 			$this->moving = false;
 			$this->data = $data;
-			$this->task = CoreMain::get()->getScheduler()->scheduleRepeatingTask(new CloakTask($this), $delay);
+			$this->task = CoreMain::get()->getSchedulerForce()->scheduleRepeatingTask(new CloakTask($this), $delay);
 			$this->listener = new CloakListener($this);
 			CoreMain::get()->getServer()->getPluginManager()->registerEvents($this->listener, CoreMain::get());
 		}elseif($this->player instanceof FakePlayer){
 			$this->moving = false;
 			$this->data = $data;
-			$this->task = CoreMain::get()->getScheduler()->scheduleRepeatingTask(new CloakTask($this), $delay);
+			$this->task = CoreMain::get()->getSchedulerForce()->scheduleRepeatingTask(new CloakTask($this), $delay);
 			$this->listener = new CloakListener($this);
 			CoreMain::get()->getServer()->getPluginManager()->registerEvents($this->listener, CoreMain::get());
 		}
@@ -92,7 +92,7 @@ abstract class ParticleCloak {
 
 	public function clear(){
 		if(!is_null($this->task)){
-			CoreMain::get()->getScheduler()->cancelTask($this->task->getTaskId());
+			CoreMain::get()->getSchedulerForce()->cancelTask($this->task->getTaskId());
 			HandlerList::unregisterAll($this->listener);
 		}
 

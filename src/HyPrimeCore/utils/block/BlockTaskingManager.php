@@ -88,8 +88,8 @@ class BlockTaskingManager {
 		$this->list[$blockId][] = [$text1, $text2, $text3];
 		$task = new BlockUpdateTask([$text1, $text2, $text3], $level); // The update text
 		$task2 = new ProgressiveScheduler($block);                       // The Yaw up and down function
-		$this->plugin->getScheduler()->scheduleRepeatingTask($task, 20);
-		$this->plugin->getScheduler()->scheduleRepeatingTask($task2, 1);
+		$this->plugin->getSchedulerForce()->scheduleRepeatingTask($task, 20);
+		$this->plugin->getSchedulerForce()->scheduleRepeatingTask($task2, 1);
 	}
 
 	public function getBlockById(int $blockId): ?Block{

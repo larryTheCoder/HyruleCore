@@ -104,7 +104,7 @@ class GadgetTrampoline extends Gadget {
 		$this->location = $this->getPlayer()->getPosition();
 		$this->getPlayer()->teleport($this->getPlayer()->add(0.0, 5.0, 0.0));
 		$this->generateTrampoline();
-		CoreMain::get()->getScheduler()->scheduleDelayedTask(new class($this) extends Task {
+		CoreMain::get()->getSchedulerForce()->scheduleDelayedTask(new class($this) extends Task {
 			/** @var GadgetTrampoline */
 			private $gadget;
 
@@ -208,7 +208,7 @@ class GadgetTrampoline extends Gadget {
 
 	public function onUpdate(): void{
 		if($this->activated){
-			CoreMain::get()->getScheduler()->scheduleTask(new class($this) extends Task {
+			CoreMain::get()->getSchedulerForce()->scheduleTask(new class($this) extends Task {
 
 				/** @var GadgetTrampoline */
 				private $gadget;

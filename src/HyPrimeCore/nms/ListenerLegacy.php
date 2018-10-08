@@ -31,77 +31,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace HyPrimeCore;
+namespace HyPrimeCore\nms;
 
-use HyPrimeCore\cosmetics\cloaks\CloakManager;
+use HyPrimeCore\CoreMain;
 use HyPrimeCore\utils\Utils;
-use larryTheCoder\events\PlayerJoinArenaEvent;
 use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerCommandPreprocessEvent;
-use pocketmine\event\player\PlayerJoinEvent;
-use pocketmine\event\player\PlayerMoveEvent;
-use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\RemoteServerCommandEvent;
 use pocketmine\event\server\ServerCommandEvent;
-use pocketmine\Server;
 
-class CoreListener implements Listener {
+/**
+ * Represents a legacy listener
+ *
+ * @package HyPrimeCore\nms
+ */
+class ListenerLegacy implements Listener {
 
 	const VERSION_COMMANDS = ["version", "ver", "about"];
-
-	/** @var CoreMain */
-	private $plugin;
-
-	public function __construct(CoreMain $plugin){
-		$this->plugin = $plugin;
-	}
-
-	public function onPlayerJoin(PlayerJoinEvent $event){
-		$p = $event->getPlayer();
-		$event->setJoinMessage("");
-
-		$p->sendMessage("§7[----------------------------------------]");
-		foreach($this->plugin->getMessage($p, 'login-message') as $msg){
-			$msg = Utils::center(str_replace(["{PLAYER}", "{ONLINE}"], [$p->getName(), count(Server::getInstance()->getOnlinePlayers())], $msg));
-			$p->sendMessage("- " . $msg);
-		}
-		$p->sendMessage("§7[----------------------------------------]");
-		$p->sendMessage($this->plugin->getPrefix() . $this->plugin->getMessage($p, 'language-select', ['LANGUAGE' => $p->getLocale()]));
-
-		$this->plugin->justJoined[strtolower($p->getName())] = true;
-		$this->plugin->idlingTime[strtolower($p->getName())] = microtime(true); // Setup time
-		Server::getInstance()->getLogger()->info($this->plugin->getPrefix() . "§7Player §a{$p->getName()} §7logged in with language: §a{$p->getLocale()}");
-	}
-
-	public function onPlayerLeave(PlayerQuitEvent $e){
-		$p = $e->getPlayer();
-		$e->setQuitMessage("");
-
-		if($this->plugin->getPlayerData($p)->getCloakData() !== null){
-			$this->plugin->getPlayerData($p)->setCurrentCloak(null);
-		}
-		unset($this->plugin->idlingTime[strtolower($p->getName())]);
-	}
-
-	public function onPlayerMove(PlayerMoveEvent $e){
-		$p = $e->getPlayer();
-
-		// TODO: check if the player trying to annoy the server
-		$this->plugin->idlingTime[strtolower($p->getName())] = microtime(true);
-	}
-
-	/**
-	 * @param PlayerCommandPreprocessEvent $ev
-	 *
-	 * @priority LOWEST
-	 */
-	public function onPlayerCommandPreProcess(PlayerCommandPreprocessEvent $ev){
-		if($ev->isCancelled()) return;
-		if(in_array(substr($ev->getMessage(), 1), self::VERSION_COMMANDS) && !$ev->isCancelled()){
-			$ev->setCancelled();
-			CoreMain::sendVersion($ev->getPlayer());
-		}
-	}
 
 	/**
 	 * @param ServerCommandEvent $ev
@@ -127,17 +72,5 @@ class CoreListener implements Listener {
 			$ev->setCancelled();
 			CoreMain::sendVersion($ev->getSender());
 		}
-	}
-
-
-	/**
-	 * @param PlayerJoinArenaEvent $event
-	 * @priority LOW
-	 */
-	public function onPlayerJoinArena(PlayerJoinArenaEvent $event){
-		$p = $event->getPlayer();
-
-		$p->setAllowFlight(false);
-		CloakManager::unequipCloak($p);
 	}
 }

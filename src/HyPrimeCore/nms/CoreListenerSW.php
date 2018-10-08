@@ -31,8 +31,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace HyPrimeCore;
+namespace HyPrimeCore\nms;
 
+use HyPrimeCore\CoreMain;
 use HyPrimeCore\cosmetics\cloaks\CloakManager;
 use larryTheCoder\events\PlayerJoinArenaEvent;
 use larryTheCoder\SkyWarsPE;

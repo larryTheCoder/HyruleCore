@@ -70,13 +70,13 @@ class CloakTask extends Task {
 			if(CoreMain::get()->getPlayerData($this->player)->getCloakData() != null){
 				if(!$this->player->isOnline()){
 					CoreMain::get()->getPlayerData($this->player)->setCurrentCloak(null);
-					CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
+					CoreMain::get()->getSchedulerForce()->cancelTask($this->getTaskId());
 
 					return;
 				}
 				if(CoreMain::get()->getPlayerData($this->player)->getCloakData()->getType() !== $this->cloak->getType()){
 					if($this->timeout === 0){
-						CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
+						CoreMain::get()->getSchedulerForce()->cancelTask($this->getTaskId());
 					}
 					$this->timeout--;
 
@@ -90,13 +90,13 @@ class CloakTask extends Task {
 				$this->timeout = 10;
 			}else{
 				if($this->timeout === 0){
-					CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
+					CoreMain::get()->getSchedulerForce()->cancelTask($this->getTaskId());
 				}
 				$this->timeout--;
 			}
 		}catch(\Exception $e){
 			$this->cloak->clear();
-			CoreMain::get()->getScheduler()->cancelTask($this->getTaskId());
+			CoreMain::get()->getSchedulerForce()->cancelTask($this->getTaskId());
 		}
 	}
 }

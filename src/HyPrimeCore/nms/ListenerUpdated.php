@@ -31,69 +31,28 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-namespace HyPrimeCore\tasks;
+namespace HyPrimeCore\nms;
 
-use HyPrimeCore\CoreMain;
-use HyPrimeCore\cosmetics\gadgets\Gadget;
-use HyPrimeCore\player\FakePlayer;
-use pocketmine\Player;
-use pocketmine\scheduler\Task;
+use pocketmine\event\{
+	Listener, server\CommandEvent
+};
 
-class GadgetTask extends Task {
-
-	/** @var null|Player */
-	private $player;
-	/** @var Gadget */
-	private $gadget;
-	/** @var int */
-	private $timeout = 10;
-
-	public function __construct(Gadget $cloak){
-		$this->player = $cloak->getPlayer();
-		$this->gadget = $cloak;
-	}
-
+/**
+ * Latest implementation of Listener
+ *
+ * @package HyPrimeCore\nms
+ */
+class ListenerUpdated implements Listener {
 	/**
-	 * Actions to execute when run
+	 * @param CommandEvent $ev
 	 *
-	 * @param int $currentTick
-	 *
-	 * @return void
+	 * @priority HIGHEST
 	 */
-	public function onRun(int $currentTick){
-		if($this->player instanceof FakePlayer){
-			$this->gadget->onUpdate();
-
-			return;
-		}
-		// Fail-safe
-		try{
-			if(CoreMain::get()->getPlayerData($this->player)->getGadgetData() != null){
-				if(!$this->player->isOnline()){
-					CoreMain::get()->getPlayerData($this->player)->setCurrentCloak(null);
-					CoreMain::get()->getSchedulerForce()->cancelTask($this->getTaskId());
-
-					return;
-				}
-				if(CoreMain::get()->getPlayerData($this->player)->getCloakData()->getType() !== $this->gadget->getType()){
-					if($this->timeout === 0){
-						CoreMain::get()->getSchedulerForce()->cancelTask($this->getTaskId());
-					}
-					$this->timeout--;
-
-					return;
-				}
-				$this->gadget->onUpdate();
-				$this->timeout = 10;
-			}else{
-				if($this->timeout === 0){
-					CoreMain::get()->getSchedulerForce()->cancelTask($this->getTaskId());
-				}
-				$this->timeout--;
-			}
-		}catch(\Exception $e){
-			$this->gadget->clear();
-			CoreMain::get()->getSchedulerForce()->cancelTask($this->getTaskId());
+	public function onServerCommand(CommandEvent $ev){
+		if($ev->isCancelled()) return;
+		if(Utils::in_arrayi($ev->getCommand(), self::VERSION_COMMANDS) && !$ev->isCancelled()){
+			$ev->setCancelled();
+			CoreMain::sendVersion($ev->getSender());
 		}
 	}
 }
