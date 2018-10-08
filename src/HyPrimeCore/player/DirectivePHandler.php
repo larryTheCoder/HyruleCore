@@ -2,7 +2,7 @@
 /**
  * BSD 3-Clause License
  *
- * Copyright (c) 2018, Adam Matthew, Hyrule Minigame Division
+ * Copyright (c) 2017-2018, larryTheCoder, Hyrule Minigame Division
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
