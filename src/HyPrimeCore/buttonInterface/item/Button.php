@@ -45,6 +45,8 @@ use pocketmine\Server;
 
 abstract class Button extends Flowable {
 
+	private $delay = 0;
+
 	public function __construct(int $meta = 0){
 		parent::__construct($this->id, $meta, $this->getType() . " Button");
 		$this->meta = $meta;
@@ -67,15 +69,22 @@ abstract class Button extends Flowable {
 			$event = new ButtonPushEvent($player, $this);
 			Server::getInstance()->getPluginManager()->callEvent($event);
 		}
+		// Stores a delay from player avoiding
+		// too much button to be handled.
+		if($this->delay !== 0 && $this->delay <= microtime() + (5 * 1000)){
+			return true;
+		}
 		$this->setDamage($this->getDamage() ^ 0x08);
 		$this->level->setBlock($this, $this, true, false);
 		$this->level->addSound(new ClickSound($this->add(0.5, 0.5, 0.5)), [$player]);
 		$this->level->scheduleDelayedBlockUpdate($this, 30);
+		$this->delay = microtime();
 
 		return true;
 	}
 
 	public function onScheduledUpdate(): void{
+		$this->delay = 0;
 		$this->setDamage($this->getDamage() ^ 0x08);
 		$this->level->setBlock($this, $this, true, false);
 	}

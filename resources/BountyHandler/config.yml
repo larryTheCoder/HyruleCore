@@ -1,0 +1,15 @@
+---
+# CONFIG V3.0
+# Suma minima pentru un jucător
+min_bounty: 10
+# Scrie dacă notificarea în chat-ul? 1 = da, 0 = nu.
+bounty_broadcast: 1
+# Arată cât de multe monede pentru sufletul jucatorului pe deasupra? 1 = da, 0 = nu.
+bounty_stats: 1
+# Arată viața jucătorului peste cap? 1 = da, 0 = nu.
+health_stats: 0
+# Pedeapsa pentru uciderea victimei. 1 = activat, 0 = Dezactivat.
+bounty_fine: 1
+# Procentul pentru uciderea jucatorului!
+fine_percentage: 10
+...

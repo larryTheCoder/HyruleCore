@@ -74,7 +74,7 @@ abstract class Gadget implements Listener {
 
 	public abstract function getPermission(): String;
 
-	public static function getGadgetById(Player $p, int $type): Gadget{
+	public static function getGadgetById(Player $p, int $type): ?Gadget{
 		// Get the gadget type
 		switch($type){
 			case self::TRAMPOLINE:
@@ -90,6 +90,8 @@ abstract class Gadget implements Listener {
 		}
 		$p->getInventory()->setHeldItemIndex(0);
 		$p->getInventory()->setItemInHand($gadget->getItem());
+
+		return $gadget;
 	}
 
 	public function clear(){

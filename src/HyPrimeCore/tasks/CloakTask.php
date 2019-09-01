@@ -33,9 +33,9 @@
 
 namespace HyPrimeCore\tasks;
 
-use HyPrimeCore\cosmetics\cloaks\ParticleCloak;
 use HyPrimeCore\CoreMain;
 use HyPrimeCore\player\FakePlayer;
+use larryTheCoder\BoxenShack\particle\ParticleCloak;
 use pocketmine\Player;
 use pocketmine\scheduler\Task;
 

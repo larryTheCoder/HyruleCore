@@ -40,14 +40,24 @@ use pocketmine\item\ItemFactory;
 use pocketmine\level\Level;
 use pocketmine\level\Location;
 use pocketmine\level\particle\Particle;
+use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\AddPlayerPacket;
 use pocketmine\network\mcpe\protocol\DataPacket;
+use pocketmine\network\mcpe\protocol\MoveEntityAbsolutePacket;
 use pocketmine\network\mcpe\protocol\PlayerListPacket;
 use pocketmine\network\mcpe\protocol\RemoveEntityPacket;
 use pocketmine\network\mcpe\protocol\types\PlayerListEntry;
 use pocketmine\Player;
+use pocketmine\Server;
 use pocketmine\utils\UUID;
 
+/**
+ * This is an NPC class that used by Particles
+ * Which is a hack to force the server to NOT
+ * SAVE THE ENTITY to disk
+ *
+ * @package larryTheCoder\npc
+ */
 class FakePlayer extends Particle {
 
 	public $entityId = -1;
@@ -62,53 +72,49 @@ class FakePlayer extends Particle {
 	public $uuid;
 	/** @var Player */
 	private $player;
-	private $title;
 
 	/**
-	 * @param Location $loc
-	 * @param Player $player
+	 * @param Vector3 $pos
+	 * @param Player $p
 	 * @param Level $level
 	 */
-	public function __construct(Location $loc, Player $player, Level $level){
-		parent::__construct($loc->x, $loc->y, $loc->z);
+	public function __construct(Vector3 $pos, Player $p, Level $level){
+		parent::__construct($pos->x, $pos->y, $pos->z);
 		$this->level = $level;
-		$this->player = $player;
 		$this->uuid = UUID::fromRandom();
-		$this->title = "";
-		$this->yaw = $loc->getYaw();
-		$this->pitch = $loc->getPitch();
-	}
-
-	public function getLocation(): Location{
-		return new Location($this->x, $this->y, $this->z, $this->yaw, $this->pitch, $this->level);
+		$this->skin = $p->getSkin();
+		$this->player = $p;
 	}
 
 	/**
-	 * Get the entity runtime ID
-	 *
-	 * @return int
+	 * Changes the entity's yaw and pitch to make it look at the specified Vector3 position. For mobs, this will cause
+	 * their heads to turn.
 	 */
-	public function getRuntimeId(){
-		return $this->entityId;
+	public function lookAt(): void{
+		$horizontal = sqrt(($this->player->x - $this->x) ** 2 + ($this->player->z - $this->z) ** 2);
+		$vertical = ($this->player->y - $this->y) + 0.5; // 0.6 is the player offset.
+		$this->pitch = -atan2($vertical, $horizontal) / M_PI * 180; //negative is up, positive is down
+
+		$xDist = $this->player->x - $this->x;
+		$zDist = $this->player->z - $this->z;
+		$this->yaw = atan2($zDist, $xDist) / M_PI * 180 - 90;
+		if($this->yaw < 0){
+			$this->yaw += 360.0;
+		}
+		$this->updateMovement();
 	}
 
-	/**
-	 * Get the main player for this NPC
-	 *
-	 * @return Player
-	 */
-	public function getPlayer(): Player{
-		return $this->player;
-	}
+	public function updateMovement(){
+		$pk = new MoveEntityAbsolutePacket();
 
-	/**
-	 * Set the title for the entity
-	 * (Need to be spawned by yourself
-	 *
-	 * @param $title
-	 */
-	public function setTitle($title){
-		$this->title = $title;
+		$pk->entityRuntimeId = $this->entityId;
+		$pk->position = $this->asVector3()->add(0, 1.6);
+
+		$pk->xRot = $this->pitch;
+		$pk->yRot = $this->yaw; //TODO: head yaw
+		$pk->zRot = $this->yaw;
+
+		$this->player->dataPacket($pk);
 	}
 
 	/**
@@ -126,11 +132,11 @@ class FakePlayer extends Particle {
 			$p[] = $pk0;
 		}
 
-		$name = $this->title;;
+		$name = "";
 
 		$add = new PlayerListPacket();
 		$add->type = PlayerListPacket::TYPE_ADD;
-		$add->entries = [PlayerListEntry::createAdditionEntry($this->uuid, $this->entityId, $name, $name, 0, $this->player->getSkin())];
+		$add->entries = [PlayerListEntry::createAdditionEntry($this->uuid, $this->entityId, $name, $this->skin)];
 		$p[] = $add;
 
 		$pk = new AddPlayerPacket();
@@ -145,7 +151,7 @@ class FakePlayer extends Particle {
 		);
 		$pk->metadata = [
 			Entity::DATA_FLAGS => [Entity::DATA_TYPE_LONG, $flags],
-			Entity::DATA_SCALE => [Entity::DATA_TYPE_FLOAT, 0.5],
+			Entity::DATA_SCALE => [Entity::DATA_TYPE_FLOAT, 0.85],
 		];
 
 		$p[] = $pk;
@@ -158,7 +164,22 @@ class FakePlayer extends Particle {
 		return $p;
 	}
 
+	public function remove(){
+		$pk0 = new RemoveEntityPacket();
+		$pk0->entityUniqueId = $this->entityId;
+
+		Server::getInstance()->broadcastPacket(Server::getInstance()->getOnlinePlayers(), $pk0);
+	}
+
+	public function getPlayer(): Player{
+		return $this->player;
+	}
+
 	public function getLevel(): Level{
 		return $this->level;
+	}
+
+	public function getLocation(): Location{
+		return new Location($this->x, $this->y, $this->z, $this->yaw, $this->pitch, $this->level);
 	}
 }

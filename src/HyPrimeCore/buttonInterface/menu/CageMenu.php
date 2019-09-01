@@ -34,7 +34,7 @@
 namespace HyPrimeCore\buttonInterface\menu;
 
 use HyPrimeCore\player\FakePlayer;
-use larryTheCoder\cages\Cage;
+use larryTheCoder\privateLibs\cages\Cage;
 use larryTheCoder\SkyWarsPE;
 use pocketmine\Player;
 

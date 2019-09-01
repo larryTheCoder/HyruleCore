@@ -7,6 +7,9 @@ softdepends: ['PocketVote']
 depends: ['SkyWarsForPE', 'EconomyAPI']
 
 commands:
+  core:
+    description: "The core command of this plugin."
+    default: true
   cloak:
     description: "The main cloak particle command"
     default: true
@@ -29,6 +32,10 @@ commands:
     description: "Set a temporary show block"
     default: op
     permission: "admin.command"
+  trampoline:
+    description: "A trampoline gadget"
+    default: op
+    permission: "core.gadget.trampoline"
 
 permissions:
   admin.command:

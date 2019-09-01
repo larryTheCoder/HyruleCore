@@ -34,7 +34,7 @@
 namespace HyPrimeCore\utils;
 
 
-use pocketmine\level\Position;
+use pocketmine\math\Vector3;
 
 class Cuboid {
 
@@ -53,14 +53,8 @@ class Cuboid {
 	/** @var int */
 	protected $z2;
 
-	public function __construct(Position $pos1, Position $pos2){
-		if(!$pos1->getLevel() !== $pos2->getLevel()){
-			Utils::send("Locations must be on the same world");
-
-			return;
-		}
-
-		$this->level = $pos1->getLevel();
+	public function __construct(Vector3 $pos1, Vector3 $pos2, Level $level){
+		$this->level = level;
 		$this->x1 = min($pos1->getFloorX(), $pos2->getFloorX());
 		$this->y1 = min($pos1->getFloorY(), $pos2->getFloorY());
 		$this->z1 = min($pos1->getFloorZ(), $pos2->getFloorZ());

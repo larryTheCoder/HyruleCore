@@ -115,7 +115,7 @@ abstract class ParticleCloak {
 
 	public function addParticle(Particle $particle){
 		if($this->player instanceof FakePlayer){
-			$this->player->getLevel()->addParticle($particle, [$this->player->getPlayer()]);
+			return;
 		}else{
 			$this->player->getLevel()->addParticle($particle);
 		}

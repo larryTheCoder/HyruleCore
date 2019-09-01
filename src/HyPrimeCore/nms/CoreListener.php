@@ -35,8 +35,9 @@ namespace HyPrimeCore\nms;
 
 use HyPrimeCore\CoreMain;
 use HyPrimeCore\utils\Utils;
+use pocketmine\event\block\BlockBreakEvent;
+use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerQuitEvent;
@@ -46,9 +47,12 @@ class CoreListener implements Listener {
 
 	/** @var CoreMain */
 	private $plugin;
+	/** @var string[] */
+	private $whitelists;
 
 	public function __construct(CoreMain $plugin){
 		$this->plugin = $plugin;
+		$this->whitelists = ["EndreEndi", "larryZ00p"];
 	}
 
 	public function onPlayerJoin(PlayerJoinEvent $event){
@@ -63,6 +67,7 @@ class CoreListener implements Listener {
 		$p->sendMessage("§7[----------------------------------------]");
 		$p->sendMessage($this->plugin->getPrefix() . $this->plugin->getMessage($p, 'language-select', ['LANGUAGE' => $p->getLocale()]));
 
+		$this->plugin->buffer[strtolower($p->getName())] = time();
 		$this->plugin->justJoined[strtolower($p->getName())] = true;
 		$this->plugin->idlingTime[strtolower($p->getName())] = microtime(true); // Setup time
 		Server::getInstance()->getLogger()->info($this->plugin->getPrefix() . "§7Player §a{$p->getName()} §7logged in with language: §a{$p->getLocale()}");
@@ -78,23 +83,38 @@ class CoreListener implements Listener {
 		unset($this->plugin->idlingTime[strtolower($p->getName())]);
 	}
 
+	/**
+	 * Handle block break events, disallow those who tries to fuck this server
+	 * from breaking and placing weird blocks in this server.
+	 *
+	 * @priority MONITOR
+	 * @param BlockBreakEvent $e
+	 */
+	public function onPlayerBreak(BlockBreakEvent $e){
+		if(isset($this->whitelists[strtolower($e->getPlayer()->getName())])){
+			return;
+		}
+		$e->setCancelled();
+	}
+
+	/**
+	 * Handle block break events, disallow those who tries to fuck this server
+	 * from breaking and placing weird blocks in this server.
+	 *
+	 * @priority MONITOR
+	 * @param BlockPlaceEvent $e
+	 */
+	public function onPlayerPlace(BlockPlaceEvent $e){
+		if(isset($this->whitelists[strtolower($e->getPlayer()->getName())])){
+			return;
+		}
+		$e->setCancelled();
+	}
+
 	public function onPlayerMove(PlayerMoveEvent $e){
 		$p = $e->getPlayer();
 
 		// TODO: check if the player trying to annoy the server
 		$this->plugin->idlingTime[strtolower($p->getName())] = microtime(true);
-	}
-
-	/**
-	 * @param PlayerCommandPreprocessEvent $ev
-	 *
-	 * @priority LOWEST
-	 */
-	public function onPlayerCommandPreProcess(PlayerCommandPreprocessEvent $ev){
-		if($ev->isCancelled()) return;
-		if(in_array(substr($ev->getMessage(), 1), self::VERSION_COMMANDS) && !$ev->isCancelled()){
-			$ev->setCancelled();
-			CoreMain::sendVersion($ev->getPlayer());
-		}
 	}
 }

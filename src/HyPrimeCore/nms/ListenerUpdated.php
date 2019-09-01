@@ -33,9 +33,9 @@
 
 namespace HyPrimeCore\nms;
 
-use pocketmine\event\{
-	Listener, server\CommandEvent
-};
+use HyPrimeCore\CoreMain;
+use HyPrimeCore\utils\Utils;
+use pocketmine\event\{Listener, server\CommandEvent};
 
 /**
  * Latest implementation of Listener
@@ -43,6 +43,9 @@ use pocketmine\event\{
  * @package HyPrimeCore\nms
  */
 class ListenerUpdated implements Listener {
+
+	const VERSION_COMMANDS = ["version", "ver", "about"];
+
 	/**
 	 * @param CommandEvent $ev
 	 *

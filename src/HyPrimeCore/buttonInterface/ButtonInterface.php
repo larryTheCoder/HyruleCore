@@ -49,9 +49,11 @@ use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\level\Location;
 use pocketmine\level\particle\FloatingTextParticle;
 use pocketmine\Player;
+use pocketmine\scheduler\Task;
+use pocketmine\Server;
 use pocketmine\utils\Config;
 
-class ButtonInterface implements Listener {
+class ButtonInterface extends Task implements Listener {
 
 	/** @var Menu[] */
 	private $menuType = []; // Choose a menu
@@ -69,7 +71,7 @@ class ButtonInterface implements Listener {
 	private $mode;
 	/** @var FloatingTextParticle[][]|FloatingTextParticle[][][] */
 	private $textInteract = [];
-	/** @var FakePlayer */
+	/** @var FakePlayer[] */
 	private $puppet = [];
 
 	public function __construct(CoreMain $plugin){
@@ -77,12 +79,13 @@ class ButtonInterface implements Listener {
 		$this->kit = new Config($plugin->getDataFolder() . "kits.yml", Config::YAML);
 		BlockFactory::registerBlock(new ButtonStone(), true);
 		BlockFactory::registerBlock(new WoodenButton(), true);
-		$this->buttonNext = Utils::parsePosition($this->kit->getNested('interface.button-next'));
-		$this->buttonSelect = Utils::parsePosition($this->kit->getNested('interface.button-choose'));
-		$this->buttonPrev = Utils::parsePosition($this->kit->getNested('interface.button-prev'));
-		$this->buttonBack = Utils::parsePosition($this->kit->getNested('interface.button-back'));
-		$this->buttonHome = Utils::parsePosition($this->kit->getNested('interface.button-home'));
-		$this->puppetLoc = Utils::parseLocation($this->kit->getNested('interface.puppet-pos'));
+		$this->buttonNext = Utils::parsePosition($this->kit->getNested('interface.button-next', ""));
+		$this->buttonSelect = Utils::parsePosition($this->kit->getNested('interface.button-choose', ""));
+		$this->buttonPrev = Utils::parsePosition($this->kit->getNested('interface.button-prev', ""));
+		$this->buttonBack = Utils::parsePosition($this->kit->getNested('interface.button-back', ""));
+		$this->buttonHome = Utils::parsePosition($this->kit->getNested('interface.button-home', ""));
+		$this->puppetLoc = Utils::parseLocation($this->kit->getNested('interface.puppet-pos', ""));
+		$plugin->getScheduler()->scheduleRepeatingTask($this, 4);
 	}
 
 	public function setupInterface(Player $p){
@@ -173,10 +176,14 @@ class ButtonInterface implements Listener {
 	public function onPlayerJoin(PlayerJoinEvent $ev){
 		$this->menuType[$ev->getPlayer()->getName()] = null;
 		$this->currentPath[$ev->getPlayer()->getName()] = Menu::INTERACT_CLOAK_MENU;
+		if($this->puppetLoc === null){
+			return;
+		}
+
 		// NPC Point
-//        $puppet = new FakePlayer($this->puppetLoc, $ev->getPlayer(), $ev->getPlayer()->getLevel());
-//        $ev->getPlayer()->getLevel()->addParticle($puppet, [$ev->getPlayer()]);
-//        $this->puppet[$ev->getPlayer()->getName()] = $puppet;
+		$puppet = new FakePlayer($this->puppetLoc, $ev->getPlayer(), $ev->getPlayer()->getLevel());
+		$ev->getPlayer()->getLevel()->addParticle($puppet, [$ev->getPlayer()]);
+		$this->puppet[$ev->getPlayer()->getName()] = $puppet;
 		// NPC Point
 		$this->updateText($ev->getPlayer());
 	}
@@ -301,6 +308,10 @@ class ButtonInterface implements Listener {
 		}
 	}
 
+	/**
+	 * @param ButtonPushEvent $event
+	 * @priority MONITOR
+	 */
 	public function onButtonPush(ButtonPushEvent $event){
 		$p = $event->getPlayer();
 		$menu = $this->menuType[$p->getName()];
@@ -352,5 +363,25 @@ class ButtonInterface implements Listener {
 		}
 		$this->menuType[$p->getName()] = $menu;
 		$this->updateText($p);
+	}
+
+	/**
+	 * Actions to execute when run
+	 *
+	 * @param int $currentTick
+	 *
+	 * @return void
+	 */
+	public function onRun(int $currentTick){
+		foreach($this->puppet as $playerName => $puppet){
+			$p = Server::getInstance()->getPlayer($playerName);
+			if($p === null || !$p->isOnline()){
+				unset($this->puppet[$playerName]);
+				continue;
+			}
+			if($puppet->distance($p) <= 5){
+				$puppet->lookAt();
+			}
+		}
 	}
 }

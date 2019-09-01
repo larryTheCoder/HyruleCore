@@ -36,8 +36,10 @@ namespace HyPrimeCore;
 use HyPrimeCore\buttonInterface\ButtonInterface;
 use HyPrimeCore\cosmetics\gadgets\Gadget;
 use HyPrimeCore\cosmetics\gadgets\GadgetManager;
+use HyPrimeCore\dependencies\Bounty\BountyHandler;
+use HyPrimeCore\dependencies\PluginDispatch;
+use HyPrimeCore\dependencies\RegionCore\RegionDispatch;
 use HyPrimeCore\formAPI\FormAPI;
-use HyPrimeCore\kits\KitInjectionModule;
 use HyPrimeCore\nms\CoreListener;
 use HyPrimeCore\nms\CoreListenerSW;
 use HyPrimeCore\nms\ListenerLegacy;
@@ -93,6 +95,8 @@ class CoreMain extends PluginBase {
 
 	/** @var BlockTaskingManager */
 	private $task;
+	/** @var Config */
+	public $gameTimeCfg;
 
 	/**
 	 * Add bypass to player, ensure that player could kill and
@@ -164,6 +168,7 @@ class CoreMain extends PluginBase {
 		$this->registerEnchantment();
 		$this->registerScheduler();
 		$this->startModuleStartup();
+		$this->registerDependencies();
 
 		$this->formAPI = new FormAPI($this);
 		$this->panel = new Panel($this);
@@ -174,13 +179,48 @@ class CoreMain extends PluginBase {
 		$this->startListener(!is_null($inj));
 	}
 
+	public function onDisable(){
+		$this->shutdownDependencies();
+	}
+
+	/** @var PluginDispatch[] */
+	private $dependencies = [];
+
+	private function registerDependencies(){
+		/** @var PluginDispatch[] $dependencies */
+		$dependencies = [];
+		$dependencies[] = new BountyHandler();
+		$dependencies[] = new RegionDispatch();
+
+		foreach($dependencies as $pl){
+			Utils::send("Starting dependency: " . $pl->getName());
+
+			if(!is_dir($this->getDataFolder() . "/" . $pl->getName())){
+				mkdir($this->getDataFolder() . "/" . $pl->getName(), 0777);
+			}
+
+			$pl->startDependency();
+			$this->getServer()->getCommandMap()->registerAll($pl->getName(), $pl->getCommands());
+		}
+
+		$this->dependencies = $dependencies;
+	}
+
+	private function shutdownDependencies(){
+		foreach($this->dependencies as $pl){
+			Utils::send("Shutting down dependency: " . $pl->getName());
+
+			$pl->shutdownDependency();
+		}
+	}
+
 	public function startListener(bool $implementation){
 		$eventLoader = $this->getServer()->getPluginManager();
 		$eventLoader->registerEvents(new CoreListener($this), $this);
 		if($implementation){
 			$eventLoader->registerEvents(new CoreListenerSW($this), $this);
 			$this->interface = new ButtonInterface($this);
-			new KitInjectionModule($this);
+			//new KitInjectionModule($this);
 		}
 		try{
 			// Check if it a legacy, uh...
@@ -190,6 +230,7 @@ class CoreMain extends PluginBase {
 					$parameters = $method->getParameters();
 					if(count($parameters) === 0 && $method->getName() === "getScheduler"){
 						$eventLoader->registerEvents(new ListenerLegacy(), $this);
+
 						return;
 					}
 				}
@@ -199,6 +240,7 @@ class CoreMain extends PluginBase {
 		}
 		$eventLoader->registerEvents(new ListenerUpdated(), $this);
 	}
+
 	/**
 	 * This function is used to register some of the pocketmine unregistered enchantments
 	 * May not be working fine
@@ -362,8 +404,7 @@ class CoreMain extends PluginBase {
 	}
 
 	/**
-	 * Get the translation for the user.
-	 * Support client localization
+	 * Get the translation for the user. Supports client localization
 	 *
 	 * @param Player|CommandSender|null $p
 	 * @param $key
@@ -428,7 +469,7 @@ class CoreMain extends PluginBase {
 				if(!$method->isStatic()){
 					$parameters = $method->getParameters();
 					if(count($parameters) === 0 && $method->getName() === "getScheduler"){
-						return $this->getServer()->getSchedulerForce();
+						return $this->getServer()->getScheduler();
 					}
 				}
 			}

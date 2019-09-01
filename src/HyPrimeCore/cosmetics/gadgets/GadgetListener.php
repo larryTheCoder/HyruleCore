@@ -51,11 +51,9 @@ class GadgetListener implements Listener {
 		if($event->getAction() != PlayerInteractEvent::RIGHT_CLICK_AIR && $event->getAction() != PlayerInteractEvent::RIGHT_CLICK_BLOCK){
 			return;
 		}
-		if(!$player->getInventory()->getItemInHand()->hasCustomName()){
-			return;
-		}
-		if(!$player->getInventory()->getItemInHand()->getCustomName() === $this->gadget->getItem()->getCustomName() ||
-			$player->getInventory()->getItemInHand()->getId() != $this->gadget->getItem()->getId()){
+
+		if($player->getInventory()->getItemInHand()->getCustomName() !== $this->gadget->getItem()->getCustomName() ||
+			$player->getInventory()->getItemInHand()->getId() !== $this->gadget->getItem()->getId()){
 			return;
 		}
 		$data = CoreMain::get()->getPlayerData($player);

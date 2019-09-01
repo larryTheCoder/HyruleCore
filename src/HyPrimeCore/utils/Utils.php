@@ -40,6 +40,7 @@ use pocketmine\entity\Entity;
 use pocketmine\entity\Living;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
+use pocketmine\level\Level;
 use pocketmine\level\Location;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
@@ -68,7 +69,7 @@ class Utils {
 	 * @param float $range
 	 * @return Living[]
 	 */
-	public static function getNearbyLivingEntities(Position $pos, float $range): array {
+	public static function getNearbyLivingEntities(Position $pos, float $range): array{
 		$livingEntities = [];
 		foreach($pos->getLevel()->getEntities() as $entity){
 			if($entity instanceof Living && $entity->distance($pos) <= $range){
@@ -78,6 +79,7 @@ class Utils {
 
 		return $livingEntities;
 	}
+
 	public static function rotateAroundAxisY(Vector3 $v, float $angle): Vector3{
 		$cos = cos($angle);
 		$sin = sin($angle);
@@ -219,16 +221,18 @@ class Utils {
 	 * Decode a position form a string
 	 *
 	 * @param string $decodedPos
+	 * @param Level|null $level
 	 * @return null|Location
 	 */
-	public static function parseLocation(string $decodedPos): ?Location{
+	public static function parseLocation(string $decodedPos, Level $level = null): ?Location{
 		$piece = explode(":", $decodedPos);
-		if(count($piece) !== 6){
+		if(($level == null && count($piece) !== 6) || ($level != null && count($piece) !== 5)){
 			Utils::send("Attempted to decode a non-decoded-location");
 
 			return null;
 		}
-		$level = Server::getInstance()->getLevelByName($piece[5]);
+
+		if($level == null) $level = Server::getInstance()->getLevelByName($piece[5]);
 
 		return new Location($piece[0], $piece[1], $piece[2], $piece[3], $piece[4], $level);
 	}

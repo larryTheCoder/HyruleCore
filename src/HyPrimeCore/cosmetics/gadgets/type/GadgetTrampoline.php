@@ -90,7 +90,7 @@ class GadgetTrampoline extends Gadget {
 		$stair = $this->getPlayer()->getLevel()->getBlock($this->getPlayer()->add(-4, 1, 0));
 		$stair2 = $this->getPlayer()->getLevel()->getBlock($this->getPlayer()->add(-5, 0, 0));
 
-		$this->cuboid = new Cuboid(Position::fromObject($loc1, $level), Position::fromObject($loc2, $level));
+		$this->cuboid = new Cuboid($loc1, $loc2, $level);
 		if(!$this->cuboid->isEmpty() || $stair->getId() !== 0 || $stair2->getId() !== 0){
 			$this->getPlayer()->sendMessage("§cNot enough space around you or above you to use this gadget!");
 

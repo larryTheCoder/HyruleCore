@@ -35,6 +35,7 @@ namespace HyPrimeCore\cosmetics\cloaks\type;
 
 
 use HyPrimeCore\cosmetics\cloaks\ParticleCloak;
+use HyPrimeCore\player\FakePlayer;
 use pocketmine\level\particle\FlameParticle;
 use pocketmine\level\particle\Particle;
 use pocketmine\math\Vector3;
@@ -98,7 +99,14 @@ class MegaWing extends ParticleCloak {
 		}
 	}
 
-	public function spawnParticle(Player $player, Particle $particle, float $x, int $degrees, float $y){
+	/**
+	 * @param FakePlayer|Player $player
+	 * @param Particle $particle
+	 * @param float $x
+	 * @param int $degrees
+	 * @param float $y
+	 */
+	public function spawnParticle($player, Particle $particle, float $x, int $degrees, float $y){
 		$loc = clone $player->getLocation();
 		$angle = $loc->getYaw() + $degrees;
 		$yaw = $angle * 3.141592653589793 / 180.0;

@@ -1,0 +1,33 @@
+###########################################################################################
+# This is a YML file. Be careful when editing. Check your edits in a YAML checker like    #
+# the one at http://yaml-online-parser.appspot.com                                        #
+###########################################################################################
+---
+
+# Protected areas in the map
+# In this keys, you will have to write many difference user ids
+areas:
+  # The arena world.
+  world:
+    # The format of default Location class
+    # x:y:z:yaw:pitch
+    spawn-location: "0:0:0:0:0"
+    # These configs are your regions config.
+    # You can set this manually in the command parameter
+    area-min-x: 0
+    area-min-z: 0
+    area-max-x: 0
+    area-max-z: 0
+    # These are the protected areas for the player.
+    # Once this parameter bypassed. The player can't enters back if they
+    # Got into a fight with a player in less that 'min-entrance' seconds
+    protected-min-x: 0
+    protected-min-z: 0
+    protected-max-x: 0
+    protected-max-z: 0
+
+
+# This is the time that the player needs after getting hit by a player
+# to get into the safe spawn. This is the best way to avoid bad gameplay
+# By the players. (In seconds)
+min-combat-log: 15
